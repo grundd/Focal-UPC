@@ -1,0 +1,253 @@
+I-AliRoot::main: Set stack size from 7 to 8 MB
+   ------------------------------------------------------------------
+  | Welcome to ROOT 6.26/04                        https://root.cern |
+  | (c) 1995-2021, The ROOT Team; conception: R. Brun, F. Rademakers |
+  | Built for macosxarm64 on Sep 22 2022, 12:25:00                   |
+  | From tags/v6-26-04-patches-alice1@v6-26-02-71-g492a133770        |
+  | With Apple clang version 13.0.0 (clang-1300.0.29.30)             |
+  | Try '.help', '.demo', '.license', '.credits', '.quit'/'.q'       |
+   ------------------------------------------------------------------
+
+
+Processing /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/sim.C...
+>>>>> Load FOCAL libs 
+I-AliQAManager::Init: AliEn classes enabled in Root. AliCDBGrid factory registered.
+>>>>> sim.C: No align data from CDB when running FOCAL !!!!!!!!!!!!!!! 
+>>>>> SimulationConfig: NoDigitization 
+I-AliCDBManager::Init: AliEn classes enabled in Root. AliCDBGrid factory registered.
+I-AliCDBManager::SetSnapshotMode: The CDB manager is set in snapshot mode!
+ALIEN_PACKAGES and ALIEN_JDL_PACKAGES not defined
+  --> Cannot check AliPhysics version
+I-AliSimulation::SetRunQA: No QA requested
+
+I-AliSimulation::ProcessEnvironmentVars: Processing environment variables
+I-AliSimulation::ProcessEnvironmentVars: Seed for random number generation = 500076523 
+I-AliSimulation::ProcessEnvironmentVars: Run number = 294925
+I-AliSimulation::Run: fRunHLT is set to "", no attempt to extract HLT mode from GRP will be done
+W-AliSimulation::InitCDB: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+W-AliSimulation::InitCDB: Default CDB storage has been already set !
+W-AliSimulation::InitCDB: Ignoring the default storage declared in AliSimulation: 
+W-AliSimulation::InitCDB: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+I-AliCDBLocal::QueryCDB: Querying files valid for run 294925 and path "*" into CDB storage  "local:///Users/david/alice/FOCAL_analysis/local_simulations/"
+I-AliCDBLocal::QueryCDB: 0 valid files found!
+I-AliCDBManager::Print: Run number = 294925; Cache is ACTIVE; Number of active storages: 1
+	*** Default Storage URI: "local:///Users/david/alice/FOCAL_analysis/local_simulations/"
+
+I-AliSimulation::RunSimulation: initializing gAlice with config file $ALIDPG_ROOT/MC/Config.C
+     ****************************************************************
+     *                                                              *
+     *    You are running AliRoot version NewIO
+     *    The SVN version for the current program is $Id$
+     *                                                              *
+     ****************************************************************
+I-AliCDBManager::Get: Object "GRP/GRP/Data" retrieved from the snapshot.
+I-AliGRPManager::ReadGRPEntry: Found an AliGRPObject in GRP/GRP/Data, reading it
+I-AliMagF::Print: MagneticFieldMap:L3: +30000 Dip: +5999 kA;  | Polarities in LHC convention
+I-AliMagF::Print: Solenoid (+1.00*)5 kG, Dipole ON (+1.00) 
+I-AliMagF::Print: Machine B fields for p-p beam (6499 GeV): QGrad: 20.4256 Dipole: 35.1671
+I-AliMagF::Print: Uses Sol30_Dip6_Hole of $(ALICE_ROOT)/data/maps/mfchebKGI_sym.root
+I-TGeoGlobalMagField::SetField: Global magnetic field set to <MagneticFieldMap>
+I-TGeoGlobalMagField::Lock: Global magnetic field <MagneticFieldMap> is now locked
+I-AliGRPManager::SetMagField: Running with the B field constructed out of GRP !
+I-AliSimulation::RunSimulation: Field is locked now. It cannot be changed in Config.C
+In file included from G__TEvtGen dictionary payload:17:
+/Users/david/alice/sw/osx_arm64/AliRoot/0_O2-local1/include/AliDecayerEvtGen.h:57:16: error: redefinition of 'kconv'
+const Double_t kconv=0.001/2.999792458e8;
+               ^
+/Users/david/alice/sw/osx_arm64/AliRoot/0_O2-local1/include/AliDecayerSLEvtGen.h:58:16: note: previous definition is here
+const Double_t kconv=0.001/2.999792458e8;
+               ^
+E-TInterpreter::AutoParse: Error parsing payload code for class AliGenEvtGen with content:
+
+#line 1 "G__TEvtGen dictionary payload"
+
+#ifndef _MODULE_
+  #define _MODULE_ "TEvtGen"
+#endif
+#ifndef ZMQ
+  #define ZMQ 1
+#endif
+#ifndef WITHXML
+  #define WITHXML 1
+#endif
+#ifndef WITHALIEN
+  #define WITHALIEN 1
+#endif
+
+#define _BACKWARD_BACKWARD_WARNING_H
+// Inline headers
+#include "AliDecayerEvtGen.h"
+#include "AliGenEvtGen.h"
+
+#undef  _BACKWARD_BACKWARD_WARNING_H
+
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1714:28: error: allocation of incomplete type 'AliGenEvtGen'
+  AliGenEvtGen *gene = new AliGenEvtGen();
+                           ^~~~~~~~~~~~
+G__TEvtGen dictionary forward declarations' payload:6:148: note: forward declaration of 'AliGenEvtGen'
+class __attribute__((annotate(R"ATTRDUMP(AliGenerator interface to EvtGen)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$AliGenEvtGen.h")))  AliGenEvtGen;
+                                                                                                                                                   ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1715:7: error: member access into incomplete type 'AliGenEvtGen'
+  gene->SetUserDecayTable(gSystem->ExpandPathName("$ALIDPG_ROOT/MC/CustomDecayTables/JPSIETACTOPROT.DEC"));
+      ^
+G__TEvtGen dictionary forward declarations' payload:6:148: note: forward declaration of 'AliGenEvtGen'
+class __attribute__((annotate(R"ATTRDUMP(AliGenerator interface to EvtGen)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$AliGenEvtGen.h")))  AliGenEvtGen;
+                                                                                                                                                   ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1716:7: error: member access into incomplete type 'AliGenEvtGen'
+  gene->SetParticleSwitchedOff(AliGenEvtGen::kCharmPart);
+      ^
+G__TEvtGen dictionary forward declarations' payload:6:148: note: forward declaration of 'AliGenEvtGen'
+class __attribute__((annotate(R"ATTRDUMP(AliGenerator interface to EvtGen)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$AliGenEvtGen.h")))  AliGenEvtGen;
+                                                                                                                                                   ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1720:23: error: cannot initialize a parameter of type 'AliGenerator *' with an lvalue of type 'AliGenEvtGen *'
+  gener->AddGenerator(gene, "EvtGen", 1.);
+                      ^~~~
+/Users/david/alice/sw/osx_arm64/AliRoot/0_O2-local1/include/AliGenCocktail.h:39:22: note: passing argument to parameter 'Generator' here
+      (AliGenerator *Generator, const char* Name, Float_t RateExp, TFormula* formula = 0, Int_t ntimes = 1);
+                     ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1777:27: error: allocation of incomplete type 'AliGenEvtGen'
+        AliGenEvtGen *gene = new AliGenEvtGen();
+                                 ^~~~~~~~~~~~
+G__TEvtGen dictionary forward declarations' payload:6:148: note: forward declaration of 'AliGenEvtGen'
+class __attribute__((annotate(R"ATTRDUMP(AliGenerator interface to EvtGen)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$AliGenEvtGen.h")))  AliGenEvtGen;
+                                                                                                                                                   ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1778:13: error: member access into incomplete type 'AliGenEvtGen'
+        gene->SetUserDecayTable(gSystem->ExpandPathName("$ALIDPG_ROOT/MC/CustomDecayTables/BTOJPSITOLLBAR.DEC"));
+            ^
+G__TEvtGen dictionary forward declarations' payload:6:148: note: forward declaration of 'AliGenEvtGen'
+class __attribute__((annotate(R"ATTRDUMP(AliGenerator interface to EvtGen)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$AliGenEvtGen.h")))  AliGenEvtGen;
+                                                                                                                                                   ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1780:26: error: member access into incomplete type 'AliGenEvtGen'
+        if(useEvtGenForB) gene->SetParticleSwitchedOff(AliGenEvtGen::kHFPart);
+                              ^
+G__TEvtGen dictionary forward declarations' payload:6:148: note: forward declaration of 'AliGenEvtGen'
+class __attribute__((annotate(R"ATTRDUMP(AliGenerator interface to EvtGen)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$AliGenEvtGen.h")))  AliGenEvtGen;
+                                                                                                                                                   ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1781:13: error: member access into incomplete type 'AliGenEvtGen'
+        else gene->SetParticleSwitchedOff(AliGenEvtGen::kCharmPart);
+                 ^
+G__TEvtGen dictionary forward declarations' payload:6:148: note: forward declaration of 'AliGenEvtGen'
+class __attribute__((annotate(R"ATTRDUMP(AliGenerator interface to EvtGen)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$AliGenEvtGen.h")))  AliGenEvtGen;
+                                                                                                                                                   ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1785:24: error: cannot initialize a parameter of type 'AliGenerator *' with an lvalue of type 'AliGenEvtGen *'
+        gener->AddGenerator(gene, "EvtGen", 1.);
+                            ^~~~
+/Users/david/alice/sw/osx_arm64/AliRoot/0_O2-local1/include/AliGenCocktail.h:39:22: note: passing argument to parameter 'Generator' here
+      (AliGenerator *Generator, const char* Name, Float_t RateExp, TFormula* formula = 0, Int_t ntimes = 1);
+                     ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1877:28: error: allocation of incomplete type 'AliGenEvtGen'
+  AliGenEvtGen *gene = new AliGenEvtGen();
+                           ^~~~~~~~~~~~
+G__TEvtGen dictionary forward declarations' payload:6:148: note: forward declaration of 'AliGenEvtGen'
+class __attribute__((annotate(R"ATTRDUMP(AliGenerator interface to EvtGen)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$AliGenEvtGen.h")))  AliGenEvtGen;
+                                                                                                                                                   ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1878:7: error: member access into incomplete type 'AliGenEvtGen'
+  gene->SetForceDecay(kBJpsiDiElectron);
+      ^
+G__TEvtGen dictionary forward declarations' payload:6:148: note: forward declaration of 'AliGenEvtGen'
+class __attribute__((annotate(R"ATTRDUMP(AliGenerator interface to EvtGen)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$AliGenEvtGen.h")))  AliGenEvtGen;
+                                                                                                                                                   ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1879:25: error: member access into incomplete type 'AliGenEvtGen'
+  if(useEvtGenForB) gene->SetParticleSwitchedOff(AliGenEvtGen::kHFPart);
+                        ^
+G__TEvtGen dictionary forward declarations' payload:6:148: note: forward declaration of 'AliGenEvtGen'
+class __attribute__((annotate(R"ATTRDUMP(AliGenerator interface to EvtGen)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$AliGenEvtGen.h")))  AliGenEvtGen;
+                                                                                                                                                   ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1880:12: error: member access into incomplete type 'AliGenEvtGen'
+  else gene->SetParticleSwitchedOff(AliGenEvtGen::kCharmPart);
+           ^
+G__TEvtGen dictionary forward declarations' payload:6:148: note: forward declaration of 'AliGenEvtGen'
+class __attribute__((annotate(R"ATTRDUMP(AliGenerator interface to EvtGen)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$AliGenEvtGen.h")))  AliGenEvtGen;
+                                                                                                                                                   ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1886:23: error: cannot initialize a parameter of type 'AliGenerator *' with an lvalue of type 'AliGenEvtGen *'
+  gener->AddGenerator(gene, "EvtGen", 1.);
+                      ^~~~
+/Users/david/alice/sw/osx_arm64/AliRoot/0_O2-local1/include/AliGenCocktail.h:39:22: note: passing argument to parameter 'Generator' here
+      (AliGenerator *Generator, const char* Name, Float_t RateExp, TFormula* formula = 0, Int_t ntimes = 1);
+                     ^
+In file included from input_line_105:1:
+In file included from /Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:52:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1991:3: error: unknown type name 'AliGenQEDBg'
+  AliGenQEDBg *genBg = new AliGenQEDBg();
+  ^
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/GeneratorConfig.C:1991:28: error: unknown type name 'AliGenQEDBg'
+  AliGenQEDBg *genBg = new AliGenQEDBg();
+                           ^
+E-TInterpreter::AutoParse: Error parsing payload code for class TGeant3TGeo with content:
+
+#line 1 "libgeant321 dictionary payload"
+
+
+#define _BACKWARD_BACKWARD_WARNING_H
+// Inline headers
+#include "TCallf77.h"
+#include "TG3Application.h"
+#include "TGeant3f77.h"
+#include "TGeant3gu.h"
+#include "TGeant3.h"
+#include "TGeant3TGeo.h"
+
+#undef  _BACKWARD_BACKWARD_WARNING_H
+
+In file included from input_line_105:1:
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local2/MC/Config.C:122:34: error: allocation of incomplete type 'TGeant3TGeo'
+  if (!isGeant4 && !isFluka) new TGeant3TGeo("C++ Interface to Geant3");
+                                 ^~~~~~~~~~~
+libgeant321 dictionary forward declarations' payload:8:176: note: forward declaration of 'TGeant3TGeo'
+class __attribute__((annotate(R"ATTRDUMP(C++ interface to Geant basic routines with the TGeo interface)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$TGeant3TGeo.h")))  TGeant3TGeo;
+                                                                                                                                                                               ^
+input_line_159:2:3: error: use of undeclared identifier 'Config'
+ (Config())
+  ^
+
+ *** Break *** segmentation violation
+I-AliCDBManager::Get: Object "GRP/Calib/MeanVertex" retrieved from the snapshot.
+I-AliSimulation::RunSimulation: Overwriting Config.C vertex settings !
+I-AliSimulation::RunSimulation: Vertex mean position from OCDB entry (GRP/Calib/MeanVertex): x =         0.068, y =         0.368, z =         0.416
+[/usr/lib/system/libsystem_platform.dylib] _sigtramp (no debug info)
+[/Users/david/alice/sw/osx_arm64/AliRoot/0_O2-local1/lib/libSTEER.so] AliSimulation::RunSimulation(int) (no debug info)
+[/Users/david/alice/sw/osx_arm64/AliRoot/0_O2-local1/lib/libSTEER.so] AliSimulation::Run(int) (no debug info)
+[<unknown binary>] (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::IncrementalExecutor::executeWrapper(llvm::StringRef, cling::Value*) const (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::Interpreter::RunFunction(clang::FunctionDecl const*, cling::Value*) (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::Interpreter::EvaluateInternal(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, cling::CompilationOptions, cling::Value*, cling::Transaction**, unsigned long) (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::MetaSema::actOnxCommand(llvm::StringRef, llvm::StringRef, cling::Value*) (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::MetaParser::isXCommand(cling::MetaSema::ActionResult&, cling::Value*) (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::MetaParser::isCommand(cling::MetaSema::ActionResult&, cling::Value*) (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::MetaProcessor::process(llvm::StringRef, cling::Interpreter::CompilationResult&, cling::Value*, bool) (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] HandleInterpreterException(cling::MetaProcessor*, char const*, cling::Interpreter::CompilationResult&, cling::Value*) (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] TCling::ProcessLine(char const*, TInterpreter::EErrorCode*) (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] TCling::ProcessLineSynch(char const*, TInterpreter::EErrorCode*) (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCore.6.26.04.so] TApplication::ExecuteFile(char const*, int*, bool) (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libRint.6.26.04.so] TRint::ProcessLineNr(char const*, char const*, int*) (no debug info)
+[/Users/david/alice/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libRint.6.26.04.so] TRint::Run(bool) (no debug info)
+[/Users/david/alice/sw/osx_arm64/AliRoot/0_O2-local1/bin/aliroot] main (no debug info)
+[/usr/lib/dyld] start (no debug info)

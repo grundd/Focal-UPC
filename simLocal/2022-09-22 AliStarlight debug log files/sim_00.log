@@ -1,0 +1,671 @@
+I-AliRoot::main: Set stack size from 7 to 8 MB
+   ------------------------------------------------------------------
+  | Welcome to ROOT 6.26/04                        https://root.cern |
+  | (c) 1995-2021, The ROOT Team; conception: R. Brun, F. Rademakers |
+  | Built for macosxarm64 on Sep 05 2022, 15:45:00                   |
+  | From tags/v6-26-04-patches-alice1@v6-26-02-71-g492a133770        |
+  | With Apple clang version 13.0.0 (clang-1300.0.29.30)             |
+  | Try '.help', '.demo', '.license', '.credits', '.quit'/'.q'       |
+   ------------------------------------------------------------------
+
+
+Processing /Users/david/alice_new/sw/osx_arm64/AliDPG/master-local6/MC/sim.C...
+>>>>> Load FOCAL libs 
+I-AliQAManager::Init: AliEn classes enabled in Root. AliCDBGrid factory registered.
+>>>>> sim.C: No align data from CDB when running FOCAL !!!!!!!!!!!!!!! 
+>>>>> SimulationConfig: NoDigitization 
+I-AliCDBManager::Init: AliEn classes enabled in Root. AliCDBGrid factory registered.
+I-AliCDBManager::SetSnapshotMode: The CDB manager is set in snapshot mode!
+ALIEN_PACKAGES and ALIEN_JDL_PACKAGES not defined
+  --> Cannot check AliPhysics version
+I-AliSimulation::SetRunQA: No QA requested
+
+I-AliSimulation::ProcessEnvironmentVars: Processing environment variables
+I-AliSimulation::ProcessEnvironmentVars: Seed for random number generation = 500076523 
+I-AliSimulation::ProcessEnvironmentVars: Run number = 294925
+I-AliSimulation::Run: fRunHLT is set to "", no attempt to extract HLT mode from GRP will be done
+W-AliSimulation::InitCDB: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+W-AliSimulation::InitCDB: Default CDB storage has been already set !
+W-AliSimulation::InitCDB: Ignoring the default storage declared in AliSimulation: 
+W-AliSimulation::InitCDB: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+I-AliCDBLocal::QueryCDB: Querying files valid for run 294925 and path "*" into CDB storage  "local:///Users/david/alice_new/simulations AliDPG/"
+I-AliCDBLocal::QueryCDB: 0 valid files found!
+I-AliCDBManager::Print: Run number = 294925; Cache is ACTIVE; Number of active storages: 1
+	*** Default Storage URI: "local:///Users/david/alice_new/simulations AliDPG/"
+
+I-AliSimulation::RunSimulation: initializing gAlice with config file $ALIDPG_ROOT/MC/Config.C
+     ****************************************************************
+     *                                                              *
+     *    You are running AliRoot version NewIO
+     *    The SVN version for the current program is $Id$
+     *                                                              *
+     ****************************************************************
+I-AliCDBManager::Get: Object "GRP/GRP/Data" retrieved from the snapshot.
+I-AliGRPManager::ReadGRPEntry: Found an AliGRPObject in GRP/GRP/Data, reading it
+I-AliMagF::Print: MagneticFieldMap:L3: +30000 Dip: +5999 kA;  | Polarities in LHC convention
+I-AliMagF::Print: Solenoid (+1.00*)5 kG, Dipole ON (+1.00) 
+I-AliMagF::Print: Machine B fields for p-p beam (6499 GeV): QGrad: 20.4256 Dipole: 35.1671
+I-AliMagF::Print: Uses Sol30_Dip6_Hole of $(ALICE_ROOT)/data/maps/mfchebKGI_sym.root
+I-TGeoGlobalMagField::SetField: Global magnetic field set to <MagneticFieldMap>
+I-TGeoGlobalMagField::Lock: Global magnetic field <MagneticFieldMap> is now locked
+I-AliGRPManager::SetMagField: Running with the B field constructed out of GRP !
+I-AliSimulation::RunSimulation: Field is locked now. It cannot be changed in Config.C
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>       run number: 294925 
+>>>>> number of events: 10 
+>>>>>   magnetic field: Default 
+>>>>>         detector: FOCAL 
+>>>>>     MC generator: Starlight 
+>>>>>          process: kCohJpsiToEl 
+>>>>>           system: Pb-Pb 
+>>>>>       CMS energy: 5500.000000 
+>>>>>          trigger: Pb-Pb 
+>>>>>              PDG: 0 
+>>>>>            b-min: 0.000000 
+>>>>>            b-max: 20.000000 
+>>>>>  ptHardMinHijing: 2.900000 
+>>>>>            y-min: 3.400000 
+>>>>>            y-max: 6.000000 
+>>>>>   phi-min (deg.): 0.000000 
+>>>>>   phi-max (deg.): 360.000000 
+>>>>>           pt-min: 0.000000 
+>>>>>           pt-max: -1.000000 
+>>>>>      pt-hard min: 0.000000 
+>>>>>      pt-hard max: -1.000000 
+>>>>>   pt-trigger min: 0.000000 
+>>>>>   pt-trigger max: -1.000000 
+>>>>>        quenching: 0 
+>>>>>            q-hat: 1.700000 
+>>>>>   crossing angle: 0.000000 
+>>>>>      random seed: 500076523 
+>>>>>           geant4: 0 
+>>>>>       g4PhysList:  
+>>>>>       purifyKine: 1 
+>>>>>            fluka: 0 
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+=============================================================
+ Virtual Monte Carlo Library
+ Version 2.0 ( 10 February 2022 )
+=============================================================
+
+=============================================================
+ Geant3 Virtual Monte Carlo 
+ Version 4.1 ( 17 March 2022 )
+ WWW : https://vmc-project.github.io/
+=============================================================
+
+Config.C: Creating Run Loader ...
+>>>>> DetectorConfig: FOCAL 
+I-AliCDBManager::Get: Object "TPC/Calib/Parameters" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "GRP/GRP/Data" retrieved from the snapshot.
+I-AliTPCcalibDB::Update: Run-specific EventSpecie set to LowMultiplicity
+I-AliCDBManager::Get: Object "TPC/Calib/PadGainFactor" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/TimeGain" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/GainFactorDedx" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/PadTime0" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/Distortion" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/PadNoise" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/Pedestals" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/Temperature" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/ClusterParam" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/RecoParam" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/GasComposition" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/AltroConfig" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/Pulser" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/IonTail" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/CE" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/Mapping" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "GRP/CTP/CTPtiming" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/Correction" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/Goofie" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/TimeDrift" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/HighVoltage" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/Raw" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/QA" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "GRP/CTP/Scalers" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "GRP/CTP/Config" retrieved from the snapshot.
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMapsRef" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 2 times>
+I-AliTPCTransform::LoadFieldDependendStaticCorrectionMap: Loaded reference correction map
+run294128_1538948050_1538949142:run294128_1538948050_1538949142 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294128 Time span: 0:4294967295 TimeDependent flag: OFF Field type: B>0 LumiInfo: +293.44
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMapsRef" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 2 times>
+I-AliTPCTransform::LoadFieldDependendStaticCorrectionMap: Loaded reference correction map
+run294128_1538948050_1538949142:run294128_1538948050_1538949142 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294128 Time span: 0:4294967295 TimeDependent flag: OFF Field type: B>0 LumiInfo: +293.44
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540326700
+run294925_1540325830_1540327571:run294925_1540325830_1540327571 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540325830:1540327571 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3497.57
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3497.5706 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Loading Lumi graph for current run
+I-AliCDBManager::Get: Object "GRP/CTP/LumiRef" retrieved from the snapshot.
+I-AliLumiTools::GetLumiFromCTP: Getting CTP lumi for run:294925 | using refClass: C0TVX-B-NOPF-CENTNOTRD, refSigma: 3.000000e+01
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 1.021 will be used for time 1540326700 (Lumi: current: 3.57e+03 COG:3.50e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540326700
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540328441
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540328441
+run294925_1540327571_1540329312:run294925_1540327571_1540329312 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540327571:1540329312 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3544.33
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3544.3267 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 0.993 will be used for time 1540328441 (Lumi: current: 3.52e+03 COG:3.54e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540330183
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540330183
+run294925_1540329312_1540331054:run294925_1540329312_1540331054 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540329312:1540331054 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3436.46
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3436.4568 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 0.973 will be used for time 1540330183 (Lumi: current: 3.34e+03 COG:3.44e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540331924
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540331924
+run294925_1540331054_1540332795:run294925_1540331054_1540332795 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540331054:1540332795 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3519.58
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3519.5840 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 1.007 will be used for time 1540331924 (Lumi: current: 3.54e+03 COG:3.52e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540333665
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540333665
+run294925_1540332795_1540334536:run294925_1540332795_1540334536 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540332795:1540334536 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3489.96
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3489.9648 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 1.010 will be used for time 1540333665 (Lumi: current: 3.53e+03 COG:3.49e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540335407
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540335407
+run294925_1540334536_1540336278:run294925_1540334536_1540336278 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540334536:1540336278 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3371.48
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3371.4788 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 1.022 will be used for time 1540335407 (Lumi: current: 3.45e+03 COG:3.37e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540337148
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540337148
+run294925_1540336278_1540338019:run294925_1540336278_1540338019 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540336278:1540338019 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3439.98
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3439.9771 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 1.016 will be used for time 1540337148 (Lumi: current: 3.50e+03 COG:3.44e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540338890
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540338890
+run294925_1540338019_1540339761:run294925_1540338019_1540339761 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540338019:1540339761 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3505.18
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3505.1841 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 1.000 will be used for time 1540338890 (Lumi: current: 3.50e+03 COG:3.51e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540340631
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540340631
+run294925_1540339761_1540341502:run294925_1540339761_1540341502 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540339761:1540341502 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3450.38
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3450.3843 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 1.004 will be used for time 1540340631 (Lumi: current: 3.47e+03 COG:3.45e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540342372
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540342372
+run294925_1540341502_1540343243:run294925_1540341502_1540343243 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540341502:1540343243 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3487.38
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3487.3762 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 1.012 will be used for time 1540342372 (Lumi: current: 3.53e+03 COG:3.49e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540344114
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540344114
+run294925_1540343243_1540344985:run294925_1540343243_1540344985 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540343243:1540344985 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3474.11
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3474.1118 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 0.999 will be used for time 1540344114 (Lumi: current: 3.47e+03 COG:3.47e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540345855
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540345855
+run294925_1540344985_1540346726:run294925_1540344985_1540346726 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540344985:1540346726 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3383.22
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3383.2229 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 1.015 will be used for time 1540345855 (Lumi: current: 3.44e+03 COG:3.38e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540347596
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540347596
+run294925_1540346726_1540348467:run294925_1540346726_1540348467 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540346726:1540348467 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3441.04
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3441.0420 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 1.006 will be used for time 1540347596 (Lumi: current: 3.46e+03 COG:3.44e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540349338
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540349338
+run294925_1540348467_1540350209:run294925_1540348467_1540350209 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540348467:1540350209 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3421.78
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3421.7803 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 0.993 will be used for time 1540349338 (Lumi: current: 3.40e+03 COG:3.42e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540351079
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540351079
+run294925_1540350209_1540351950:run294925_1540350209_1540351950 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540350209:1540351950 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3508.94
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3508.9431 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 1.015 will be used for time 1540351079 (Lumi: current: 3.56e+03 COG:3.51e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: Querying maps at time 1540352821
+I-AliCDBManager::Get: Object "TPC/Calib/CorrectionMaps" retrieved from the snapshot.
+I-AliTPCChebCorr::Init: Doing on-the-fly initialization
+ <message repeated 15 times>
+I-AliTPCTransform::LoadCorrectionMapsForTimeBin: Loaded 1 correction map(s) for time stamp 1540352821
+run294925_1540351950_1540353692:run294925_1540351950_1540353692 Cheb2D[S] Param: 2 slices in -1.0<Z/R<+1.0 1 per sector. DeadZone: 1.5cm
+Run used: 294925 Time span: 1540351950:1540353692 TimeDependent flag: ON  Field type: B>0 LumiInfo: +3528.14
+I-AliTPCTransform::UpdateTimeDependentCache: Threshold of Dist.Disp. wrt reference to consider fluctuation: 3.000000e-02
+
+I-AliTPCTransform::UpdateTimeDependentCache: Lumi COG=3528.1409 is provided in the correction map
+I-AliTPCTransform::UpdateTimeDependentCache: Luminosity scaling factor 0.993 will be used for time 1540352821 (Lumi: current: 3.50e+03 COG:3.53e+03)
+I-AliTPCcalibDB::GetMaskedChannelsFromCorrectionMaps: masked 2 pads (0 full padrows, 2 individual pads)
+I-AliTPCTransform::ResetCache: Reseting Transform in view of possible RecoParam modification
+I-AliTPCcalibDB::InitDeadMap: Deactivated  100 channels in ROC  0 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   96 channels in ROC  1 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  107 channels in ROC  2 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  131 channels in ROC  3 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  101 channels in ROC  4 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  101 channels in ROC  5 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   82 channels in ROC  6 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   92 channels in ROC  7 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  103 channels in ROC  8 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  189 channels in ROC  9 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  138 channels in ROC 10 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  133 channels in ROC 11 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  145 channels in ROC 12 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  358 channels in ROC 13 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  143 channels in ROC 14 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  125 channels in ROC 15 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  187 channels in ROC 16 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  120 channels in ROC 17 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   73 channels in ROC 18 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   75 channels in ROC 19 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  111 channels in ROC 20 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   89 channels in ROC 21 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   92 channels in ROC 22 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   92 channels in ROC 23 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   72 channels in ROC 24 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   98 channels in ROC 25 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  106 channels in ROC 26 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   77 channels in ROC 27 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  279 channels in ROC 28 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   81 channels in ROC 29 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  389 channels in ROC 30 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  169 channels in ROC 31 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   66 channels in ROC 32 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  172 channels in ROC 33 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   95 channels in ROC 34 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  247 channels in ROC 35 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   80 channels in ROC 36 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   27 channels in ROC 37 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   59 channels in ROC 38 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   10 channels in ROC 39 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   75 channels in ROC 40 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   22 channels in ROC 41 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   37 channels in ROC 42 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   98 channels in ROC 43 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   62 channels in ROC 44 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  147 channels in ROC 45 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  116 channels in ROC 46 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   27 channels in ROC 47 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   66 channels in ROC 48 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   95 channels in ROC 49 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  386 channels in ROC 50 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  504 channels in ROC 51 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  115 channels in ROC 52 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   75 channels in ROC 53 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   37 channels in ROC 54 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   34 channels in ROC 55 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   52 channels in ROC 56 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   54 channels in ROC 57 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   27 channels in ROC 58 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   31 channels in ROC 59 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   42 channels in ROC 60 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   55 channels in ROC 61 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   50 channels in ROC 62 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  209 channels in ROC 63 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated  776 channels in ROC 64 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   84 channels in ROC 65 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   72 channels in ROC 66 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   44 channels in ROC 67 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   38 channels in ROC 68 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   74 channels in ROC 69 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   36 channels in ROC 70 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitDeadMap: Deactivated   29 channels in ROC 71 due to altro and DDL map states as well as chamber status and correction map
+I-AliTPCcalibDB::InitAltroData: fMaxTimeBinAllPads set to 1023
+I-AliTPC::AliTPC: Time-dependent distortions requested: enforce generation of timeStamp according to CDB
+I-AliCDBManager::Get: Object "MUON/Calib/MappingData" retrieved from the snapshot.
+*** PHOS time resolution off
+AliEMCALGeometry::GetInstanceFromRunNumber() - Initialized geometry with name <<EMCAL_COMPLETE12SMV1_DCAL_8SM>>
+I-AliEMCALGeometry::AliEMCALGeometry: Name <<EMCAL_COMPLETE12SMV1_DCAL_8SM>>
+I-AliEMCALGeometry::AliEMCALGeometry: EMCAL Trigger Mapping Version V2 Enabled
+I-AliEMCALv2::AliEMCALv2: Very good, V2 version is used!
+ AliFOCALv2::AliFOCALv2 
+I-AliFOCALv2.cxx::AliFOCALv2(char *name, char *title): FoCAL geometry is configured by geometry.txt
+Create instance : Using geometry configured by geometry.txt
+ Geometry init for FoCAL from geometry.txt
+ Use Geometryfile geometry.txt
+ start loading geometry file 
+# Volume Name            Material     C-X   C-Y    X      Y       Z  
+Skipping comment
+  COMPOSITION_PAD_S0       PureW       0     0     9.     8.      0.35 
+COMPOSITION_PAD_S0
+  COMPOSITION_PAD_S1       G10         0     0     9.     8.      0.05 
+COMPOSITION_PAD_S1
+  COMPOSITION_PAD_S2       SiPad       0     0     9.     8.      0.05 
+COMPOSITION_PAD_S2
+  COMPOSITION_PAD_S3       G10         0     0     9.     8.      0.05 
+COMPOSITION_PAD_S3
+  COMPOSITION_PAD_S4       Cu          0     0     9.     8.      0.01 
+COMPOSITION_PAD_S4
+  COMPOSITION_PAD_S5       Air         0     0     9.     8.      0.5 
+COMPOSITION_PAD_S5
+  # Replica of above pad layers to 50 layers 
+Skipping comment
+  COMMAND_NUMBER_OF_PAD_LAYERS 18 
+ number of pad layers 18
+# HCAL layers 
+Skipping comment
+# Volume Name              Material     C-X   C-Y     X       Y        Z  
+Skipping comment
+  COMPOSITION_HCAL_S0       Pb           0     0     2.5     2.5      3.0 
+COMPOSITION_HCAL_S0
+  COMPOSITION_HCAL_S1       Scint        0     0     2.5     2.5      0.2 
+COMPOSITION_HCAL_S1
+  COMMAND_NUMBER_OF_HCAL_LAYERS 34 
+ Number of HCAL layers 34
+  COMMAND_NUMBER_OF_SEGMENTS 54 
+ Number of Segments 54
+# Strip sectors  
+Skipping comment
+# Volume Name             Material    C-X   C-Y     X       Y         Z 
+Skipping comment
+  COMPOSITION_PIX_S0       PureW       0     0     3.0     2.74      0.35 
+  COMPOSITION_PIX_S1       G10         0     0     3.0     2.74      0.05 
+  COMPOSITION_PIX_S2       Si          0     0     3.0     2.74      0.047 
+  COMPOSITION_PIX_S3       SiPix       0     0     3.0     2.74      0.003 
+  COMPOSITION_PIX_S4       G10         0     0     3.0     2.74      0.05 
+  COMPOSITION_PIX_S5       Cu          0     0     3.0     2.74      0.01 
+  COMPOSITION_PIX_S6       Air         0     0     3.0     2.74      0.05 
+COMMAND_INSERT_PIX_AT_L4  
+ number of pixel layer 0 : location 4
+COMMAND_INSERT_PIX_AT_L9  
+ number of pixel layer 1 : location 9
+# COMMAND_INSERT_STR_AT_L4 
+Skipping comment
+# COMMAND_INSERT_STR_AT_L6 
+Skipping comment
+# COMMAND_INSERT_STR_AT_L8 
+Skipping comment
+#Front Matter definition 
+Skipping comment
+  COMPOSITION_FM_S0        G10         0     0     5.    5.      0.01 
+COMPOSITION_FM_S0 G10 0 
+  COMPOSITION_FM_S1        SiStripX    0     0     5.    5.      0.05 
+COMPOSITION_FM_S1 SiStripX 1 
+  COMPOSITION_FM_S2        G10         0     0     5.    5.      0.05 
+COMPOSITION_FM_S2 G10 2 
+  COMPOSITION_FM_S3        Air         0     0     5.    5.      0.01 
+COMPOSITION_FM_S3 Air 3 
+  COMPOSITION_FM_S4        G10         0     0     5.    5.      0.01 
+COMPOSITION_FM_S4 G10 4 
+  COMPOSITION_FM_S5        SiStripY    0     0     5.    5.      0.05 
+COMPOSITION_FM_S5 SiStripY 5 
+  COMPOSITION_FM_S6        G10         0     0     5.    5.      0.05 
+COMPOSITION_FM_S6 G10 6 
+# PIXEL readout 
+Skipping comment
+  GLOBAL_PIX_NX                  15 
+  GLOBAL_PIX_NY                  3 
+  GLOBAL_PIX_OffsetX             1.2 
+ Pixel offset from the beam pipe will be: 1.2
+  GLOBAL_PIX_OffsetY             0.09 
+ Pixel offset from the top of tower will be: 0.09
+  GLOBAL_PIX_SKIN                0.004 
+ Pad-Edge distance is set to : 0.004
+#  pxel size in cm 
+Skipping comment
+  COMMAND_PIXEL_READOUT_ON       0.005 
+ Pixel readout on (for MASPS): pixel size is set to : 0.005
+# Pad information 
+Skipping comment
+  GLOBAL_PAD_SIZE_X_Y            1 
+ Pad Size is set to : 1
+  GLOBAL_PAD_NX_NY               8 
+ N * N Pads is defined as : 8
+  GLOBAL_PAD_NX                  9 
+ N * N Pads is defined as : 9
+  GLOBAL_PAD_NY                  8 
+ N * N Pads is defined as : 8
+  GLOBAL_PAD_PPTOL               0. 
+ Pad-Pad distance is set to : 0
+  GLOBAL_PAD_SKIN                0.2 
+ Pad-Edge distance is set to : 0.2
+# Global information (TOL:1cm of T-T space filled with "AIR") 
+Skipping comment
+  GLOBAL_PAD_SUPERMODULE_X 5 
+ Number of Pads in x direction is set to : 5
+  GLOBAL_PAD_SUPERMODULE_Y 1 
+ Number of Pads in y direction is set to : 1
+  GLOBAL_SUPERMODULE_TOLX 0. Air 
+  GLOBAL_SUPERMODULE_TOLY 0. Air 
+  GLOBAL_TOWER_TOL        0.    Air 
+  GLOBAL_TOWER_TOLX       0.02  Air 
+ Tower-Tower Gap is set to : 0.02 Material : Air
+  GLOBAL_TOWER_TOLY       0.5   PureW 
+ Tower-Tower Gap is set to : 0.5 Material : PureW
+  GLOBAL_FOCAL_Z          764.05 
+ Z-Location of the FoCAL is set to : 764.05
+  GLOBAL_Tower_NX      2 
+ Number of Towers of FOCAL in x direction is set to : 2
+  GLOBAL_Tower_NY      11 
+ Number of Towers of FOCALin y direction is set to : 11
+  GLOBAL_MIDDLE_TOWER_OFFSET 5  
+ Middle tower offset will be: 5
+  GLOBAL_NSTRIPS	        128 
+  GLOBAL_STRIPSIZE_LONG   9.0 
+  GLOBAL_STRIPSIZE_WIDTH  0.07 
+  GLOBAL_HCAL_TOWER_SIZE  2.5 
+ The size of the HCAL readout tower will be : 2.5
+# New VIRTUAL settings 
+Skipping comment
+  VIRTUAL_N_SEGMENTS      7 
+ Number of Virtual Segments is set to : 7
+  #                            N   Start End   PadSize  RelThickness  IsPixel    PixelTreshold [eV] 
+Skipping comment
+  #                                Layer Layer 
+Skipping comment
+  VIRTUAL_SEGMENT_LAYOUT_N0       0    3           1.0           1.0       0                  400000 
+Making 7 segments
+Segment number 0 defined with (minLayer, maxLayer, padSize, isPixel): (0, 3, 1, 0)
+  VIRTUAL_SEGMENT_LAYOUT_N1       4    4           0.05          1.0       1                  4000 
+Segment number 1 defined with (minLayer, maxLayer, padSize, isPixel): (4, 4, 0.05, 1)
+  VIRTUAL_SEGMENT_LAYOUT_N2       5    8           1.0           1.0       0                  400000 
+Segment number 2 defined with (minLayer, maxLayer, padSize, isPixel): (5, 8, 1, 0)
+  VIRTUAL_SEGMENT_LAYOUT_N3       9    9           0.05          1.0       1                  4000 
+Segment number 3 defined with (minLayer, maxLayer, padSize, isPixel): (9, 9, 0.05, 1)
+  VIRTUAL_SEGMENT_LAYOUT_N4      10   14           1.0           1.0       0                  500000 
+Segment number 4 defined with (minLayer, maxLayer, padSize, isPixel): (10, 14, 1, 0)
+  VIRTUAL_SEGMENT_LAYOUT_N5      15   19           1.0           1.0       0                  500000 
+Segment number 5 defined with (minLayer, maxLayer, padSize, isPixel): (15, 19, 1, 0)
+  VIRTUAL_SEGMENT_LAYOUT_N6      20   53           2.5           3.2       2                  5000 
+Segment number 6 defined with (minLayer, maxLayer, padSize, isPixel): (20, 53, 2.5, 2)
+#EOF 
+Skipping comment
+ tower size is set to : 47 : 8.4 : wafer size = 9.4 : 8.4
+ ********************************** 
+layer/segment: 1
+ ********************************** 
+ ********************************** 
+47  8.4   9.4  8.4
+ end of SetParameters 
+ Geometry init done.
+ AliFOCALGeometry::BuildComposition 
+Check pixel layer idx 0 loc 4 i= 0
+Check pixel layer idx 1 loc 9 i= 0
+Check pixel layer idx 0 loc 4 i= 1
+Check pixel layer idx 1 loc 9 i= 1
+Check pixel layer idx 0 loc 4 i= 2
+Check pixel layer idx 1 loc 9 i= 2
+Check pixel layer idx 0 loc 4 i= 3
+Check pixel layer idx 1 loc 9 i= 3
+Check pixel layer idx 0 loc 4 i= 4
+Adding pixel layer at layer 4
+Check pixel layer idx 0 loc 4 i= 5
+Check pixel layer idx 1 loc 9 i= 5
+Check pixel layer idx 0 loc 4 i= 6
+Check pixel layer idx 1 loc 9 i= 6
+Check pixel layer idx 0 loc 4 i= 7
+Check pixel layer idx 1 loc 9 i= 7
+Check pixel layer idx 0 loc 4 i= 8
+Check pixel layer idx 1 loc 9 i= 8
+Check pixel layer idx 0 loc 4 i= 9
+Check pixel layer idx 1 loc 9 i= 9
+Adding pixel layer at layer 9
+Check pixel layer idx 0 loc 4 i= 10
+Check pixel layer idx 1 loc 9 i= 10
+Check pixel layer idx 0 loc 4 i= 11
+Check pixel layer idx 1 loc 9 i= 11
+Check pixel layer idx 0 loc 4 i= 12
+Check pixel layer idx 1 loc 9 i= 12
+Check pixel layer idx 0 loc 4 i= 13
+Check pixel layer idx 1 loc 9 i= 13
+Check pixel layer idx 0 loc 4 i= 14
+Check pixel layer idx 1 loc 9 i= 14
+Check pixel layer idx 0 loc 4 i= 15
+Check pixel layer idx 1 loc 9 i= 15
+Check pixel layer idx 0 loc 4 i= 16
+Check pixel layer idx 1 loc 9 i= 16
+Check pixel layer idx 0 loc 4 i= 17
+Check pixel layer idx 1 loc 9 i= 17
+Check pixel layer idx 0 loc 4 i= 18
+Check pixel layer idx 1 loc 9 i= 18
+Check pixel layer idx 0 loc 4 i= 19
+Check pixel layer idx 1 loc 9 i= 19
+Done !! 1
+
+*******************DeBug:On*************************
+
+
+ Info:: Constructor 1 is called..Rihan.. 
+ #Sector = 4 #Ring = 5	 dZ Scint = 4	 Scint.Sep = 0.07	 dZPlastic = 2.5
+
+ Avg Ring. Radii = 4.01, 7.3, 12.9, 21.25, 38.7
+
+****************************************************
+
+
+ *** Break *** segmentation violation
+ERROR: Starlight not yet compatible with ROOT 6!
+>>>>> Diamond sigma-xy: 0.005464 
+[/usr/lib/system/libsystem_platform.dylib] _sigtramp (no debug info)
+[<unknown binary>] (no debug info)
+[<unknown binary>] (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::IncrementalExecutor::executeWrapper(llvm::StringRef, cling::Value*) const (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::Interpreter::RunFunction(clang::FunctionDecl const*, cling::Value*) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::Interpreter::EvaluateInternal(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, cling::CompilationOptions, cling::Value*, cling::Transaction**, unsigned long) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::Interpreter::process(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, cling::Value*, cling::Transaction**, bool) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::MetaProcessor::process(llvm::StringRef, cling::Interpreter::CompilationResult&, cling::Value*, bool) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] HandleInterpreterException(cling::MetaProcessor*, char const*, cling::Interpreter::CompilationResult&, cling::Value*) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] TCling::ProcessLine(char const*, TInterpreter::EErrorCode*) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/AliRoot/c5ff4d8f51b96128934855539386b1299b0a48c1_O2-local1/lib/libSTEER.so] AliSimulation::RunSimulation(int) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/AliRoot/c5ff4d8f51b96128934855539386b1299b0a48c1_O2-local1/lib/libSTEER.so] AliSimulation::Run(int) (no debug info)
+[<unknown binary>] (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::IncrementalExecutor::executeWrapper(llvm::StringRef, cling::Value*) const (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::Interpreter::RunFunction(clang::FunctionDecl const*, cling::Value*) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::Interpreter::EvaluateInternal(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, cling::CompilationOptions, cling::Value*, cling::Transaction**, unsigned long) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::MetaSema::actOnxCommand(llvm::StringRef, llvm::StringRef, cling::Value*) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::MetaParser::isXCommand(cling::MetaSema::ActionResult&, cling::Value*) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::MetaParser::isCommand(cling::MetaSema::ActionResult&, cling::Value*) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] cling::MetaProcessor::process(llvm::StringRef, cling::Interpreter::CompilationResult&, cling::Value*, bool) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] HandleInterpreterException(cling::MetaProcessor*, char const*, cling::Interpreter::CompilationResult&, cling::Value*) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] TCling::ProcessLine(char const*, TInterpreter::EErrorCode*) (no debug inf
+ MZSTOR.  ZEBRA table base TAB(0) in /MZCC/ at adr   188046371     B355C23 HEX
+
+ MZSTOR.  Initialize Store  0  in /GCBANK/
+          with Store/Table at absolute adrs   182636613   188046371
+                                        HEX     AE2D045     B355C23
+                                        HEX    FFAD726A           0
+                              relative adrs    -5410198           0
+          with     1 Str. in     2 Links in   5300 Low words in 4999970 words.
+          This store has a fence of   16 words.
+
+ MZLOGL.  Set Log Level 0 for store  0
+1*****  GEANT Version  3.21/11 Released on 100298
+0*****  Correction Cradle Version  0.1100
+
+ MZDIV.   Initialize Division  Constant  in Store  0
+          NW/NWMAX=   20004000000,  MODE/KIND=  1  2
+          Division 20 initialized.
+
+ MZLINK.  Initialize Link Area  /GCLINK/  for Store  0 NL/NS=    20    20
+
+ MZLINK.  Initialize Link Area  /GCSLNK/  for Store  0 NL/NS=   100   100
+o)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCling.6.26.04.so] TCling::ProcessLineSynch(char const*, TInterpreter::EErrorCode*) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libCore.6.26.04.so] TApplication::ExecuteFile(char const*, int*, bool) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libRint.6.26.04.so] TRint::ProcessLineNr(char const*, char const*, int*) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/ROOT/v6-26-04-patches-alice1-local1/lib/libRint.6.26.04.so] TRint::Run(bool) (no debug info)
+[/Users/david/alice_new/sw/osx_arm64/AliRoot/c5ff4d8f51b96128934855539386b1299b0a48c1_O2-local1/bin/aliroot] main (no debug info)
+[/usr/lib/dyld] start (no debug info)
