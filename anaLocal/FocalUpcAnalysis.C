@@ -24,11 +24,11 @@
 Bool_t plotEvInfo = kFALSE;
 Bool_t printEvInfo = kFALSE;
 // superclusterizer:
-Bool_t doSupercls = kTRUE; // if true, create superclusters using:
+Bool_t doSupercls = kFALSE; // if true, create superclusters using:
 const Float_t minSeedE = 5; // [GeV]
 const Float_t radius = 8; // [cm]
 // selections:
-const Float_t cutM = 0.2; // [GeV]; if > 0, filter out all (super)cluster pairs having mass below cutM
+const Float_t cutM = 0.0; // [GeV]; if > 0, filter out all (super)cluster pairs having mass below cutM
 const Float_t cutE = 10.0; // [GeV]; if > 0, filter out all (super) clusters having energy below cutE 
 // cuts used during matching with MC particles:
 const Float_t cutdEta = 0.4; // [-] difference in eta of a MC particle and a (super)cluster
@@ -279,7 +279,9 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
         TList listClsPref;
         listClsPref.SetOwner(kFALSE);
         // find the total and maximum cluster energy in this event
-        Float_t ETot(0.), ETotWithHCalE(0.), ETotWithIsoER2(0.), ETotWithIsoER4(0.), EClMax(-1.);
+        Float_t ETot(0.), EClMax(-1.);
+        Float_t EHCalTot(0.), EIsoR2Tot(0.), EIsoR4Tot(0.);
+        Float_t ETotWithEHcalTot(0.), ETotWithEIsoR2Tot(0.), ETotWithEIsoR4Tot(0.);
         Int_t iMaxClE(-1); // index of a cluster with maximum energy
         for(Int_t iCl = 0; iCl < nClsSum; iCl++) 
         {
@@ -287,9 +289,12 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
             listClsPref.Add(clust);
             // get the total energy summing over summed clusters
             ETot += clust->E();
-            ETotWithHCalE += clust->E() + clust->GetHCALEnergy();
-            ETotWithIsoER2 += clust->E() + clust->GetIsoEnergyR2();
-            ETotWithIsoER4 += clust->E() + clust->GetIsoEnergyR4();
+            EHCalTot += clust->GetHCALEnergy();
+            EIsoR2Tot += clust->GetIsoEnergyR2();
+            EIsoR4Tot += clust->GetIsoEnergyR4();
+            ETotWithEHcalTot += clust->E() + EHCalTot;
+            ETotWithEIsoR2Tot += clust->E() + EIsoR2Tot;
+            ETotWithEIsoR4Tot += clust->E() + EIsoR4Tot;
             // get the maximum cluster energy
             if(clust->E() > EClMax) {
                 EClMax = clust->E();
@@ -463,20 +468,30 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
             ((TH1F*)arrTH1F->At(kBx_mcE))->Fill(stack->Particle(0)->Energy());
             ((TH1F*)arrTH1F->At(kBx_mcPt))->Fill(stack->Particle(0)->Pt());
             ((TH2F*)arrTH2F->At(kBx_mcE_nCls))->Fill(stack->Particle(0)->Energy(), nClsPref);
-            // MC energy vs total energy over all clusters
+            // MC energy vs total energies
             ((TH2F*)arrTH2F->At(kBx_mcE_totE))->Fill(stack->Particle(0)->Energy(), ETot);
             ((TH2F*)arrTH2F->At(kBx_totE_mcE))->Fill(ETot, stack->Particle(0)->Energy());
-            ((TH2F*)arrTH2F->At(kBx_totEwHCalE_mcE))->Fill(ETotWithHCalE, stack->Particle(0)->Energy());
-            ((TH2F*)arrTH2F->At(kBx_totEwIsoER2_mcE))->Fill(ETotWithIsoER2, stack->Particle(0)->Energy());
-            ((TH2F*)arrTH2F->At(kBx_totEwIsoER4_mcE))->Fill(ETotWithIsoER4, stack->Particle(0)->Energy());
-            ((TH2F*)arrTH2F->At(kBx_totEFromSegCls_mcE))->Fill(ETotFromSegCls*.001, stack->Particle(0)->Energy());
             ((TProfile*)arrTPrf->At(kBx_mcE_totE_prof))->Fill(stack->Particle(0)->Energy(), ETot);
             ((TProfile*)arrTPrf->At(kBx_totE_mcE_prof))->Fill(ETot, stack->Particle(0)->Energy());
+            // total energy vs HCal energies
+            ((TH2F*)arrTH2F->At(kBx_totEwHCalE_mcE))->Fill(ETotWithEHcalTot, stack->Particle(0)->Energy());
+            ((TH2F*)arrTH2F->At(kBx_totEwIsoR2E_mcE))->Fill(ETotWithEIsoR2Tot, stack->Particle(0)->Energy());
+            ((TH2F*)arrTH2F->At(kBx_totEwIsoR4E_mcE))->Fill(ETotWithEIsoR4Tot, stack->Particle(0)->Energy());
+            ((TH2F*)arrTH2F->At(kBx_totE_totHCalE))->Fill(ETot, EHCalTot);
+            ((TH2F*)arrTH2F->At(kBx_totE_totIsoR2E))->Fill(ETot, EIsoR2Tot);
+            ((TH2F*)arrTH2F->At(kBx_totE_totIsoR4E))->Fill(ETot, EIsoR4Tot);
+            ((TH2F*)arrTH2F->At(kBx_totEFromSegCls_mcE))->Fill(ETotFromSegCls*.001, stack->Particle(0)->Energy());
             // MC energy vs maximum cluster energy
             ((TH2F*)arrTH2F->At(kBx_mcE_maxClE))->Fill(stack->Particle(0)->Energy(), EClMax);
             ((TH2F*)arrTH2F->At(kBx_maxClE_mcE))->Fill(EClMax, stack->Particle(0)->Energy());
             ((TProfile*)arrTPrf->At(kBx_mcE_maxClE_prof))->Fill(stack->Particle(0)->Energy(), EClMax);
             ((TProfile*)arrTPrf->At(kBx_maxClE_mcE_prof))->Fill(EClMax, stack->Particle(0)->Energy());
+            // correlation between MC energy and energies of prefiltered clusters
+            for(Int_t iCl = 0; iCl < nClsPref; iCl++)
+            {
+                AliFOCALCluster *clust = (AliFOCALCluster*) listClsPref.At(iCl);
+                ((TH2F*)arrTH2F->At(kBx_clE_mcE))->Fill(clust->E(), stack->Particle(0)->Energy());
+            }
         }
         // ******************************************************************************************************************
         // analysis of J/psi simulations

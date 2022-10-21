@@ -29,11 +29,15 @@ enum kBx_TH2F {
     kBx_mcE_totE,
     kBx_totE_mcE,
     kBx_totEwHCalE_mcE,
-    kBx_totEwIsoER2_mcE,
-    kBx_totEwIsoER4_mcE,
+    kBx_totEwIsoR2E_mcE,
+    kBx_totEwIsoR4E_mcE,
+    kBx_totE_totHCalE,
+    kBx_totE_totIsoR2E,
+    kBx_totE_totIsoR4E,
     kBx_totEFromSegCls_mcE,
     kBx_mcE_maxClE,
     kBx_maxClE_mcE,
+    kBx_clE_mcE,
     kBx_TH2F_all
 };
 
@@ -132,12 +136,21 @@ void DefineHisto_Bx_TH2F(TObjArray* objArr)
     TH2F* hBx_totEwHCalE_mcE = new TH2F("hBx_totEwHCalE_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
                     hBx_totEwHCalE_mcE->SetTitle("(#it{E}_{total with HCal}, #it{E}_{MC});#it{E}_{total with HCal} [GeV];#it{E}_{MC} [GeV]");
                     objArr->AddAt(hBx_totEwHCalE_mcE, kBx_totEwHCalE_mcE);
-    TH2F* hBx_totEwIsoER2_mcE = new TH2F("hBx_totEwIsoER2_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_totEwIsoER2_mcE->SetTitle("(#it{E}_{total with HCal isoR2}, #it{E}_{MC});#it{E}_{total with HCal isoR2} [GeV];#it{E}_{MC} [GeV]");
-                    objArr->AddAt(hBx_totEwIsoER2_mcE, kBx_totEwIsoER2_mcE);
-    TH2F* hBx_totEwIsoER4_mcE = new TH2F("hBx_totEwIsoER4_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_totEwIsoER4_mcE->SetTitle("(#it{E}_{total with HCal isoR4}, #it{E}_{MC});#it{E}_{total with HCal isoR4} [GeV];#it{E}_{MC} [GeV]");
-                    objArr->AddAt(hBx_totEwIsoER4_mcE, kBx_totEwIsoER4_mcE);
+    TH2F* hBx_totEwIsoR2E_mcE = new TH2F("hBx_totEwIsoR2E_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
+                    hBx_totEwIsoR2E_mcE->SetTitle("(#it{E}_{total with HCal isoR2}, #it{E}_{MC});#it{E}_{total with HCal isoR2} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hBx_totEwIsoR2E_mcE, kBx_totEwIsoR2E_mcE);
+    TH2F* hBx_totEwIsoR4E_mcE = new TH2F("hBx_totEwIsoR4E_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
+                    hBx_totEwIsoR4E_mcE->SetTitle("(#it{E}_{total with HCal isoR4}, #it{E}_{MC});#it{E}_{total with HCal isoR4} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hBx_totEwIsoR4E_mcE, kBx_totEwIsoR4E_mcE);
+    TH2F* hBx_totE_totHCalE = new TH2F("hBx_totE_totHCalE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
+                    hBx_totE_totHCalE->SetTitle("(#it{E}_{total}, #it{E}_{total HCal});#it{E}_{total} [GeV];#it{E}_{total HCal} [GeV]");
+                    objArr->AddAt(hBx_totE_totHCalE, kBx_totE_totHCalE);
+    TH2F* hBx_totE_totIsoR2E = new TH2F("hBx_totE_totIsoR2E","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
+                    hBx_totE_totIsoR2E->SetTitle("(#it{E}_{total}, #it{E}_{total isoR2});#it{E}_{total} [GeV];#it{E}_{total isoR2} [GeV]");
+                    objArr->AddAt(hBx_totE_totIsoR2E, kBx_totE_totIsoR2E);
+    TH2F* hBx_totE_totIsoR4E = new TH2F("hBx_totE_totIsoR4E","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
+                    hBx_totE_totIsoR4E->SetTitle("(#it{E}_{total}, #it{E}_{total isoR4});#it{E}_{total} [GeV];#it{E}_{total isoR4} [GeV]");
+                    objArr->AddAt(hBx_totE_totIsoR4E, kBx_totE_totIsoR4E);
     TH2F* hBx_totEFromSegCls_mcE = new TH2F("hBx_totEFromSegCls_mcE","",nBinsE,lowE,2500,nBinsE,lowE,uppE);
                     hBx_totEFromSegCls_mcE->SetTitle("(#it{E}_{total from per seg cls}, #it{E}_{MC});#it{E}_{total from per seg cls} [GeV];#it{E}_{MC} [GeV]");
                     objArr->AddAt(hBx_totEFromSegCls_mcE, kBx_totEFromSegCls_mcE);
@@ -147,6 +160,9 @@ void DefineHisto_Bx_TH2F(TObjArray* objArr)
     TH2F* hBx_maxClE_mcE = new TH2F("hBx_maxClE_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
                     hBx_maxClE_mcE->SetTitle("(#it{E}_{cl,max}, #it{E}_{MC});#it{E}_{cl,max} [GeV];#it{E}_{MC} [GeV]");
                     objArr->AddAt(hBx_maxClE_mcE, kBx_maxClE_mcE);
+    TH2F* hBx_clE_mcE = new TH2F("hBx_clE_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
+                    hBx_clE_mcE->SetTitle("(#it{E}_{cl}, #it{E}_{MC});#it{E}_{cl} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hBx_clE_mcE, kBx_clE_mcE);
     return;
 }
 
