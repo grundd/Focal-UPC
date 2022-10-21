@@ -2,10 +2,10 @@
 // David Grund, Oct 16, 2022
 
 // binning
-const Int_t nBinsPt = 100; // bin per 20 MeV
+const Int_t nBinsPt = 80; // bin per 25 MeV
 const Float_t lowPt = 0.;
 const Float_t uppPt = 2.;
-const Int_t nBinsEta = 125; // bin per 0.04
+const Int_t nBinsEta = 100; // bin per 0.05
 const Float_t lowEta = 2.;
 const Float_t uppEta = 7.;
 const Int_t nBinsE = 100; // bin per 2 GeV
@@ -31,6 +31,7 @@ enum kBx_TH2F {
     kBx_totEwHCalE_mcE,
     kBx_totEwIsoER2_mcE,
     kBx_totEwIsoER4_mcE,
+    kBx_totEFromSegCls_mcE,
     kBx_mcE_maxClE,
     kBx_maxClE_mcE,
     kBx_TH2F_all
@@ -110,7 +111,7 @@ void DefineHisto_Bx_TH1F(TObjArray* objArr)
     TH1F* hBx_mcE = new TH1F("hBx_mcE","",nBinsE,lowE,uppE);
                     hBx_mcE->SetTitle("electron #it{E} generated;#it{E}_{MC} [GeV];counts");
                     objArr->AddAt(hBx_mcE, kBx_mcE);
-    TH1F* hBx_mcPt = new TH1F("hBx_mcPt","",nBinsPt,lowPt,uppPt);
+    TH1F* hBx_mcPt = new TH1F("hBx_mcPt","",40,lowPt,uppPt);
                     hBx_mcPt->SetTitle("electron #it{p}_{T} generated;#it{p}_{T} [GeV/#it{c}];counts");
                     objArr->AddAt(hBx_mcPt, kBx_mcPt);
     return;
@@ -138,6 +139,9 @@ void DefineHisto_Bx_TH2F(TObjArray* objArr)
     TH2F* hBx_totEwIsoER4_mcE = new TH2F("hBx_totEwIsoER4_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
                     hBx_totEwIsoER4_mcE->SetTitle("(#it{E}_{total with HCal isoR4}, #it{E}_{MC});#it{E}_{total with HCal isoR4} [GeV];#it{E}_{MC} [GeV]");
                     objArr->AddAt(hBx_totEwIsoER4_mcE, kBx_totEwIsoER4_mcE);
+    TH2F* hBx_totEFromSegCls_mcE = new TH2F("hBx_totEFromSegCls_mcE","",nBinsE,lowE,2500,nBinsE,lowE,uppE);
+                    hBx_totEFromSegCls_mcE->SetTitle("(#it{E}_{total from per seg cls}, #it{E}_{MC});#it{E}_{total from per seg cls} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hBx_totEFromSegCls_mcE, kBx_totEFromSegCls_mcE);
     TH2F* hBx_mcE_maxClE = new TH2F("hBx_mcE_maxClE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
                     hBx_mcE_maxClE->SetTitle("(#it{E}_{MC}, #it{E}_{cl,max});#it{E}_{MC} [GeV];#it{E}_{cl,max} [GeV]");
                     objArr->AddAt(hBx_mcE_maxClE, kBx_mcE_maxClE);

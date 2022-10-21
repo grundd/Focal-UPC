@@ -1,3 +1,6 @@
+# Folders to be ignored:
+_documents/
+
 # File extensions to be ignored:
 *.root
 *.txt

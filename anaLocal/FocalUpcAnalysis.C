@@ -27,10 +27,14 @@ Int_t vSim = 2;
 // version of the simulated input files:
 // 1 -> files produced on Oct 17, 2022
 // 2 -> files produced on Oct 19, 2022, after an update of FoCal&AliRoot
-Int_t vCls = 2;
-// version of the produced clusters
-// 1 -> clusters produced with the clusterizer before the update on Oct 19, 2022
-// 2 -> clusters produced with the clusterizer after the update on Oct 19, 2022
+Int_t vGeomFile = 2;
+// version of the FoCal software and the "geometry.txt" file using which the clusters were produced 
+// 1 -> "geometry_01.txt" (used before the update on Oct 19, 2022)
+// 2 -> "geometry_02.txt" (used after the update on Oct 19, 2022)
+Int_t vParaFile = 2;
+// version of the "parameters.txt" file using which the clusters were produced
+// 1 -> "parameters_01.txt": Calib.Const1 set to 12900. (current official file)
+// 2 -> "parameters_02.txt": Calib.Const1 set to 11220. (old value)
 // values of the cuts:
 const Float_t cutE = 0.0;  // [GeV] cut on minimal cluster energy
 const Float_t cutM = 0.2;  // [GeV] cut on mass of cluster pair
@@ -126,7 +130,16 @@ void FocalUpcAnalysis(Int_t pdgSim, Bool_t testOnly = kFALSE)
     {
         if(testOnly) DoFocalAnalysis(sInputJpsi[0],443,10);
         else for(Int_t i = 0; i < nInputJpsi; i++) DoFocalAnalysis(sInputJpsi[i],443);
-
+    }
+    // post-analysis of histograms
+    if(pdgSim == 11 || pdgSim == 22)
+    {
+        // integrate the histograms at kBx_totE_mcE and kBx_totEFromSegCls_mcE
+        cout << "integral of hBx_totE_mcE: " << ((TH2F*)arrTH2F->At(kBx_totE_mcE))->Integral(1,nBinsE,1,nBinsE) << endl;
+        cout << "integral of hBx_totEFromSegCls_mcE: " << ((TH2F*)arrTH2F->At(kBx_totEFromSegCls_mcE))->Integral(1,2*nBinsE,1,2*nBinsE) << endl;
+    }
+    else 
+    {
         // calculate the fraction of coh J/psi -> ee events that have energy of both electron larger than 20 GeV
         Double_t nAll = ((TH2F*)arrTH2F->At(kJp_mcJE1E_mcJE2E))->Integral(1,nBinsE,1,nBinsE);
         Double_t nAbove20 = ((TH2F*)arrTH2F->At(kJp_mcJE1E_mcJE2E))->Integral(11,nBinsE,11,nBinsE);
@@ -139,7 +152,7 @@ void FocalUpcAnalysis(Int_t pdgSim, Bool_t testOnly = kFALSE)
     }
     // draw output histograms
     Int_t nTH1F(-1), nTPrf(-1), nTH2F(-1);
-    TString outputFolder = Form("results/sim0%i_cls0%i/",vSim,vCls);
+    TString outputFolder = Form("results/sim%02i_g%02i_p%02i/",vSim,vGeomFile,vParaFile);
     if(pdgSim == 11) {
         nTH1F = kBx_TH1F_all; nTPrf = kBx_TPrf_all; nTH2F = kBx_TH2F_all;
         outputFolder += "_boxEle";
@@ -162,16 +175,16 @@ void FocalUpcAnalysis(Int_t pdgSim, Bool_t testOnly = kFALSE)
 
 void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
 {
-    gSystem->Exec(Form("mkdir -p results/sim0%i_cls0%i/%seventInfo/",vSim,vCls,dataset.Data()));
+    gSystem->Exec(Form("mkdir -p results/sim%02i_g%02i_p%02i/%seventInfo/",vSim,vGeomFile,vParaFile,dataset.Data()));
 
     // if clusters not yet produced, run the clusterizer
-    TString sClFile = Form("inputData/sim0%i/%sfocalClusters_v0%i.root",vSim,dataset.Data(),vCls);
+    TString sClFile = Form("inputData/sim%02i/%sfocalClusters_g%02i_p%02i.root",vSim,dataset.Data(),vGeomFile,vParaFile);
     if(gSystem->AccessPathName(sClFile.Data()))
     {
         cout << " MESSAGE: cluster file not found! Running the clusterizer now." << endl;
         // protection against accidentally overwriting the old cluster files:
-        if(vCls == 1) return;
-        TString sCmd = Form(".x ClusterizeJpsi.C(\"inputData/sim0%i/%s\",%i)",vSim,dataset.Data(),vCls);
+        if(vGeomFile == 1) return;
+        TString sCmd = Form(".x ClusterizeJpsi.C(\"inputData/sim%02i/%s\",%i,%i)",vSim,dataset.Data(),vGeomFile,vParaFile);
         gROOT->ProcessLine(sCmd.Data());
     }
     // check if focalClusters.root were produced properly
@@ -186,12 +199,13 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
 
     // load the clusterizer
     AliFOCALClusterizerv2* clusterizer = new AliFOCALClusterizerv2();
-    clusterizer->InitGeometry(Form("geometry_0%i.txt",vCls));
+    TString geomFile = Form("geometry_%02i.txt",vGeomFile);
+    clusterizer->InitGeometry(geomFile.Data());
     AliFOCALGeometry* geometry = clusterizer->GetGeometry();
 
     // define ALICE run loader: open galice.root
     AliRunLoader* runLoader = NULL;
-    runLoader = AliRunLoader::Open(Form("inputData/sim0%i/%sgalice.root",vSim,dataset.Data()));
+    runLoader = AliRunLoader::Open(Form("inputData/sim%02i/%sgalice.root",vSim,dataset.Data()));
     if(!runLoader) 
     {
         cout << " ERROR: AliRunLoader not good! Terminating." << endl;
@@ -224,7 +238,7 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
         }
 
         // output text file
-        TString sEvFile = Form("results/sim0%i_cls0%i/%seventInfo/Ev%i",vSim,vCls,dataset.Data(),iEv);
+        TString sEvFile = Form("results/sim%02i_g%02i_p%02i/%seventInfo/Ev%i",vSim,vGeomFile,vParaFile,dataset.Data(),iEv);
         ofstream of((sEvFile + ".txt").Data());
         of << std::fixed << std::setprecision(0);
 
@@ -250,6 +264,16 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
         bClsSeg->GetEvent(0);
         Int_t nClsSeg = arrClsSeg->GetEntries();
         of << "seg. clusters: " << nClsSeg << endl;
+
+        // find the total energy deposited in FoCal in this event from cls per segment
+        Float_t totEFromSegCls(0.);
+        for(Int_t iCl = 0; iCl < nClsSeg; iCl++) 
+        {
+            AliFOCALCluster* clust = (AliFOCALCluster*) arrClsSeg->At(iCl);
+            // count only the energy deposited in EMCal
+            //if(clust->Segment() < 6) 
+            totEFromSegCls += clust->E();
+        }
 
         // get the branch with final summed clusters
         TBranch* bClsSum = NULL;
@@ -379,6 +403,7 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
             ((TH2F*)arrTH2F->At(kBx_totEwHCalE_mcE))->Fill(totEwHCalE, stack->Particle(0)->Energy());
             ((TH2F*)arrTH2F->At(kBx_totEwIsoER2_mcE))->Fill(totEwIsoER2, stack->Particle(0)->Energy());
             ((TH2F*)arrTH2F->At(kBx_totEwIsoER4_mcE))->Fill(totEwIsoER4, stack->Particle(0)->Energy());
+            ((TH2F*)arrTH2F->At(kBx_totEFromSegCls_mcE))->Fill(totEFromSegCls*.001, stack->Particle(0)->Energy());
             ((TProfile*)arrTPrf->At(kBx_mcE_totE_prof))->Fill(stack->Particle(0)->Energy(), totE);
             ((TProfile*)arrTPrf->At(kBx_totE_mcE_prof))->Fill(totE, stack->Particle(0)->Energy());
             // MC energy vs maximum cluster energy

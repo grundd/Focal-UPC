@@ -7,10 +7,6 @@ bool clusteringSaveImages = false; //true;
 bool clusteringCalibrationRun = false;
 // Whether should clusterizer provide debug messages
 bool clusteringDebugMode = false; //true;
-// File with geometry information - path
-// -> moved below
-// File with parameters information - path
-char clusterizerParametersFile[200] = "parameters.txt"; // directory of parameters.txt
 // Which segments to use as 'seeds'
 // for creating clusters from sub-clusters
 Int_t  COARSE_SEEDS[3] = {2,4,0};
@@ -40,13 +36,20 @@ Float_t Calibration(Float_t signal, Int_t segment, Float_t * pars, bool calibrat
 Bool_t LoadLibs();
 
 //____________________________________________________________________________________________
-void ClusterizeGrid(TString dataset,Int_t vCls = 0) {
-
-  gSystem->Load("libpythia6_4_28.so");        
+void ClusterizeJpsi(TString inputFolder,Int_t vGeomFile,Int_t vParaFile) 
+{
+    gSystem->Load("libpythia6_4_28.so");        
        
-  AliFOCALClusterizerv2 *clusterizer = new AliFOCALClusterizerv2();
-  clusterizer->InitGeometry(Form("geometry_0%i.txt",vCls));
-  clusterizer->InitParameters(clusterizerParametersFile);
+    AliFOCALClusterizerv2 *clusterizer = new AliFOCALClusterizerv2();
+    // file with geometry information - path
+    TString geomFile = Form("geometry_%02i.txt",vGeomFile);
+    clusterizer->InitGeometry(geomFile.Data());
+    // file with parameters information - path
+    TString paraFile = Form("parameters_%02i.txt",vParaFile);
+    clusterizer->InitParameters(paraFile.Data());
+
+    // ...
+
   clusterizer->SetDebugMode(clusteringDebugMode);
   clusterizer->SetLocalEnergyThreshold(eThreshold); //0.5MeV (1/2MIP)
 //  clusterizer->SetClusteringEnergyThreshold(0.004); //40MeV 
@@ -97,20 +100,19 @@ void ClusterizeGrid(TString dataset,Int_t vCls = 0) {
   
   /*
   if(gSystem->AccessPathName("root_archive.zip")) {
-    cout << "ClusterizeGrid() ERROR:  galice.root file not found!" << endl;      
+    cout << "ClusterizeGrid() ERROR:  galice.root file not found!" << endl;  
     return;
   }
   */
-  TString sClFile = "focalClusters";
-  if(vCls > 0) sClFile += Form("_v0%i",vCls);
-  sClFile += ".root";
-  TFile * outputFile = clusterizer->CreateOutputFile(dataset + sClFile);
+
+    TString clustFile = Form("focalClusters_g%02i_p%02i.root",vGeomFile,vParaFile);
+    TFile * outputFile = clusterizer->CreateOutputFile((inputFolder + clustFile).Data());
             
   //Alice run loader
   if (runLoader)
     runLoader->Delete();
   
-  runLoader = AliRunLoader::Open(dataset + "galice.root");
+  runLoader = AliRunLoader::Open(inputFolder + "galice.root");
   if (!runLoader) {
     cout << "ClusterizeGrid() ERROR: run loader could not be initialized" << endl;
     return;
