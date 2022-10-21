@@ -160,24 +160,37 @@ void DrawFOCAL(AliFOCALGeometry* geometry, TCanvas* c)
     return;
 }
 
-void DrawSegClusters(TClonesArray* arrClsSeg, TCanvas* c)
+void DrawClusters(TClonesArray* arrCls, TCanvas* c, Bool_t perSeg = kFALSE)
 {
-    for(Int_t iClust = 0; iClust < arrClsSeg->GetEntries(); iClust++)
+    for(Int_t iClust = 0; iClust < arrCls->GetEntries(); iClust++)
     {
-        AliFOCALCluster* clust = (AliFOCALCluster*) arrClsSeg->At(iClust);
+        AliFOCALCluster* clust = (AliFOCALCluster*) arrCls->At(iClust);
         Float_t z(clust->Z()), x(clust->X()), y(clust->Y());
         // z-x plane
         TMarker* mX = new TMarker(z,x,0);
-        mX->SetMarkerStyle(kOpenSquare);
-        mX->SetMarkerColor(kRed);
-        mX->SetMarkerSize(.5);
+        if(!perSeg) {
+            mX->SetMarkerStyle(kOpenSquare);
+            mX->SetMarkerColor(kGreen+1);
+            mX->SetMarkerSize(1);
+        } else {
+            mX->SetMarkerStyle(kOpenTriangleUp);
+            mX->SetMarkerColor(kRed);
+            mX->SetMarkerSize(.5);
+        }
+
         c->cd(1);
         mX->Draw("SAME");
         // z-y plane
         TMarker* mY = new TMarker(z,y,0);
-        mY->SetMarkerStyle(kOpenSquare);
-        mY->SetMarkerColor(kRed);
-        mY->SetMarkerSize(.5);
+        if(!perSeg) {
+            mY->SetMarkerStyle(kOpenSquare);
+            mY->SetMarkerColor(kGreen+1);
+            mY->SetMarkerSize(1);
+        } else {
+            mY->SetMarkerStyle(kOpenTriangleUp);
+            mY->SetMarkerColor(kRed);
+            mY->SetMarkerSize(.5);
+        }
         c->cd(2);
         mY->Draw("SAME");
     }
@@ -190,24 +203,23 @@ void DrawPrefClusters(TList* listClsPref, TCanvas* c)
     l->SetMargin(0.10);
     l->SetTextSize(0.025);
     l->SetBorderSize(0);
-    l->AddEntry((TObject*)0,Form("%i summed prefiltered clusters :", listClsPref->GetEntries()),"");
+    l->AddEntry((TObject*)0,Form("%i pref. (super)clusters:", listClsPref->GetEntries()),"");
     for(Int_t iClust = 0; iClust < listClsPref->GetEntries(); iClust++) 
     {
         AliFOCALCluster* clust = (AliFOCALCluster*)listClsPref->At(iClust);
         Float_t z(clust->Z()), x(clust->X()), y(clust->Y());
-        Float_t r = TMath::Sqrt(TMath::Power(x,2) + TMath::Power(y,2));
         // z-x plane
         TMarker *mX = new TMarker(z,x,0);
         mX->SetMarkerStyle(kOpenCircle);
-        mX->SetMarkerColor(kGreen+1);
-        mX->SetMarkerSize(1);
+        mX->SetMarkerColor(kBlue);
+        mX->SetMarkerSize(1.5);
         c->cd(1);
         mX->Draw("SAME");
         // z-y plane
         TMarker *mY = new TMarker(z,y,0);
         mY->SetMarkerStyle(kOpenCircle);
-        mY->SetMarkerColor(kGreen+1);
-        mY->SetMarkerSize(1);
+        mY->SetMarkerColor(kBlue);
+        mY->SetMarkerSize(1.5);
         c->cd(2);
         mY->Draw("SAME");
         l->AddEntry(mX,Form("x = %.2f cm, y = %.2f cm, E = %.1f GeV", x, y, clust->E()),"P");
@@ -229,7 +241,7 @@ void SetTrackStyle(TLine* l, Int_t codePDG, Bool_t isPrimary = kTRUE)
 {
     if(TMath::Abs(codePDG) == 11) // an electron
     {
-        if(isPrimary) l->SetLineColor(kBlue);
+        if(isPrimary) l->SetLineColor(kCyan+3);
         else          l->SetLineColor(kCyan);
         l->SetLineWidth(1);
         l->SetLineStyle(1);
@@ -314,6 +326,8 @@ void DrawTracksMC(AliStack *stack, TCanvas* c, Bool_t withLegend = kTRUE)
                 lY->Draw();
             } 
         }
+        // uncomment the following section to plot also (daughters of pp particles) with at least 500 MeV 
+        /*
         // daughters of primary particles with at least 500 MeV
         else if(part->GetMother(0) >= 0 && stack->IsPhysicalPrimary(part->GetMother(0)) && part->Energy() > 1)
         {
@@ -330,6 +344,7 @@ void DrawTracksMC(AliStack *stack, TCanvas* c, Bool_t withLegend = kTRUE)
                 lY->Draw();
             }
         }
+        */
     }
     c->cd(1);
     if(withLegend) l->Draw();

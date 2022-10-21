@@ -87,7 +87,6 @@ enum kJp_TH2F {
     //
     kJp_primElClPairEta_mcJEta,
     kJp_primElClPairPt_mcJPt,
-    kJp_mcJEE_relDiffE,
     // matching pp (direct vs by mother)
     kJp_mtchE_mtchDirE,
     kJp_mtchE_mtchDirE_primEl,
@@ -166,7 +165,7 @@ void DefineHisto_Bx_TPrf(TObjArray* objArr)
                     objArr->AddAt(hBx_mcE_maxClE_prof, kBx_mcE_maxClE_prof);   
     TProfile* hBx_maxClE_mcE_prof = new TProfile("hBx_maxClE_mcE_prof","",nBinsE,lowE,uppE,lowE,uppE);
                     hBx_maxClE_mcE_prof->SetTitle("(#it{E}_{cl,max}, #it{E}_{MC});#it{E}_{cl,max} [GeV];#it{E}_{MC} [GeV]");
-                    objArr->AddAt(hBx_maxClE_mcE_prof, kBx_maxClE_mcE_prof);   
+                    objArr->AddAt(hBx_maxClE_mcE_prof, kBx_maxClE_mcE_prof);
     return;
 }
 
@@ -196,13 +195,13 @@ void DefineHisto_Jp_TH1F(TObjArray* objArr)
                     hJp_clPairPt->SetTitle("#it{p}_{T} of cluster pairs;#it{p}_{T,cl pairs} [GeV/#it{c}];counts");
                     objArr->AddAt(hJp_clPairPt, kJp_clPairPt);
     TH1F* hJp_clPairPt_massCut = new TH1F("hJp_clPairPt_massCut","",nBinsPt,lowPt,uppPt);
-                    hJp_clPairPt_massCut->SetTitle("#it{p}_{T} of cluster pairs having inv. mass above 2.2 GeV/#it{c}^{2};#it{p}_{T,cl pairs} [GeV/#it{c}];counts");
+                    hJp_clPairPt_massCut->SetTitle("#it{p}_{T} of cluster pairs having inv. mass above 2.5 GeV/#it{c}^{2};#it{p}_{T,cl pairs} [GeV/#it{c}];counts");
                     objArr->AddAt(hJp_clPairPt_massCut, kJp_clPairPt_massCut);
     TH1F* hJp_primElClPairM = new TH1F("hJp_primElClPairM","",nBinsM,lowM,uppM);
                     hJp_primElClPairM->SetTitle("inv. mass of cluster pairs matched with a pair of pp electrons;#it{m}_{cl pairs matched} [GeV/#it{c}^{2}];counts");
                     objArr->AddAt(hJp_primElClPairM, kJp_primElClPairM);
     TH1F* hJp_primElClPairM_dir = new TH1F("hJp_primElClPairM_dir","",nBinsM,lowM,uppM);
-                    hJp_primElClPairM_dir->SetTitle("inv. mass of cluster pairs matched with a pair of pp electrons;#it{m}_{cl pairs dir. matched} [GeV/#it{c}^{2}];counts");
+                    hJp_primElClPairM_dir->SetTitle("inv. mass of cluster pairs directly matched with a pair of pp electrons;#it{m}_{cl pairs dir. matched} [GeV/#it{c}^{2}];counts");
                     objArr->AddAt(hJp_primElClPairM_dir, kJp_primElClPairM_dir);
     /*
     TH1F* hJp_primElClPairEta = new TH1F("hJp_primElClPairEta","",nBinsEta,lowEta,uppEta);
@@ -299,9 +298,6 @@ void DefineHisto_Jp_TH2F(TObjArray* objArr)
     TH2F* hJp_primElClPairPt_mcJPt = new TH2F("hJp_primElClPairPt_mcJPt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
                     hJp_primElClPairPt_mcJPt->SetTitle("#it{p}_{T} of a cluster pair matched with a pair of primary J/#psi electrons vs #it{p}_{T} of generated J/#psi;#it{p}_{T} (cluster pair) [GeV/#it{c}];#it{p}_{T} (matched primary electron pair) [GeV/#it{c}]");
                     objArr->AddAt(hJp_primElClPairPt_mcJPt, kJp_primElClPairPt_mcJPt);
-    TH2F* hJp_mcJEE_relDiffE = new TH2F("hJp_mcJEE_relDiffE","",nBinsE,lowE,uppE,40,0.,1.);
-                    hJp_mcJEE_relDiffE->SetTitle("rel. diff. in energy of a matched primary J/#psi electron and cluster energy vs energy of primary J/#psi electron;(#it{E}_{match} - #it{E}_{cluster}) / #it{E}_{match} [-];counts");
-                    objArr->AddAt(hJp_mcJEE_relDiffE, kJp_mcJEE_relDiffE);
     */
 
     // matching to physical primary particles (direct vs finding physical primary mother of matched track of arbitrary type)
