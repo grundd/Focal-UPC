@@ -24,12 +24,12 @@
 Bool_t plotEvInfo = kFALSE;
 Bool_t printEvInfo = kFALSE;
 // superclusterizer:
-Bool_t doSupercls = kFALSE; // if true, create superclusters using:
+Bool_t doSupercls = kTRUE; // if true, create superclusters using:
 const Float_t minSeedE = 5; // [GeV]
 const Float_t radius = 8; // [cm]
 // selections:
 const Float_t cutM = 0.0; // [GeV]; if > 0, filter out all (super)cluster pairs having mass below cutM
-const Float_t cutE = 10.0; // [GeV]; if > 0, filter out all (super) clusters having energy below cutE 
+const Float_t cutE = 30.0; // [GeV]; if > 0, filter out all (super) clusters having energy below cutE 
 // cuts used during matching with MC particles:
 const Float_t cutdEta = 0.4; // [-] difference in eta of a MC particle and a (super)cluster
 const Float_t cutdPhi = 0.4; // [-] difference in phi angles of a MC particle and a (super)cluster
@@ -694,9 +694,9 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
                     Double_t mass = cl12.M();
                     // fill some kinematic histograms
                     ((TH1F*)arrTH1F->At(kJp_clPairM))->Fill(mass);
-                    ((TH1F*)arrTH1F->At(kJp_clPairEta))->Fill(cl12.Eta());
+                    ((TH1F*)arrTH1F->At(kJp_clPairRap))->Fill(cl12.Rapidity());
                     ((TH1F*)arrTH1F->At(kJp_clPairPt))->Fill(cl12.Pt());
-                    if(mass > 2.5) ((TH1F*)arrTH1F->At(kJp_clPairPt_massCut))->Fill(cl12.Pt());
+                    if(mass > 2.8) ((TH1F*)arrTH1F->At(kJp_clPairPt_massCut))->Fill(cl12.Pt());
                     // if both paired to a different pp electron:
                     // matching by mothers
                     if((idxMtchP_prim[iCl1] != idxMtchP_prim[iCl2]) && idxMtchP_prim[iCl1] != -1 && idxMtchP_prim[iCl2] != -1)

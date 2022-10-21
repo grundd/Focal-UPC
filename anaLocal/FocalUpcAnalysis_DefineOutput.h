@@ -52,7 +52,7 @@ enum kBx_TPrf {
 enum kJp_TH1F {
     kJp_mcJPt = 0,
     kJp_clPairM,
-    kJp_clPairEta,
+    kJp_clPairRap,
     kJp_clPairPt,
     kJp_clPairPt_massCut,
     kJp_primElClPairM,
@@ -204,14 +204,14 @@ void DefineHisto_Jp_TH1F(TObjArray* objArr)
     TH1F* hJp_clPairM = new TH1F("hJp_clPairM","",nBinsM,lowM,uppM);
                     hJp_clPairM->SetTitle("inv. mass of cluster pairs;#it{m}_{cl pairs} [GeV/#it{c}^{2}];counts");
                     objArr->AddAt(hJp_clPairM, kJp_clPairM);
-    TH1F* hJp_clPairEta = new TH1F("hJp_clPairEta","",nBinsEta,lowEta,uppEta);
-                    hJp_clPairEta->SetTitle("#eta of cluster pairs;#eta_{cl pairs} [-];counts");
-                    objArr->AddAt(hJp_clPairEta, kJp_clPairEta);
+    TH1F* hJp_clPairRap = new TH1F("hJp_clPairRap","",nBinsEta,lowEta,uppEta);
+                    hJp_clPairRap->SetTitle("rapidity of cluster pairs;#it{y}_{cl pairs} [-];counts");
+                    objArr->AddAt(hJp_clPairRap, kJp_clPairRap);
     TH1F* hJp_clPairPt = new TH1F("hJp_clPairPt","",nBinsPt,lowPt,uppPt);
                     hJp_clPairPt->SetTitle("#it{p}_{T} of cluster pairs;#it{p}_{T,cl pairs} [GeV/#it{c}];counts");
                     objArr->AddAt(hJp_clPairPt, kJp_clPairPt);
     TH1F* hJp_clPairPt_massCut = new TH1F("hJp_clPairPt_massCut","",nBinsPt,lowPt,uppPt);
-                    hJp_clPairPt_massCut->SetTitle("#it{p}_{T} of cluster pairs having inv. mass above 2.5 GeV/#it{c}^{2};#it{p}_{T,cl pairs} [GeV/#it{c}];counts");
+                    hJp_clPairPt_massCut->SetTitle("#it{p}_{T} of cluster pairs having inv. mass above 2.8 GeV/#it{c}^{2};#it{p}_{T,cl pairs} [GeV/#it{c}];counts");
                     objArr->AddAt(hJp_clPairPt_massCut, kJp_clPairPt_massCut);
     TH1F* hJp_primElClPairM = new TH1F("hJp_primElClPairM","",nBinsM,lowM,uppM);
                     hJp_primElClPairM->SetTitle("inv. mass of cluster pairs matched with a pair of pp electrons;#it{m}_{cl pairs matched} [GeV/#it{c}^{2}];counts");
