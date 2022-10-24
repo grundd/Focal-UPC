@@ -34,6 +34,10 @@ Float_t x_max = 52.;
 Float_t etaFOClow = 3.4;
 Float_t etaFOCupp = 5.8;
 
+// cuts used during matching with MC particles:
+const Float_t cutdEta = 0.4; // [-] difference in eta of a MC particle and a (super)cluster
+const Float_t cutdPhi = 0.4; // [-] difference in phi angles of a MC particle and a (super)cluster
+
 using std::cout;
 using std::endl;
 
@@ -256,7 +260,7 @@ void SetTrackStyle(TLine* l, Int_t codePDG, Bool_t isPrimary = kTRUE)
     return;
 }
 
-void DrawTracksMC(AliStack *stack, TCanvas* c, Bool_t withLegend = kTRUE)
+void DrawTracksMC(AliStack* stack, TCanvas* c, Bool_t withLegend = kTRUE)
 {
     // calculate the number of primary particles
     Int_t nPrim(0.);
@@ -348,4 +352,97 @@ void DrawTracksMC(AliStack *stack, TCanvas* c, Bool_t withLegend = kTRUE)
     }
     c->cd(1);
     if(withLegend) l->Draw();
+}
+
+// ******************************************************************************************************************
+// Function to match clusters with physical primary MC particles
+// ******************************************************************************************************************
+
+void MatchClsToPhysPrimP(AliStack* stack, TList* listClsPref, vector<Int_t>& idxMtchPhysPrimP, TObjArray* arrMtchPhysPrimP, Bool_t matchDirectly = kFALSE)
+// matchDirectly = false -> match each cluster to the closest (in XY distance) MC track, then go by mothers and find its physical primary particle
+//               = true  -> match each cluster to the closest primary physical MC track (directly)
+{
+    arrMtchPhysPrimP->Clear();
+    // initialize the arrays
+    for(Int_t iCl = 0; iCl < listClsPref->GetEntries(); iCl++)
+    {
+        idxMtchPhysPrimP.push_back(-1);
+        arrMtchPhysPrimP->AddLast(NULL);
+    }
+    // now do the actual matching
+    for(Int_t iCl = 0; iCl < listClsPref->GetEntries(); iCl++)
+    {
+        AliFOCALCluster *clust = (AliFOCALCluster*) listClsPref->At(iCl);
+        if(!clust) continue;
+        // get energy and coordinates of this cluster
+        Float_t xCl = clust->X();
+        Float_t yCl = clust->Y();
+        Float_t zCl = clust->Z();
+        Float_t ECl = clust->E();
+        TLorentzVector cl = ConvertXYZEtoLorVec(xCl,yCl,zCl,ECl);
+
+        // do the matching
+        Float_t mtchXY(1e3);
+        Float_t mtchXY_dir(1e3);
+        TParticle* mtchP_any = NULL;
+        TParticle* mtchP_prim = NULL;
+        TParticle* mtchP_primDir = NULL;
+        Int_t iMtchP_any = -1;
+        Int_t iMtchP_prim = -1;
+        Int_t iMtchP_primDir = -1;
+        for(Int_t iTrk = 0; iTrk < stack->GetNtrack(); iTrk++)
+        {
+            TParticle *part = stack->Particle(iTrk);
+            // during matching, skip photons with very low energy (< 0.2 MeV)
+            // trajectories of these often overlap with those of pp electron (when projected as straight lines)
+            // and clusters could very likely be matched with them instead of pp electrons
+            if(part->GetPdgCode() == 22 && part->Energy() < 0.2) continue;
+            // eta cut
+            Float_t dEta = TMath::Abs(part->Eta() - cl.Eta());
+            if(dEta > cutdEta) continue;
+            // phi cut
+            Float_t dPhi = TMath::Abs(part->Phi() - cl.Phi());
+            if(dPhi > TMath::Pi()) dPhi = 2*TMath::Pi() - dPhi;
+            if(dPhi > cutdPhi) continue;
+            // do matching
+            Float_t x(0.), y(0.);
+            TrackCoordinatesAtZ(part,zCl,x,y);
+            Float_t distXY = TMath::Sqrt(TMath::Power(x-xCl,2) + TMath::Power(y-yCl,2));
+            if(distXY < mtchXY) {
+                // a new closest MC particle found
+                mtchP_any = part;
+                iMtchP_any = iTrk;
+                mtchXY = distXY;
+            }
+            if((distXY < mtchXY_dir) && stack->IsPhysicalPrimary(iTrk)) {
+                // a new closest physical primary MC particle found
+                mtchP_primDir = part;
+                iMtchP_primDir = iTrk;
+                mtchXY_dir = distXY;
+            }
+        }
+        // if a matching particle found
+        if(mtchP_any) {
+            // find the physical primary particle from which the matched particle originates
+            mtchP_prim = mtchP_any;
+            Bool_t physPrimFound = stack->IsPhysicalPrimary(iMtchP_any);
+            while(!physPrimFound) {
+                Int_t iNewMother = mtchP_prim->GetMother(0);
+                mtchP_prim = stack->Particle(iNewMother);
+                physPrimFound = stack->IsPhysicalPrimary(iNewMother);
+                iMtchP_any = iNewMother;
+            }
+            iMtchP_prim = iMtchP_any;
+        }
+        // if going by mothers
+        if(!matchDirectly) {
+            idxMtchPhysPrimP[iCl] = iMtchP_prim;
+            arrMtchPhysPrimP->AddAt(mtchP_prim, iCl);
+        // if matching directly to the closest ppp
+        } else {
+            idxMtchPhysPrimP[iCl] = iMtchP_primDir;
+            arrMtchPhysPrimP->AddAt(mtchP_primDir, iCl);
+        }
+    }    
+    return;
 }

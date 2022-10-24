@@ -2,186 +2,213 @@
 // David Grund, Oct 16, 2022
 
 // binning
+const Int_t nBinsEn = 100; // bin per 2 GeV
+const Float_t lowEn = 0.;
+const Float_t uppEn = 200.;
 const Int_t nBinsPt = 80; // bin per 25 MeV
 const Float_t lowPt = 0.;
 const Float_t uppPt = 2.;
-const Int_t nBinsEta = 100; // bin per 0.05
-const Float_t lowEta = 2.;
-const Float_t uppEta = 7.;
-const Int_t nBinsE = 100; // bin per 2 GeV
-const Float_t lowE = 0.;
-const Float_t uppE = 200.;
-const Int_t nBinsM = 50; // bin per 100 MeV
-const Float_t lowM = 0.;
-const Float_t uppM = 5.;
+const Int_t nBinsYEta = 100; // bin per 0.05
+const Float_t lowYEta = 2.;
+const Float_t uppYEta = 7.;
 const Int_t nBinsPhi = 80; // bin per 0.04
 const Float_t lowPhi = 0.;
 const Float_t uppPhi = 3.2;
+const Int_t nBinsM = 50; // bin per 100 MeV
+const Float_t lowM = 0.;
+const Float_t uppM = 5.;
+const Int_t nBinsSep = 50;
+const Float_t lowSep = 0.;
+const Float_t uppSep = 100.;
 
-enum kBx_TH1F {
-    kBx_mcE = 0,
-    kBx_mcPt,
-    kBx_TH1F_all    
+enum kBxH1 {
+    kB1_mcE = 0,
+    kB1_mcPt,
+    kB1_all    
 };
 
-enum kBx_TH2F {
-    kBx_mcE_nCls = 0,
-    kBx_mcE_totE,
-    kBx_totE_mcE,
-    kBx_totEwHCalE_mcE,
-    kBx_totEwIsoR2E_mcE,
-    kBx_totEwIsoR4E_mcE,
-    kBx_totE_totHCalE,
-    kBx_totE_totIsoR2E,
-    kBx_totE_totIsoR4E,
-    kBx_totEFromSegCls_mcE,
-    kBx_mcE_maxClE,
-    kBx_maxClE_mcE,
-    kBx_clE_mcE,
-    kBx_TH2F_all
+enum kBxH2 {
+    kB2_clMcDX_clMcDY = 0,
+    kB2_mcE_clMcSep,
+    kB2_clMaxClDX_clMaxClDY,
+    kB2_mcE_clMaxClSep,
+    kB2_mcE_nCls,
+    kB2_clE_mcE,
+    kB2_totE_mcE,
+    kB2_maxClE_mcE,
+    kB2_totEwHCalE_mcE,
+    kB2_totEwIsoR2E_mcE,
+    kB2_totEwIsoR4E_mcE,
+    kB2_totE_totHCalE,
+    kB2_totE_totIsoR2E,
+    kB2_totE_totIsoR4E,
+    kB2_totEFromSegCls_mcE,
+    //kB2_mcE_totE,
+    //kB2_mcE_maxClE,
+    kB2_all
 };
 
-enum kBx_TPrf {
-    kBx_mcE_totE_prof = 0,
-    kBx_totE_mcE_prof,
-    kBx_mcE_maxClE_prof,
-    kBx_maxClE_mcE_prof,
-    kBx_TPrf_all
+enum kBxPr {
+    kBP_totE_mcE = 0,
+    kBP_maxClE_mcE,
+    //kBP_mcE_totE,
+    //kBP_mcE_maxClE,
+    kBP_all
 };
 
-enum kJp_TH1F {
-    kJp_mcJPt = 0,
-    kJp_clPairM,
-    kJp_clPairRap,
-    kJp_clPairPt,
-    kJp_clPairPt_massCut,
-    kJp_primElClPairM,
-    kJp_primElClPairM_dir,
-    //
-    kJp_primElClPairEta,
-    kJp_primElClPairPt,
-    kJp_mcJEEall,
-    kJp_mcJEEmtch,
-    kJp_mcJEEratio,
-    kJp_TH1F_all
+enum kJpH1 {
+    // MC J/psi
+    kJ1_mcJEn = 0,
+    kJ1_mcJPt,
+    kJ1_mcJRap,
+    kJ1_mcJM,
+    // ppe pairs
+    kJ1_mcJElPairEn,
+    kJ1_mcJElPairPt,
+    kJ1_mcJElPairRap,
+    kJ1_mcJElPairM,
+    // cluster pairs
+    kJ1_clPairEn,
+    kJ1_clPairPt,
+    kJ1_clPairPt_massCut,
+    kJ1_clPairRap,
+    kJ1_clPairM,
+    kJ1_clPairSep,
+    // matched cl. pairs
+    kJ1_ppeClPairM,
+    kJ1_ppeClPairSep,
+    kJ1_all
 };
 
-enum kJp_TH2F {
-    kJp_mcJRap_mcJPt = 0,
-    kJp_mcJRap_mcJPt_acc,
-    kJp_mcJEEta_mcJEPt,
-    kJp_mcJE1E_mcJE2E,
-    kJp_mcJE1Pt_mcJE2Pt,
-    kJp_clEta_clPhi,
-    kJp_clEta_clPt,
+enum kJpH2 {
+    // MC J/psi kinematics
+    kJ2_mcJRap_mcJPt = 0,
+    // ppe kinematics
+    kJ2_mcJElEta_mcJElPt,
+    kJ2_mcJEl1En_mcJEl2En,
+    kJ2_mcJEl1Pt_mcJEl2Pt,
+    // cluster kinematics corr
+    kJ2_clEta_clPhi,
+    kJ2_clEta_clPt,
     // cluster vs ppp
-    kJp_clE_mtchE,
-    kJp_clE_mtchDirE,
-    kJp_clEta_mtchEta,
-    kJp_clEta_mtchDirEta,
-    kJp_clPt_mtchPt,
-    kJp_clPt_mtchDirPt,
+    kJ2_pppClEn_mtchEn,
+    kJ2_pppClEta_mtchEta,
+    kJ2_pppClPt_mtchPt,
     // cluster vs ppe
-    kJp_primElClE_mtchE,
-    kJp_primElClE_mtchDirE,
-    kJp_primElClEta_mtchEta,
-    kJp_primElClEta_mtchDirEta,
-    kJp_primElClPt_mtchPt,
-    kJp_primElClPt_mtchDirPt,
-    //
-    kJp_primElClPairEta_mcJEta,
-    kJp_primElClPairPt_mcJPt,
-    // matching pp (direct vs by mother)
-    kJp_mtchE_mtchDirE,
-    kJp_mtchE_mtchDirE_primEl,
-    kJp_mtchEta_mtchDirEta_primEl,
-    kJp_mtchPt_mtchDirPt_primEl,
-    kJp_TH2F_all
+    kJ2_ppeClEn_mtchEn,
+    kJ2_ppeClEta_mtchEta,
+    kJ2_ppeClPt_mtchPt,
+    // cluster pairs vs ppe pairs
+    kJ2_ppeClPairEn_mtchEn,
+    kJ2_ppeClPairRap_mtchRap,
+    kJ2_ppeClPairPt_mtchPt,
+    kJ2_ppeClPairM_mtchM,
+    kJ2_clPairSep_mcJElSep,
+    kJ2_all
 };
 
-enum kJp_TPrf {
-    kJp_TPrf_all = 0
+enum kJpPr {
+    kpJp_all = 0
 };
 
 // ******************************************************************************************************************
 // for analyses of box electron/photon: events:
 // ******************************************************************************************************************
 
-void DefineHisto_Bx_TH1F(TObjArray* objArr)
+void DefineHisto_BxH1(TObjArray* objArr)
 {
     objArr->SetOwner();
 
-    TH1F* hBx_mcE = new TH1F("hBx_mcE","",nBinsE,lowE,uppE);
-                    hBx_mcE->SetTitle("electron #it{E} generated;#it{E}_{MC} [GeV];counts");
-                    objArr->AddAt(hBx_mcE, kBx_mcE);
-    TH1F* hBx_mcPt = new TH1F("hBx_mcPt","",40,lowPt,uppPt);
-                    hBx_mcPt->SetTitle("electron #it{p}_{T} generated;#it{p}_{T} [GeV/#it{c}];counts");
-                    objArr->AddAt(hBx_mcPt, kBx_mcPt);
+    TH1F* hB1_mcE = new TH1F("hB1_mcE","",nBinsEn,lowEn,uppEn);
+                    hB1_mcE->SetTitle("#it{E} of generated electron;#it{E}_{MC} [GeV];counts");
+                    objArr->AddAt(hB1_mcE, kB1_mcE);
+    TH1F* hB1_mcPt = new TH1F("hB1_mcPt","",40,lowPt,uppPt);
+                    hB1_mcPt->SetTitle("#it{p}_{T} of generated electron;#it{p}_{T} [GeV/#it{c}];counts");
+                    objArr->AddAt(hB1_mcPt, kB1_mcPt);
     return;
 }
 
-void DefineHisto_Bx_TH2F(TObjArray* objArr)
+void DefineHisto_BxH2(TObjArray* objArr)
 {
     objArr->SetOwner();
 
-    TH2F* hBx_mcE_nCls = new TH2F("hBx_mcE_nCls","",nBinsE,lowE,uppE,8,-0.5,7.5);
-                    hBx_mcE_nCls->SetTitle("(#it{E}_{MC}, #it{N}_{cls});#it{E}_{MC} [GeV];#it{N}_{cls} [-]");
-                    objArr->AddAt(hBx_mcE_nCls, kBx_mcE_nCls);
-    TH2F* hBx_mcE_totE = new TH2F("hBx_mcE_totE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_mcE_totE->SetTitle("(#it{E}_{MC}, #it{E}_{total});#it{E}_{MC} [GeV];#it{E}_{total} [GeV]");
-                    objArr->AddAt(hBx_mcE_totE, kBx_mcE_totE);
-    TH2F* hBx_totE_mcE = new TH2F("hBx_totE_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_totE_mcE->SetTitle("(#it{E}_{total}, #it{E}_{MC});#it{E}_{total} [GeV];#it{E}_{MC} [GeV]");
-                    objArr->AddAt(hBx_totE_mcE, kBx_totE_mcE);
-    TH2F* hBx_totEwHCalE_mcE = new TH2F("hBx_totEwHCalE_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_totEwHCalE_mcE->SetTitle("(#it{E}_{total with HCal}, #it{E}_{MC});#it{E}_{total with HCal} [GeV];#it{E}_{MC} [GeV]");
-                    objArr->AddAt(hBx_totEwHCalE_mcE, kBx_totEwHCalE_mcE);
-    TH2F* hBx_totEwIsoR2E_mcE = new TH2F("hBx_totEwIsoR2E_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_totEwIsoR2E_mcE->SetTitle("(#it{E}_{total with HCal isoR2}, #it{E}_{MC});#it{E}_{total with HCal isoR2} [GeV];#it{E}_{MC} [GeV]");
-                    objArr->AddAt(hBx_totEwIsoR2E_mcE, kBx_totEwIsoR2E_mcE);
-    TH2F* hBx_totEwIsoR4E_mcE = new TH2F("hBx_totEwIsoR4E_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_totEwIsoR4E_mcE->SetTitle("(#it{E}_{total with HCal isoR4}, #it{E}_{MC});#it{E}_{total with HCal isoR4} [GeV];#it{E}_{MC} [GeV]");
-                    objArr->AddAt(hBx_totEwIsoR4E_mcE, kBx_totEwIsoR4E_mcE);
-    TH2F* hBx_totE_totHCalE = new TH2F("hBx_totE_totHCalE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_totE_totHCalE->SetTitle("(#it{E}_{total}, #it{E}_{total HCal});#it{E}_{total} [GeV];#it{E}_{total HCal} [GeV]");
-                    objArr->AddAt(hBx_totE_totHCalE, kBx_totE_totHCalE);
-    TH2F* hBx_totE_totIsoR2E = new TH2F("hBx_totE_totIsoR2E","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_totE_totIsoR2E->SetTitle("(#it{E}_{total}, #it{E}_{total isoR2});#it{E}_{total} [GeV];#it{E}_{total isoR2} [GeV]");
-                    objArr->AddAt(hBx_totE_totIsoR2E, kBx_totE_totIsoR2E);
-    TH2F* hBx_totE_totIsoR4E = new TH2F("hBx_totE_totIsoR4E","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_totE_totIsoR4E->SetTitle("(#it{E}_{total}, #it{E}_{total isoR4});#it{E}_{total} [GeV];#it{E}_{total isoR4} [GeV]");
-                    objArr->AddAt(hBx_totE_totIsoR4E, kBx_totE_totIsoR4E);
-    TH2F* hBx_totEFromSegCls_mcE = new TH2F("hBx_totEFromSegCls_mcE","",nBinsE,lowE,2500,nBinsE,lowE,uppE);
-                    hBx_totEFromSegCls_mcE->SetTitle("(#it{E}_{total from per seg cls}, #it{E}_{MC});#it{E}_{total from per seg cls} [GeV];#it{E}_{MC} [GeV]");
-                    objArr->AddAt(hBx_totEFromSegCls_mcE, kBx_totEFromSegCls_mcE);
-    TH2F* hBx_mcE_maxClE = new TH2F("hBx_mcE_maxClE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_mcE_maxClE->SetTitle("(#it{E}_{MC}, #it{E}_{cl,max});#it{E}_{MC} [GeV];#it{E}_{cl,max} [GeV]");
-                    objArr->AddAt(hBx_mcE_maxClE, kBx_mcE_maxClE);
-    TH2F* hBx_maxClE_mcE = new TH2F("hBx_maxClE_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_maxClE_mcE->SetTitle("(#it{E}_{cl,max}, #it{E}_{MC});#it{E}_{cl,max} [GeV];#it{E}_{MC} [GeV]");
-                    objArr->AddAt(hBx_maxClE_mcE, kBx_maxClE_mcE);
-    TH2F* hBx_clE_mcE = new TH2F("hBx_clE_mcE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hBx_clE_mcE->SetTitle("(#it{E}_{cl}, #it{E}_{MC});#it{E}_{cl} [GeV];#it{E}_{MC} [GeV]");
-                    objArr->AddAt(hBx_clE_mcE, kBx_clE_mcE);
+    // cluster XY position vs that of ppe / cluster with maximum energy
+    TH2F* hB2_clMcDX_clMcDY = new TH2F("hB2_clMcDX_clMcDY","",100,-20.,20.,100,-20.,20.);
+                    hB2_clMcDX_clMcDY->SetTitle("Distance (in the XY plane) between the cluster and the MC track;#Delta#it{x} = #it{x}_{cl} - #it{x}_{MC} [cm];#Delta#it{y} = #it{y}_{cl} - #it{y}_{MC} [cm]");
+                    objArr->AddAt(hB2_clMcDX_clMcDY, kB2_clMcDX_clMcDY);
+    TH2F* hB2_mcE_clMcSep = new TH2F("hB2_mcE_clMcSep","",nBinsEn,lowEn,uppEn,100,0.,20.);
+                    hB2_mcE_clMcSep->SetTitle("Radial distance #Delta#it{R} = #sqrt{(#Delta#it{x})^{2} + (#Delta#it{y})^{2}} between the cluster and the MC track;#it{E}_{MC} [GeV];#Delta#it{R} [cm]");
+                    objArr->AddAt(hB2_mcE_clMcSep, kB2_mcE_clMcSep);
+    TH2F* hB2_clMaxClDX_clMaxClDY = new TH2F("hB2_clMaxClDX_clMaxClDY","",100,-20.,20.,100,-20.,20.);
+                    hB2_clMaxClDX_clMaxClDY->SetTitle("Distance between the cluster and the cluster with maximum energy;#Delta#it{x} = #it{x}_{cl} - #it{x}_{cl,max} [cm];#Delta#it{y} = #it{y}_{cl} - #it{y}_{cl,max} [cm]");
+                    objArr->AddAt(hB2_clMaxClDX_clMaxClDY, kB2_clMaxClDX_clMaxClDY);
+    TH2F* hB2_mcE_clMaxClSep = new TH2F("hB2_mcE_clMaxClSep","",nBinsEn,lowEn,uppEn,100,0.,20.);
+                    hB2_mcE_clMaxClSep->SetTitle("Radial distance #Delta#it{R} = #sqrt{(#Delta#it{x})^{2} + (#Delta#it{y})^{2}} between the cluster and the cluster with maximum energy;#it{E}_{MC} [GeV];#Delta#it{R} [cm]");
+                    objArr->AddAt(hB2_mcE_clMaxClSep, kB2_mcE_clMaxClSep);
+    // number of clusters, cluster energy, total energy and maximum cluster energy vs MC energy
+    TH2F* hB2_mcE_nCls = new TH2F("hB2_mcE_nCls","",nBinsEn,lowEn,uppEn,8,-0.5,7.5);
+                    hB2_mcE_nCls->SetTitle("(#it{E}_{MC}, #it{N}_{cls});#it{E}_{MC} [GeV];#it{N}_{cls} [-]");
+                    objArr->AddAt(hB2_mcE_nCls, kB2_mcE_nCls);
+    TH2F* hB2_clE_mcE = new TH2F("hB2_clE_mcE","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hB2_clE_mcE->SetTitle("(#it{E}_{cl}, #it{E}_{MC});#it{E}_{cl} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hB2_clE_mcE, kB2_clE_mcE);
+    TH2F* hB2_totE_mcE = new TH2F("hB2_totE_mcE","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hB2_totE_mcE->SetTitle("(#it{E}_{total}, #it{E}_{MC});#it{E}_{total} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hB2_totE_mcE, kB2_totE_mcE);
+    TH2F* hB2_maxClE_mcE = new TH2F("hB2_maxClE_mcE","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hB2_maxClE_mcE->SetTitle("(#it{E}_{cl,max}, #it{E}_{MC});#it{E}_{cl,max} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hB2_maxClE_mcE, kB2_maxClE_mcE);
+    // contribution of HCal energy to the total energy
+    TH2F* hB2_totEwHCalE_mcE = new TH2F("hB2_totEwHCalE_mcE","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hB2_totEwHCalE_mcE->SetTitle("(#it{E}_{total with HCal}, #it{E}_{MC});#it{E}_{total with HCal} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hB2_totEwHCalE_mcE, kB2_totEwHCalE_mcE);
+    TH2F* hB2_totEwIsoR2E_mcE = new TH2F("hB2_totEwIsoR2E_mcE","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hB2_totEwIsoR2E_mcE->SetTitle("(#it{E}_{total with HCal isoR2}, #it{E}_{MC});#it{E}_{total with HCal isoR2} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hB2_totEwIsoR2E_mcE, kB2_totEwIsoR2E_mcE);
+    TH2F* hB2_totEwIsoR4E_mcE = new TH2F("hB2_totEwIsoR4E_mcE","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hB2_totEwIsoR4E_mcE->SetTitle("(#it{E}_{total with HCal isoR4}, #it{E}_{MC});#it{E}_{total with HCal isoR4} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hB2_totEwIsoR4E_mcE, kB2_totEwIsoR4E_mcE);
+    TH2F* hB2_totE_totHCalE = new TH2F("hB2_totE_totHCalE","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hB2_totE_totHCalE->SetTitle("(#it{E}_{total}, #it{E}_{total HCal});#it{E}_{total} [GeV];#it{E}_{total HCal} [GeV]");
+                    objArr->AddAt(hB2_totE_totHCalE, kB2_totE_totHCalE);
+    TH2F* hB2_totE_totIsoR2E = new TH2F("hB2_totE_totIsoR2E","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hB2_totE_totIsoR2E->SetTitle("(#it{E}_{total}, #it{E}_{total isoR2});#it{E}_{total} [GeV];#it{E}_{total isoR2} [GeV]");
+                    objArr->AddAt(hB2_totE_totIsoR2E, kB2_totE_totIsoR2E);
+    TH2F* hB2_totE_totIsoR4E = new TH2F("hB2_totE_totIsoR4E","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hB2_totE_totIsoR4E->SetTitle("(#it{E}_{total}, #it{E}_{total isoR4});#it{E}_{total} [GeV];#it{E}_{total isoR4} [GeV]");
+                    objArr->AddAt(hB2_totE_totIsoR4E, kB2_totE_totIsoR4E);
+    TH2F* hB2_totEFromSegCls_mcE = new TH2F("hB2_totEFromSegCls_mcE","",nBinsEn,lowEn,2500,nBinsEn,lowEn,uppEn);
+                    hB2_totEFromSegCls_mcE->SetTitle("(#it{E}_{total from per seg cls}, #it{E}_{MC});#it{E}_{total from per seg cls} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hB2_totEFromSegCls_mcE, kB2_totEFromSegCls_mcE);
+    /*
+    TH2F* hB2_mcE_totE = new TH2F("hB2_mcE_totE","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hB2_mcE_totE->SetTitle("(#it{E}_{MC}, #it{E}_{total});#it{E}_{MC} [GeV];#it{E}_{total} [GeV]");
+                    objArr->AddAt(hB2_mcE_totE, kB2_mcE_totE);
+    TH2F* hB2_mcE_maxClE = new TH2F("hB2_mcE_maxClE","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hB2_mcE_maxClE->SetTitle("(#it{E}_{MC}, #it{E}_{cl,max});#it{E}_{MC} [GeV];#it{E}_{cl,max} [GeV]");
+                    objArr->AddAt(hB2_mcE_maxClE, kB2_mcE_maxClE);
+    */
     return;
 }
 
-void DefineHisto_Bx_TPrf(TObjArray* objArr)
+void DefineHisto_BxPr(TObjArray* objArr)
 {
     objArr->SetOwner();
 
-    TProfile* hBx_mcE_totE_prof = new TProfile("hBx_mcE_totE_prof","",nBinsE,lowE,uppE,lowE,uppE);
-                    hBx_mcE_totE_prof->SetTitle("(#it{E}_{MC}, #it{E}_{total});#it{E}_{MC} [GeV];#it{E}_{total} [GeV]");
-                    objArr->AddAt(hBx_mcE_totE_prof, kBx_mcE_totE_prof); 
-    TProfile* hBx_totE_mcE_prof = new TProfile("hBx_totE_mcE_prof","",nBinsE,lowE,uppE,lowE,uppE);
-                    hBx_totE_mcE_prof->SetTitle("(#it{E}_{total}, #it{E}_{MC});#it{E}_{total} [GeV];#it{E}_{MC} [GeV]");
-                    objArr->AddAt(hBx_totE_mcE_prof, kBx_totE_mcE_prof);   
-    TProfile* hBx_mcE_maxClE_prof = new TProfile("hBx_mcE_maxClE_prof","",nBinsE,lowE,uppE,lowE,uppE);
-                    hBx_mcE_maxClE_prof->SetTitle("(#it{E}_{MC}, #it{E}_{cl,max});#it{E}_{MC} [GeV];#it{E}_{cl,max} [GeV]");
-                    objArr->AddAt(hBx_mcE_maxClE_prof, kBx_mcE_maxClE_prof);   
-    TProfile* hBx_maxClE_mcE_prof = new TProfile("hBx_maxClE_mcE_prof","",nBinsE,lowE,uppE,lowE,uppE);
-                    hBx_maxClE_mcE_prof->SetTitle("(#it{E}_{cl,max}, #it{E}_{MC});#it{E}_{cl,max} [GeV];#it{E}_{MC} [GeV]");
-                    objArr->AddAt(hBx_maxClE_mcE_prof, kBx_maxClE_mcE_prof);
+    TProfile* hBP_totE_mcE = new TProfile("hBP_totE_mcE","",nBinsEn,lowEn,uppEn,lowEn,uppEn);
+                    hBP_totE_mcE->SetTitle("(#it{E}_{total}, #it{E}_{MC});#it{E}_{total} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hBP_totE_mcE, kBP_totE_mcE);
+    TProfile* hBP_maxClE_mcE = new TProfile("hBP_maxClE_mcE","",nBinsEn,lowEn,uppEn,lowEn,uppEn);
+                    hBP_maxClE_mcE->SetTitle("(#it{E}_{cl,max}, #it{E}_{MC});#it{E}_{cl,max} [GeV];#it{E}_{MC} [GeV]");
+                    objArr->AddAt(hBP_maxClE_mcE, kBP_maxClE_mcE);
+    /*
+    TProfile* hBP_mcE_totE = new TProfile("hBP_mcE_totE","",nBinsEn,lowEn,uppEn,lowEn,uppEn);
+                    hBP_mcE_totE->SetTitle("(#it{E}_{MC}, #it{E}_{total});#it{E}_{MC} [GeV];#it{E}_{total} [GeV]");
+                    objArr->AddAt(hBP_mcE_totE, kBP_mcE_totE);
+    TProfile* hBP_mcE_maxClE = new TProfile("hBP_mcE_maxClE","",nBinsEn,lowEn,uppEn,lowEn,uppEn);
+                    hBP_mcE_maxClE->SetTitle("(#it{E}_{MC}, #it{E}_{cl,max});#it{E}_{MC} [GeV];#it{E}_{cl,max} [GeV]");
+                    objArr->AddAt(hBP_mcE_maxClE, kBP_mcE_maxClE);
+    */
     return;
 }
 
@@ -189,150 +216,131 @@ void DefineHisto_Bx_TPrf(TObjArray* objArr)
 // for analyses of J/psi events:
 // ******************************************************************************************************************
 
-/*
-    TH2F* hMismatchXY = CreateTH2F("hMismatchXY", 
-                    "XY distance between a cluster and a matched primary J/#psi electron vs matched energy;#it{E} (matched primary electron) [GeV];#sqrt{(#Delta#it{x})^{2} + (#Delta#it{y})^{2}} [cm]",
-                    nBinsE,lowE,uppE,40,0.,8.);
-*/
-
-void DefineHisto_Jp_TH1F(TObjArray* objArr)
+void DefineHisto_JpH1(TObjArray* objArr)
 {
     objArr->SetOwner();
-    TH1F* hJp_mcJPt = new TH1F("hJp_mcJPt","",nBinsPt,lowPt,uppPt);
-                    hJp_mcJPt->SetTitle("J/#psi #it{p}_{T} generated;#it{p}_{T,J/#psi} [GeV/#it{c}];counts");
-                    objArr->AddAt(hJp_mcJPt, kJp_mcJPt);
-    TH1F* hJp_clPairM = new TH1F("hJp_clPairM","",nBinsM,lowM,uppM);
-                    hJp_clPairM->SetTitle("inv. mass of cluster pairs;#it{m}_{cl pairs} [GeV/#it{c}^{2}];counts");
-                    objArr->AddAt(hJp_clPairM, kJp_clPairM);
-    TH1F* hJp_clPairRap = new TH1F("hJp_clPairRap","",nBinsEta,lowEta,uppEta);
-                    hJp_clPairRap->SetTitle("rapidity of cluster pairs;#it{y}_{cl pairs} [-];counts");
-                    objArr->AddAt(hJp_clPairRap, kJp_clPairRap);
-    TH1F* hJp_clPairPt = new TH1F("hJp_clPairPt","",nBinsPt,lowPt,uppPt);
-                    hJp_clPairPt->SetTitle("#it{p}_{T} of cluster pairs;#it{p}_{T,cl pairs} [GeV/#it{c}];counts");
-                    objArr->AddAt(hJp_clPairPt, kJp_clPairPt);
-    TH1F* hJp_clPairPt_massCut = new TH1F("hJp_clPairPt_massCut","",nBinsPt,lowPt,uppPt);
-                    hJp_clPairPt_massCut->SetTitle("#it{p}_{T} of cluster pairs having inv. mass above 2.8 GeV/#it{c}^{2};#it{p}_{T,cl pairs} [GeV/#it{c}];counts");
-                    objArr->AddAt(hJp_clPairPt_massCut, kJp_clPairPt_massCut);
-    TH1F* hJp_primElClPairM = new TH1F("hJp_primElClPairM","",nBinsM,lowM,uppM);
-                    hJp_primElClPairM->SetTitle("inv. mass of cluster pairs matched with a pair of pp electrons;#it{m}_{cl pairs matched} [GeV/#it{c}^{2}];counts");
-                    objArr->AddAt(hJp_primElClPairM, kJp_primElClPairM);
-    TH1F* hJp_primElClPairM_dir = new TH1F("hJp_primElClPairM_dir","",nBinsM,lowM,uppM);
-                    hJp_primElClPairM_dir->SetTitle("inv. mass of cluster pairs directly matched with a pair of pp electrons;#it{m}_{cl pairs dir. matched} [GeV/#it{c}^{2}];counts");
-                    objArr->AddAt(hJp_primElClPairM_dir, kJp_primElClPairM_dir);
-    /*
-    TH1F* hJp_primElClPairEta = new TH1F("hJp_primElClPairEta","",nBinsEta,lowEta,uppEta);
-                    hJp_primElClPairEta->SetTitle("#eta of cluster pairs matched with a pair of primary J/#psi electrons;#eta [-];counts");
-                    objArr->AddAt(hJp_primElClPairEta, kJp_primElClPairEta); 
-    TH1F* hJp_primElClPairPt = new TH1F("hJp_primElClPairPt","",nBinsPt,lowPt,uppPt);
-                    hJp_primElClPairPt->SetTitle("#it{p}_{T} of cluster pairs matched with a pair of primary J/#psi electrons;#it{p}_{T} [GeV/#it{c}];counts");
-                    objArr->AddAt(hJp_primElClPairPt, kJp_primElClPairPt); 
-    TH1F* hJp_mcJEEall = new TH1F("hJp_mcJEEall","",nBinsE,lowE,uppE);
-                    hJp_mcJEEall->SetTitle("energy of primary J/#psi electron tracks: all;#it{E} [GeV];counts");
-                    objArr->AddAt(hJp_mcJEEall, kJp_mcJEEall); 
-    TH1F* hJp_mcJEEmtch = new TH1F("hJp_mcJEEmtch","",nBinsE,lowE,uppE);
-                    hJp_mcJEEmtch->SetTitle("energy of primary J/#psi electron tracks: only matched;#it{E} [GeV];counts");
-                    objArr->AddAt(hJp_mcJEEmtch, kJp_mcJEEmtch); 
-    TH1F* hJp_mcJEEratio = new TH1F("hJp_mcJEEratio","",nBinsE,lowE,uppE);
-                    hJp_mcJEEratio->SetTitle("energy of primary J/#psi electron tracks: ratio matched/all;#it{E} [GeV];ratio matched/all [-]");
-                    objArr->AddAt(hJp_mcJEEratio, kJp_mcJEEratio); 
-    // matching to physical primary particles (direct vs finding physical primary mother of matched track of arbitrary type)
-    //TH1F* hJp_mcJE_
-    */
+    // MC kinematics
+    // J/psi
+    TH1F* hJ1_mcJEn = new TH1F("hJ1_mcJEn","",nBinsEn,lowEn,uppEn);
+                    hJ1_mcJEn->SetTitle("#it{E} of generated J/#psi;#it{E}_{J/#psi} [GeV];counts");
+                    objArr->AddAt(hJ1_mcJEn, kJ1_mcJEn);
+    TH1F* hJ1_mcJPt = new TH1F("hJ1_mcJPt","",nBinsPt,lowPt,uppPt);
+                    hJ1_mcJPt->SetTitle("#it{p}_{T} of generated J/#psi;#it{p}_{T,J/#psi} [GeV/#it{c}];counts");
+                    objArr->AddAt(hJ1_mcJPt, kJ1_mcJPt);
+    TH1F* hJ1_mcJRap = new TH1F("hJ1_mcJRap","",nBinsYEta,lowYEta,uppYEta);
+                    hJ1_mcJRap->SetTitle("#it{y} of generated J/#psi;#it{y}_{J/#psi} [-];counts");
+                    objArr->AddAt(hJ1_mcJRap, kJ1_mcJRap);
+    TH1F* hJ1_mcJM = new TH1F("hJ1_mcJM","",nBinsM,lowM,uppM);
+                    hJ1_mcJM->SetTitle("#it{m} of generated J/#psi;#it{m}_{J/#psi} [GeV/#it{c}^{2}];counts");
+                    objArr->AddAt(hJ1_mcJM, kJ1_mcJM);
+    // pairs of pp electrons
+    TH1F* hJ1_mcJElPairEn = new TH1F("hJ1_mcJElPairEn","",nBinsEn,lowEn,uppEn);
+                    hJ1_mcJElPairEn->SetTitle("#it{E} of pairs of pp electrons;#it{E}_{ppe pair} [GeV];counts");
+                    objArr->AddAt(hJ1_mcJElPairEn, kJ1_mcJElPairEn);
+    TH1F* hJ1_mcJElPairPt = new TH1F("hJ1_mcJElPairPt","",nBinsPt,lowPt,uppPt);
+                    hJ1_mcJElPairPt->SetTitle("#it{p}_{T} of pairs of pp electrons;#it{p}_{T,ppe pair} [GeV/#it{c}];counts");
+                    objArr->AddAt(hJ1_mcJElPairPt, kJ1_mcJElPairPt);
+    TH1F* hJ1_mcJElPairRap = new TH1F("hJ1_mcJElPairRap","",nBinsYEta,lowYEta,uppYEta);
+                    hJ1_mcJElPairRap->SetTitle("#it{y} of pairs of pp electrons;#it{y}_{ppe pair} [-];counts");
+                    objArr->AddAt(hJ1_mcJElPairRap, kJ1_mcJElPairRap);
+    TH1F* hJ1_mcJElPairM = new TH1F("hJ1_mcJElPairM","",nBinsM,lowM,uppM);
+                    hJ1_mcJElPairM->SetTitle("#it{m} of pairs of pp electrons;#it{m}_{ppe pair} [GeV/#it{c}^{2}];counts");
+                    objArr->AddAt(hJ1_mcJElPairM, kJ1_mcJElPairM);
+    // cluster pair kinematics
+    TH1F* hJ1_clPairEn = new TH1F("hJ1_clPairEn","",nBinsEn,lowEn,uppEn);
+                    hJ1_clPairEn->SetTitle("#it{E} of cluster pairs;#it{m}_{cl pair} [GeV];counts");
+                    objArr->AddAt(hJ1_clPairEn, kJ1_clPairEn);
+    TH1F* hJ1_clPairPt = new TH1F("hJ1_clPairPt","",nBinsPt,lowPt,uppPt);
+                    hJ1_clPairPt->SetTitle("#it{p}_{T} of cluster pairs;#it{p}_{T,cl pair} [GeV/#it{c}];counts");
+                    objArr->AddAt(hJ1_clPairPt, kJ1_clPairPt);
+    TH1F* hJ1_clPairPt_massCut = new TH1F("hJ1_clPairPt_massCut","",nBinsPt,lowPt,uppPt);
+                    hJ1_clPairPt_massCut->SetTitle("#it{p}_{T} of cluster pairs with #it{m} > 2.8 GeV/#it{c}^{2};#it{p}_{T,cl pair} [GeV/#it{c}];counts");
+                    objArr->AddAt(hJ1_clPairPt_massCut, kJ1_clPairPt_massCut);
+    TH1F* hJ1_clPairM = new TH1F("hJ1_clPairM","",nBinsM,lowM,uppM);
+                    hJ1_clPairM->SetTitle("#it{m} of cluster pairs;#it{m}_{cl pair} [GeV/#it{c}^{2}];counts");
+                    objArr->AddAt(hJ1_clPairM, kJ1_clPairM);
+    TH1F* hJ1_clPairRap = new TH1F("hJ1_clPairRap","",nBinsYEta,lowYEta,uppYEta);
+                    hJ1_clPairRap->SetTitle("rapidity of cluster pairs;#it{y}_{cl pair} [-];counts");
+                    objArr->AddAt(hJ1_clPairRap, kJ1_clPairRap);
+    TH1F* hJ1_clPairSep = new TH1F("hJ1_clPairSep","",nBinsSep,lowSep,uppSep);
+                    hJ1_clPairSep->SetTitle("Radial separation of cluster pairs;#Delta#it{R}_{cl pair} [cm];counts");
+                    objArr->AddAt(hJ1_clPairSep, kJ1_clPairSep);
+    // cluster pairs matched with ppe pairs
+    TH1F* hJ1_ppeClPairM = new TH1F("hJ1_ppeClPairM","",nBinsM,lowM,uppM);
+                    hJ1_ppeClPairM->SetTitle("#it{m} of cluster pairs matched with a pair of pp electrons;#it{m}_{matched cl pair} [GeV/#it{c}^{2}];counts");
+                    objArr->AddAt(hJ1_ppeClPairM, kJ1_ppeClPairM);
+    TH1F* hJ1_ppeClPairSep = new TH1F("hJ1_ppeClPairSep","",nBinsSep,lowSep,uppSep);
+                    hJ1_ppeClPairSep->SetTitle("Radial separation of cluster pairs matched with a pair of pp electrons;#Delta#it{R}_{matched cl pair} [cm];counts");
+                    objArr->AddAt(hJ1_ppeClPairSep, kJ1_ppeClPairSep);
     return;
 }
 
-void DefineHisto_Jp_TH2F(TObjArray* objArr)
+void DefineHisto_JpH2(TObjArray* objArr)
 {
     objArr->SetOwner();
-    TH2F* hJp_mcJRap_mcJPt = new TH2F("hJp_mcJRap_mcJPt","",nBinsEta,lowEta,uppEta,nBinsPt,lowPt,uppPt);
-                    hJp_mcJRap_mcJPt->SetTitle("(#it{y}, #it{p}_{T}) of generated J/#psi;#it{y}_{J/#psi} [-];#it{p}_{T,J/#psi} [GeV/#it{c}]");
-                    objArr->AddAt(hJp_mcJRap_mcJPt, kJp_mcJRap_mcJPt);
-    /*
-    TH2F* hJp_mcJRap_mcJPt_acc = new TH2F("hJp_mcJRap_mcJPt_acc","",nBinsEta,lowEta,uppEta,nBinsPt,lowPt,uppPt);
-                    hJp_mcJRap_mcJPt_acc->SetTitle("(#it{y}, #it{p}_{T}) of generated J/#psi with electrons within FOCAL acceptance;#it{y} [-];#it{p}_{T} [GeV/#it{c}]");
-                    objArr->AddAt(hJp_mcJRap_mcJPt_acc, kJp_mcJRap_mcJPt_acc);
-    */
-    TH2F* hJp_mcJEEta_mcJEPt = new TH2F("hJp_mcJEEta_mcJEPt","",nBinsEta,lowEta,uppEta,nBinsPt,lowPt,uppPt);
-                    hJp_mcJEEta_mcJEPt->SetTitle("(#eta, #it{p}_{T}) of pp electron;#eta_{ppe^{#pm}} [-];#it{p}_{T,ppe^{#pm}} [GeV/#it{c}]");
-                    objArr->AddAt(hJp_mcJEEta_mcJEPt, kJp_mcJEEta_mcJEPt);
-    TH2F* hJp_mcJE1E_mcJE2E = new TH2F("hJp_mcJE1E_mcJE2E","",nBinsE,lowE,uppE,nBinsE,lowE,uppE);
-                    hJp_mcJE1E_mcJE2E->SetTitle("correlation between energy of two pp electrons;#it{E}_{ppe^{#pm},1} [GeV];#it{E}_{ppe^{#pm},2} [GeV]");
-                    objArr->AddAt(hJp_mcJE1E_mcJE2E, kJp_mcJE1E_mcJE2E);
-    TH2F* hJp_mcJE1Pt_mcJE2Pt = new TH2F("hJp_mcJE1Pt_mcJE2Pt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
-                    hJp_mcJE1Pt_mcJE2Pt->SetTitle("correlation between transverse momentum of two pp electrons;#it{p}_{T,ppe^{#pm},1} [GeV/#it{c}];#it{p}_{T,ppe^{#pm},2} [GeV/#it{c}]");
-                    objArr->AddAt(hJp_mcJE1Pt_mcJE2Pt, kJp_mcJE1Pt_mcJE2Pt);
-    // in the following, a cluster means a prefiltered cluster
-    // correlation of cluster kinematic variables
-    TH2F* hJp_clEta_clPhi = new TH2F("hJp_clEta_clPhi","",nBinsEta,lowEta,uppEta,nBinsPhi,lowPhi,uppPhi);
-                    hJp_clEta_clPhi->SetTitle("(#eta, #phi) of pref. clusters;#eta_{cl} [-];#phi_{cl} [-]");
-                    objArr->AddAt(hJp_clEta_clPhi, kJp_clEta_clPhi);
-    TH2F* hJp_clEta_clPt = new TH2F("hJp_clEta_clPt","",nBinsEta,lowEta,uppEta,nBinsPt,lowPt,uppPt);
-                    hJp_clEta_clPt->SetTitle("(#eta, #it{p}_{T}) of pref. clusters;#eta_{cl} [-];#it{p}_{T,cl} [GeV/#it{c}]");
-                    objArr->AddAt(hJp_clEta_clPt, kJp_clEta_clPt);
-    // cluster kinematics vs matched kinematics (ppp)
-    TH2F* hJp_clE_mtchE = new TH2F("hJp_clE_mtchE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE); 
-                    hJp_clE_mtchE->SetTitle("cl. energy vs energy of matched pp particle;#it{E}_{cl} [GeV];#it{E}_{matched ppp} [GeV]");
-                    objArr->AddAt(hJp_clE_mtchE, kJp_clE_mtchE);
-    TH2F* hJp_clE_mtchDirE = new TH2F("hJp_clE_mtchDirE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE); 
-                    hJp_clE_mtchDirE->SetTitle("cl. energy vs energy of directly matched pp particle;#it{E}_{cl} [GeV];#it{E}_{dir. matched ppp} [GeV]");
-                    objArr->AddAt(hJp_clE_mtchDirE, kJp_clE_mtchDirE);
-    TH2F* hJp_clEta_mtchEta = new TH2F("hJp_clEta_mtchEta","",nBinsEta,lowEta,uppEta,nBinsEta,lowEta,uppEta);
-                    hJp_clEta_mtchEta->SetTitle("cl. #eta vs #eta of matched pp particle;#eta_{cl} [-];#eta_{matched ppp} [-]");
-                    objArr->AddAt(hJp_clEta_mtchEta, kJp_clEta_mtchEta);
-    TH2F* hJp_clEta_mtchDirEta = new TH2F("hJp_clEta_mtchDirEta","",nBinsEta,lowEta,uppEta,nBinsEta,lowEta,uppEta);
-                    hJp_clEta_mtchDirEta->SetTitle("cl. #eta vs #eta of directly matched pp particle;#eta_{cl} [-];#eta_{dir. matched ppp} [-]");
-                    objArr->AddAt(hJp_clEta_mtchDirEta, kJp_clEta_mtchDirEta);
-    TH2F* hJp_clPt_mtchPt = new TH2F("hJp_clPt_mtchPt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
-                    hJp_clPt_mtchPt->SetTitle("cl. #it{p}_{T} vs #it{p}_{T} of matched pp particle;#it{p}_{T,cl} [GeV/#it{c}];#it{p}_{T,matched ppp} [GeV/#it{c}]");
-                    objArr->AddAt(hJp_clPt_mtchPt, kJp_clPt_mtchPt);
-    TH2F* hJp_clPt_mtchDirPt = new TH2F("hJp_clPt_mtchDirPt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
-                    hJp_clPt_mtchDirPt->SetTitle("cl. #it{p}_{T} vs #it{p}_{T} of directly matched pp particle;#it{p}_{T,cl} [GeV/#it{c}];#it{p}_{T,dir. matched ppp} [GeV/#it{c}]");
-                    objArr->AddAt(hJp_clPt_mtchDirPt, kJp_clPt_mtchDirPt);
-    // cluster kinematics vs matched kinematics (ppe only)
-    TH2F* hJp_primElClE_mtchE = new TH2F("hJp_primElClE_mtchE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE); 
-                    hJp_primElClE_mtchE->SetTitle("cl. energy vs energy of matched pp electron;#it{E}_{cl} [GeV];#it{E}_{matched ppe^{#pm}} [GeV]");
-                    objArr->AddAt(hJp_primElClE_mtchE, kJp_primElClE_mtchE);
-    TH2F* hJp_primElClE_mtchDirE = new TH2F("hJp_primElClE_mtchDirE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE); 
-                    hJp_primElClE_mtchDirE->SetTitle("cl. energy vs energy of directly matched pp electron;#it{E}_{cl} [GeV];#it{E}_{dir. matched ppe^{#pm}} [GeV]");
-                    objArr->AddAt(hJp_primElClE_mtchDirE, kJp_primElClE_mtchDirE);
-    TH2F* hJp_primElClEta_mtchEta = new TH2F("hJp_primElClEta_mtchEta","",nBinsEta,lowEta,uppEta,nBinsEta,lowEta,uppEta);
-                    hJp_primElClEta_mtchEta->SetTitle("cl. #eta vs #eta of matched pp electron;#eta_{cl} [-];#eta_{matched ppe^{#pm}} [-]");
-                    objArr->AddAt(hJp_primElClEta_mtchEta, kJp_primElClEta_mtchEta);
-    TH2F* hJp_primElClEta_mtchDirEta = new TH2F("hJp_primElClEta_mtchDirEta","",nBinsEta,lowEta,uppEta,nBinsEta,lowEta,uppEta);
-                    hJp_primElClEta_mtchDirEta->SetTitle("cl. #eta vs #eta of directly matched pp electron;#eta_{cl} [-];#eta_{dir. matched ppe^{#pm}} [-]");
-                    objArr->AddAt(hJp_primElClEta_mtchDirEta, kJp_primElClEta_mtchDirEta);
-    TH2F* hJp_primElClPt_mtchPt = new TH2F("hJp_primElClPt_mtchPt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
-                    hJp_primElClPt_mtchPt->SetTitle("cl. #it{p}_{T} vs #it{p}_{T} of matched pp electron;#it{p}_{T,cl} [GeV/#it{c}];#it{p}_{T,matched ppe^{#pm}} [GeV/#it{c}]");
-                    objArr->AddAt(hJp_primElClPt_mtchPt, kJp_primElClPt_mtchPt);
-    TH2F* hJp_primElClPt_mtchDirPt = new TH2F("hJp_primElClPt_mtchDirPt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
-                    hJp_primElClPt_mtchDirPt->SetTitle("cl. #it{p}_{T} vs #it{p}_{T} of directly matched pp electron;#it{p}_{T,cl} [GeV/#it{c}];#it{p}_{T,dir. matched ppe^{#pm}} [GeV/#it{c}]");
-                    objArr->AddAt(hJp_primElClPt_mtchDirPt, kJp_primElClPt_mtchDirPt);
-    /*
-    TH2F* hJp_primElClPairEta_mcJEta = new TH2F("hJp_primElClPairEta_mcJEta","",nBinsEta,lowEta,10.,nBinsEta,lowEta,10.);
-                    hJp_primElClPairEta_mcJEta->SetTitle("#eta of a cluster pair matched with a pair of primary J/#psi electrons vs #eta of generated J/#psi;#eta (cluster pair) [-];#eta (matched primary electron pair) [-]");
-                    objArr->AddAt(hJp_primElClPairEta_mcJEta, kJp_primElClPairEta_mcJEta);
-    TH2F* hJp_primElClPairPt_mcJPt = new TH2F("hJp_primElClPairPt_mcJPt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
-                    hJp_primElClPairPt_mcJPt->SetTitle("#it{p}_{T} of a cluster pair matched with a pair of primary J/#psi electrons vs #it{p}_{T} of generated J/#psi;#it{p}_{T} (cluster pair) [GeV/#it{c}];#it{p}_{T} (matched primary electron pair) [GeV/#it{c}]");
-                    objArr->AddAt(hJp_primElClPairPt_mcJPt, kJp_primElClPairPt_mcJPt);
-    */
-
-    // matching to physical primary particles (direct vs finding physical primary mother of matched track of arbitrary type)
-    TH2F* hJp_mtchE_mtchDirE = new TH2F("hJp_mtchE_mtchDirE","",nBinsE,lowE,uppE,nBinsE,lowE,uppE); 
-                    hJp_mtchE_mtchDirE->SetTitle("energy of matched pp particle vs energy of directly matched ppp;#it{E}_{matched ppp} [GeV];#it{E}_{dir. matched ppp} [GeV]");
-                    objArr->AddAt(hJp_mtchE_mtchDirE, kJp_mtchE_mtchDirE);
-    TH2F* hJp_mtchE_mtchDirE_primEl = new TH2F("hJp_mtchE_mtchDirE_primEl","",nBinsE,lowE,uppE,nBinsE,lowE,uppE); 
-                    hJp_mtchE_mtchDirE_primEl->SetTitle("energy of matched pp electron vs energy of directly matched ppe;#it{E}_{matched ppe^{#pm}} [GeV];#it{E}_{dir. matched ppe^{#pm}} [GeV]");
-                    objArr->AddAt(hJp_mtchE_mtchDirE_primEl, kJp_mtchE_mtchDirE_primEl);
-    TH2F* hJp_mtchEta_mtchDirEta_primEl = new TH2F("hJp_mtchEta_mtchDirEta_primEl","",nBinsEta,lowEta,uppEta,nBinsEta,lowEta,uppEta); 
-                    hJp_mtchEta_mtchDirEta_primEl->SetTitle("#eta of matched pp electron vs #eta of directly matched ppe;#it{eta}_{matched ppe^{#pm}} [GeV];#it{eta}_{dir. matched ppe^{#pm}} [GeV]");
-                    objArr->AddAt(hJp_mtchEta_mtchDirEta_primEl, kJp_mtchEta_mtchDirEta_primEl);
-    TH2F* hJp_mtchPt_mtchDirPt_primEl = new TH2F("hJp_mtchPt_mtchDirPt_primEl","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt); 
-                    hJp_mtchPt_mtchDirPt_primEl->SetTitle("#it{p}_{T} of matched pp electron vs #it{p}_{T} of directly matched ppe;#it{p}_{T,matched ppe^{#pm}} [GeV];#it{p}_{T,dir. matched ppe^{#pm}} [GeV]");
-                    objArr->AddAt(hJp_mtchPt_mtchDirPt_primEl, kJp_mtchPt_mtchDirPt_primEl);
+    // correlation of MC kinematics
+    // J/psi
+    TH2F* hJ2_mcJRap_mcJPt = new TH2F("hJ2_mcJRap_mcJPt","",nBinsYEta,lowYEta,uppYEta,nBinsPt,lowPt,uppPt);
+                    hJ2_mcJRap_mcJPt->SetTitle("(#it{y}, #it{p}_{T}) of generated J/#psi;#it{y}_{J/#psi} [-];#it{p}_{T,J/#psi} [GeV/#it{c}]");
+                    objArr->AddAt(hJ2_mcJRap_mcJPt, kJ2_mcJRap_mcJPt);
+    // pp electrons
+    TH2F* hJ2_mcJElEta_mcJElPt = new TH2F("hJ2_mcJElEta_mcJElPt","",nBinsYEta,lowYEta,uppYEta,nBinsPt,lowPt,uppPt);
+                    hJ2_mcJElEta_mcJElPt->SetTitle("(#eta, #it{p}_{T}) of a pp electron;#eta_{ppe^{#pm}} [-];#it{p}_{T,ppe^{#pm}} [GeV/#it{c}]");
+                    objArr->AddAt(hJ2_mcJElEta_mcJElPt, kJ2_mcJElEta_mcJElPt);
+    TH2F* hJ2_mcJEl1En_mcJEl2En = new TH2F("hJ2_mcJEl1En_mcJEl2En","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hJ2_mcJEl1En_mcJEl2En->SetTitle("correlation between energy of two pp electrons;#it{E}_{ppe^{#pm},1} [GeV];#it{E}_{ppe^{#pm},2} [GeV]");
+                    objArr->AddAt(hJ2_mcJEl1En_mcJEl2En, kJ2_mcJEl1En_mcJEl2En);
+    TH2F* hJ2_mcJEl1Pt_mcJEl2Pt = new TH2F("hJ2_mcJEl1Pt_mcJEl2Pt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
+                    hJ2_mcJEl1Pt_mcJEl2Pt->SetTitle("correlation between transverse momenta of two pp electrons;#it{p}_{T,ppe^{#pm},1} [GeV/#it{c}];#it{p}_{T,ppe^{#pm},2} [GeV/#it{c}]");
+                    objArr->AddAt(hJ2_mcJEl1Pt_mcJEl2Pt, kJ2_mcJEl1Pt_mcJEl2Pt);
+    // in the following, "cluster" denotes a prefiltered cluster
+    // correlation of cluster kinematics
+    TH2F* hJ2_clEta_clPhi = new TH2F("hJ2_clEta_clPhi","",nBinsYEta,lowYEta,uppYEta,nBinsPhi,lowPhi,uppPhi);
+                    hJ2_clEta_clPhi->SetTitle("(#eta, #phi) of cluster;#eta_{cl} [-];#phi_{cl} [-]");
+                    objArr->AddAt(hJ2_clEta_clPhi, kJ2_clEta_clPhi);
+    TH2F* hJ2_clEta_clPt = new TH2F("hJ2_clEta_clPt","",nBinsYEta,lowYEta,uppYEta,nBinsPt,lowPt,uppPt);
+                    hJ2_clEta_clPt->SetTitle("(#eta, #it{p}_{T}) of cluster;#eta_{cl} [-];#it{p}_{T,cl} [GeV/#it{c}]");
+                    objArr->AddAt(hJ2_clEta_clPt, kJ2_clEta_clPt);
+    // cluster kinematics vs kinematics of matched ppp
+    TH2F* hJ2_pppClEn_mtchEn = new TH2F("hJ2_pppClEn_mtchEn","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hJ2_pppClEn_mtchEn->SetTitle("energy of a cluster matched with a pp particle vs energy ppp;#it{E}_{cl} [GeV];#it{E}_{matched ppp} [GeV]");
+                    objArr->AddAt(hJ2_pppClEn_mtchEn, kJ2_pppClEn_mtchEn);
+    TH2F* hJ2_pppClEta_mtchEta = new TH2F("hJ2_pppClEta_mtchEta","",nBinsYEta,lowYEta,uppYEta,nBinsYEta,lowYEta,uppYEta);
+                    hJ2_pppClEta_mtchEta->SetTitle("#eta of a cluster matched with a pp particle vs #eta of ppp;#eta_{cl} [-];#eta_{matched ppp} [-]");
+                    objArr->AddAt(hJ2_pppClEta_mtchEta, kJ2_pppClEta_mtchEta);
+    TH2F* hJ2_pppClPt_mtchPt = new TH2F("hJ2_pppClPt_mtchPt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
+                    hJ2_pppClPt_mtchPt->SetTitle("#it{p}_{T} of a cluster matched with a pp particle vs #it{p}_{T} of ppp;#it{p}_{T,cl} [GeV/#it{c}];#it{p}_{T,matched ppp} [GeV/#it{c}]");
+                    objArr->AddAt(hJ2_pppClPt_mtchPt, kJ2_pppClPt_mtchPt);
+    // cluster kinematics vs kinematics of matched ppe
+    TH2F* hJ2_ppeClEn_mtchEn = new TH2F("hJ2_ppeClEn_mtchEn","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn); 
+                    hJ2_ppeClEn_mtchEn->SetTitle("energy of a cluster matched with a pp electron vs vs energy of ppe;#it{E}_{cl} [GeV];#it{E}_{matched ppe^{#pm}} [GeV]");
+                    objArr->AddAt(hJ2_ppeClEn_mtchEn, kJ2_ppeClEn_mtchEn);
+    TH2F* hJ2_ppeClEta_mtchEta = new TH2F("hJ2_ppeClEta_mtchEta","",nBinsYEta,lowYEta,uppYEta,nBinsYEta,lowYEta,uppYEta);
+                    hJ2_ppeClEta_mtchEta->SetTitle("#eta of a cluster matched with a pp electron vs #eta of ppe;#eta_{cl} [-];#eta_{matched ppe^{#pm}} [-]");
+                    objArr->AddAt(hJ2_ppeClEta_mtchEta, kJ2_ppeClEta_mtchEta);
+    TH2F* hJ2_ppeClPt_mtchPt = new TH2F("hJ2_ppeClPt_mtchPt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
+                    hJ2_ppeClPt_mtchPt->SetTitle("#it{p}_{T} of a cluster matched with a pp electron vs #it{p}_{T} of ppe;#it{p}_{T,cl} [GeV/#it{c}];#it{p}_{T,matched ppe^{#pm}} [GeV/#it{c}]");
+                    objArr->AddAt(hJ2_ppeClPt_mtchPt, kJ2_ppeClPt_mtchPt);
+    // cluster pair kinematics vs kinematics of matched ppe pair
+    TH2F* hJ2_ppeClPairEn_mtchEn = new TH2F("hJ2_ppeClPairEn_mtchEn","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hJ2_ppeClPairEn_mtchEn->SetTitle("energy of a cluster pair matched with a pair of pp electrons vs energy of ppe pair;#it{E}_{cl. pair} [GeV];#it{E}_{matched ppe pair} [GeV]");
+                    objArr->AddAt(hJ2_ppeClPairEn_mtchEn, kJ2_ppeClPairEn_mtchEn);
+    TH2F* hJ2_ppeClPairRap_mtchRap = new TH2F("hJ2_ppeClPairRap_mtchRap","",nBinsYEta,lowYEta,uppYEta,nBinsYEta,lowYEta,uppYEta);
+                    hJ2_ppeClPairRap_mtchRap->SetTitle("#it{y} of a cluster pair matched with a pair of pp electrons vs #it{y} of ppe pair;#it{y}_{cl. pair} [-];#it{y}_{matched ppe pair} [-]");
+                    objArr->AddAt(hJ2_ppeClPairRap_mtchRap, kJ2_ppeClPairRap_mtchRap);
+    TH2F* hJ2_ppeClPairPt_mtchPt = new TH2F("hJ2_ppeClPairPt_mtchPt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
+                    hJ2_ppeClPairPt_mtchPt->SetTitle("#it{p}_{T} of a cluster pair matched with a pair of pp electrons vs #it{p}_{T} of ppe pair;#it{p}_{T,cl. pair} [GeV/#it{c}];#it{p}_{T,matched ppe pair} [GeV/#it{c}]");
+                    objArr->AddAt(hJ2_ppeClPairPt_mtchPt, kJ2_ppeClPairPt_mtchPt);
+    TH2F* hJ2_ppeClPairM_mtchM = new TH2F("hJ2_ppeClPairM_mtchM","",nBinsM,lowM,uppM,nBinsM,lowM,uppM);
+                    hJ2_ppeClPairM_mtchM->SetTitle("#it{m} of a cluster pair matched with a pair of pp electrons vs #it{m} of ppe pair;#it{m}_{cl. pair} [GeV/#it{c}];#it{m}_{matched ppe pair} [GeV/#it{c}]");
+                    objArr->AddAt(hJ2_ppeClPairM_mtchM, kJ2_ppeClPairM_mtchM);
+    TH2F* hJ2_clPairSep_mcJElSep = new TH2F("hJ2_clPairSep_mcJElSep","",nBinsSep,lowSep,uppSep,nBinsSep,lowSep,uppSep);
+                    hJ2_clPairSep_mcJElSep->SetTitle("Radial separation of cluster pairs vs radial separation of ppe pair;#Delta#it{R}_{cl pair} [cm];#Delta#it{R}_{ppe pair} [cm]");
+                    objArr->AddAt(hJ2_clPairSep_mcJElSep, kJ2_clPairSep_mcJElSep);
     return;
 }
 
-void DefineHisto_Jp_TPrf(TObjArray* objArr)
+void DefineHisto_JpPr(TObjArray* objArr)
 {
     objArr->SetOwner();
 
@@ -363,9 +371,11 @@ void DrawHistoCOLZ(TH2F* h, TString subfolder) // for TH2F
 {
     TCanvas c("c","c",700,600);
     c.SetGrid();
-    //c.SetLogz();
+    c.SetLogz();
     h->GetYaxis()->SetMaxDigits(3);
     h->GetXaxis()->SetTitleOffset(1.2);
+    Float_t hMax = h->GetMaximum();
+    h->GetZaxis()->SetRangeUser(1.,hMax);
     TString path_out = subfolder + h->GetName() + ".pdf";
     c.cd();
     h->Draw("COLZ");

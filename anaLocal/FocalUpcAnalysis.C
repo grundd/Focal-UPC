@@ -23,16 +23,14 @@
 // options to set:
 Bool_t plotEvInfo = kFALSE;
 Bool_t printEvInfo = kFALSE;
+Bool_t matchDirectly = kFALSE;
 // superclusterizer:
-Bool_t doSupercls = kTRUE; // if true, create superclusters using:
+Bool_t doSupercls = kFALSE; // if true, create superclusters using:
 const Float_t minSeedE = 5; // [GeV]
 const Float_t radius = 8; // [cm]
 // selections:
 const Float_t cutM = 0.0; // [GeV]; if > 0, filter out all (super)cluster pairs having mass below cutM
-const Float_t cutE = 30.0; // [GeV]; if > 0, filter out all (super) clusters having energy below cutE 
-// cuts used during matching with MC particles:
-const Float_t cutdEta = 0.4; // [-] difference in eta of a MC particle and a (super)cluster
-const Float_t cutdPhi = 0.4; // [-] difference in phi angles of a MC particle and a (super)cluster
+const Float_t cutE = 0.0; // [GeV]; if > 0, filter out all (super) clusters having energy below cutE 
 // *****************************************************************************
 // input files and configuration:
 Int_t vSim = 2;
@@ -97,16 +95,16 @@ void FocalUpcAnalysis(Int_t pdgSim, Bool_t testOnly = kFALSE)
     // if box simulations
     if(pdgSim == 11 || pdgSim == 22) 
     {
-        arrTH1F = new TObjArray(kBx_TH1F_all); DefineHisto_Bx_TH1F(arrTH1F); nTH1F = kBx_TH1F_all;
-        arrTPrf = new TObjArray(kBx_TPrf_all); DefineHisto_Bx_TPrf(arrTPrf); nTPrf = kBx_TPrf_all;
-        arrTH2F = new TObjArray(kBx_TH2F_all); DefineHisto_Bx_TH2F(arrTH2F); nTH2F = kBx_TH2F_all;
+        arrTH1F = new TObjArray(kB1_all); DefineHisto_BxH1(arrTH1F); nTH1F = kB1_all;
+        arrTH2F = new TObjArray(kB2_all); DefineHisto_BxH2(arrTH2F); nTH2F = kB2_all;
+        arrTPrf = new TObjArray(kBP_all); DefineHisto_BxPr(arrTPrf); nTPrf = kBP_all;
     } 
     // if starlight simulations
     else if(pdgSim == 443)
     {
-        arrTH1F = new TObjArray(kJp_TH1F_all); DefineHisto_Jp_TH1F(arrTH1F); nTH1F = kJp_TH1F_all;
-        arrTH2F = new TObjArray(kJp_TH2F_all); DefineHisto_Jp_TH2F(arrTH2F); nTPrf = kJp_TPrf_all;
-        arrTPrf = new TObjArray(kJp_TPrf_all); DefineHisto_Jp_TPrf(arrTPrf); nTH2F = kJp_TH2F_all;
+        arrTH1F = new TObjArray(kJ1_all); DefineHisto_JpH1(arrTH1F); nTH1F = kJ1_all;
+        arrTH2F = new TObjArray(kJ2_all); DefineHisto_JpH2(arrTH2F); nTH2F = kJ2_all; 
+        arrTPrf = new TObjArray(kpJp_all); DefineHisto_JpPr(arrTPrf); nTPrf = kpJp_all;
     }
 
     // mass filtering only for J/psi simulations
@@ -127,21 +125,21 @@ void FocalUpcAnalysis(Int_t pdgSim, Bool_t testOnly = kFALSE)
     // if box simulations
     if(pdgSim == 11 || pdgSim == 22)
     {
+        /*
         // integrate the histograms at kBx_totE_mcE and kBx_totEFromSegCls_mcE
         cout << "integral of hBx_totE_mcE: " << ((TH2F*)arrTH2F->At(kBx_totE_mcE))->Integral(1,nBinsE,1,nBinsE) << endl;
         cout << "integral of hBx_totEFromSegCls_mcE: " << ((TH2F*)arrTH2F->At(kBx_totEFromSegCls_mcE))->Integral(1,2*nBinsE,1,2*nBinsE) << endl;
+        */
     }
     // if starlight simulations
     else if(pdgSim == 443)
     {
+        /*
         // calculate the fraction of coh J/psi -> ee events that have energy of both electron larger than 20 GeV
         Double_t nAll = ((TH2F*)arrTH2F->At(kJp_mcJE1E_mcJE2E))->Integral(1,nBinsE,1,nBinsE);
         Double_t nAbove20 = ((TH2F*)arrTH2F->At(kJp_mcJE1E_mcJE2E))->Integral(11,nBinsE,11,nBinsE);
         cout << "total no. of coh J/psi events: " << nAll << endl;
         cout << "no. of J/psi events with energy of both electron higher than 20 GeV: " << nAbove20 << endl;
-        /*
-        hMCJpsiEnRatio->Sumw2();
-        hMCJpsiEnRatio->Divide(hMCJpsiEnAll);
         */
     }
     // draw output histograms
@@ -150,13 +148,14 @@ void FocalUpcAnalysis(Int_t pdgSim, Bool_t testOnly = kFALSE)
     else if(pdgSim == 22)  outputFolder += "_boxPho";
     else if(pdgSim == 443) outputFolder += "_Jpsi";
     if(doSupercls) outputFolder += Form("_supCl");
+    if(pdgSim == 443 && matchDirectly) outputFolder += Form("_dirMtch");
     if(cutM > 0)   outputFolder += Form("_cutM%.1f",cutM);
     if(cutE > 0)   outputFolder += Form("_cutE%.1f",cutE);
     outputFolder += "/";    
     gSystem->Exec("mkdir -p " + outputFolder);    
     for(Int_t i = 0; i < nTH1F; i++) if((TH1F*)arrTH1F->At(i)) DrawHisto<TH1F>(((TH1F*)arrTH1F->At(i)),outputFolder);
-    for(Int_t i = 0; i < nTPrf; i++) if((TProfile*)arrTPrf->At(i)) DrawHisto<TProfile>(((TProfile*)arrTPrf->At(i)),outputFolder);
     for(Int_t i = 0; i < nTH2F; i++) if((TH2F*)arrTH2F->At(i)) DrawHistoCOLZ(((TH2F*)arrTH2F->At(i)),outputFolder);
+    for(Int_t i = 0; i < nTPrf; i++) if((TProfile*)arrTPrf->At(i)) DrawHisto<TProfile>(((TProfile*)arrTPrf->At(i)),outputFolder);
 
     return;
 }
@@ -276,17 +275,17 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
 
         // prepare a list of prefiltered clusters 
         // for the moment, add all clusters (later we will apply selections)
-        TList listClsPref;
-        listClsPref.SetOwner(kFALSE);
+        TList* listClsPref = new TList();
+        listClsPref->SetOwner(kFALSE);
         // find the total and maximum cluster energy in this event
         Float_t ETot(0.), EClMax(-1.);
         Float_t EHCalTot(0.), EIsoR2Tot(0.), EIsoR4Tot(0.);
         Float_t ETotWithEHcalTot(0.), ETotWithEIsoR2Tot(0.), ETotWithEIsoR4Tot(0.);
-        Int_t iMaxClE(-1); // index of a cluster with maximum energy
+        Int_t iClMaxE(-1); // index of a cluster with maximum energy
         for(Int_t iCl = 0; iCl < nClsSum; iCl++) 
         {
             AliFOCALCluster* clust = (AliFOCALCluster*) arrClsSum->At(iCl);
-            listClsPref.Add(clust);
+            listClsPref->Add(clust);
             // get the total energy summing over summed clusters
             ETot += clust->E();
             EHCalTot += clust->GetHCALEnergy();
@@ -298,10 +297,10 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
             // get the maximum cluster energy
             if(clust->E() > EClMax) {
                 EClMax = clust->E();
-                iMaxClE = iCl;
+                iClMaxE = iCl;
             } 
         }
-        Int_t nClsPref = listClsPref.GetEntries();
+        Int_t nClsPref = listClsPref->GetEntries();
 
         // prepare superclusters
         if(doSupercls)
@@ -314,9 +313,9 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
             {
                 Float_t EClMaxFound = -1.;
                 AliFOCALCluster* clustMaxE = NULL;
-                for(Int_t iCl = 0; iCl < listClsPref.GetEntries(); iCl++) 
+                for(Int_t iCl = 0; iCl < listClsPref->GetEntries(); iCl++) 
                 {
-                    AliFOCALCluster* clust = (AliFOCALCluster*)listClsPref.At(iCl);
+                    AliFOCALCluster* clust = (AliFOCALCluster*)listClsPref->At(iCl);
                     Float_t ECl = clust->E();
                     if(ECl > EClMaxFound) {
                         EClMaxFound = ECl;
@@ -324,7 +323,7 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
                     }
                 }
                 listClsPrefSort.Add(clustMaxE);
-                listClsPref.Remove(clustMaxE);
+                listClsPref->Remove(clustMaxE);
             }
             // while the energy of the most energetic cluster in listClsPrefSort is above minSeedE, 
             // take this cluster as a seed for a new supercluster
@@ -368,9 +367,9 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
                 else EClTop = 0;
                 // add the new supercluster to listClsPref
                 AliFOCALCluster* supClNew = new AliFOCALCluster(xSupCl/ESupCl,ySupCl/ESupCl,zSupCl/ESupCl,ESupCl,-1);
-                listClsPref.Add(supClNew);
+                listClsPref->Add(supClNew);
             }
-            nClsPref = listClsPref.GetEntries();
+            nClsPref = listClsPref->GetEntries();
             if(printEvInfo) of << "identified superclusters: " << nClsPref << endl;
         }
 
@@ -383,7 +382,7 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
             // go over the clusters
             for(Int_t iCl1 = 0; iCl1 < nClsPref; iCl1++) 
             {            
-                AliFOCALCluster* clust1 = (AliFOCALCluster*)listClsPref.At(iCl1);
+                AliFOCALCluster* clust1 = (AliFOCALCluster*)listClsPref->At(iCl1);
                 if(!clust1) continue;
                 // get energy and coordinates of this cluster
                 Float_t xCl1 = clust1->X();
@@ -394,7 +393,7 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
                 // go over all possible pairs and combine clusters
                 for(Int_t iCl2 = iCl1+1; iCl2 < nClsPref; iCl2++) 
                 {
-                    AliFOCALCluster* clust2 = (AliFOCALCluster*)listClsPref.At(iCl2);
+                    AliFOCALCluster* clust2 = (AliFOCALCluster*)listClsPref->At(iCl2);
                     if(!clust2) continue;
                     // get energy and coordinates of this cluster
                     Float_t xCl2 = clust2->X();
@@ -417,11 +416,11 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
             // remove all clusters giving low mass when paired
             for(Int_t iCl = nClsPref-1; iCl >= 0; iCl--)
             {
-                AliFOCALCluster* clust = (AliFOCALCluster*)listClsPref.At(iCl);
-                if(foundLowMass[iCl]) listClsPref.Remove(clust);
+                AliFOCALCluster* clust = (AliFOCALCluster*)listClsPref->At(iCl);
+                if(foundLowMass[iCl]) listClsPref->Remove(clust);
             }
             // how many clusters there are after prefiltering
-            nClsPref = listClsPref.GetEntries();
+            nClsPref = listClsPref->GetEntries();
             if(printEvInfo) of << "pref. (super)clusters after mass cleaning: " << nClsPref << endl;
         }
 
@@ -431,10 +430,10 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
         {
             for(Int_t iCl = nClsPref-1; iCl >= 0; iCl--) 
             {
-                AliFOCALCluster* clust = (AliFOCALCluster*)listClsPref.At(iCl);
-                if(clust->E() < cutE) listClsPref.Remove(clust);
+                AliFOCALCluster* clust = (AliFOCALCluster*)listClsPref->At(iCl);
+                if(clust->E() < cutE) listClsPref->Remove(clust);
             }
-            nClsPref = listClsPref.GetEntries();
+            nClsPref = listClsPref->GetEntries();
             if(printEvInfo) of << "pref. (super)clusters with E > " << cutE << " GeV: " << nClsPref << endl;
         }
 
@@ -452,7 +451,7 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
             // plot the positions of all summed clusters
             DrawClusters(arrClsSum,cMain,kFALSE);
             // plot the positions of prefiltered (super)clusters
-            DrawPrefClusters(&listClsPref,cMain);
+            DrawPrefClusters(listClsPref,cMain);
             // save the canvas
             cout << " * ";
             cMain->SaveAs((sEvFile + ".pdf").Data());
@@ -465,32 +464,59 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
         if(pdgSim == 11 || pdgSim == 22)
         {
             // general histograms
-            ((TH1F*)arrTH1F->At(kBx_mcE))->Fill(stack->Particle(0)->Energy());
-            ((TH1F*)arrTH1F->At(kBx_mcPt))->Fill(stack->Particle(0)->Pt());
-            ((TH2F*)arrTH2F->At(kBx_mcE_nCls))->Fill(stack->Particle(0)->Energy(), nClsPref);
+            ((TH1F*)arrTH1F->At(kB1_mcE))->Fill(stack->Particle(0)->Energy());
+            ((TH1F*)arrTH1F->At(kB1_mcPt))->Fill(stack->Particle(0)->Pt());
+            ((TH2F*)arrTH2F->At(kB2_mcE_nCls))->Fill(stack->Particle(0)->Energy(), nClsPref);
             // MC energy vs total energies
-            ((TH2F*)arrTH2F->At(kBx_mcE_totE))->Fill(stack->Particle(0)->Energy(), ETot);
-            ((TH2F*)arrTH2F->At(kBx_totE_mcE))->Fill(ETot, stack->Particle(0)->Energy());
-            ((TProfile*)arrTPrf->At(kBx_mcE_totE_prof))->Fill(stack->Particle(0)->Energy(), ETot);
-            ((TProfile*)arrTPrf->At(kBx_totE_mcE_prof))->Fill(ETot, stack->Particle(0)->Energy());
+            ((TH2F*)arrTH2F->At(kB2_totE_mcE))->Fill(ETot, stack->Particle(0)->Energy());
+            ((TProfile*)arrTPrf->At(kBP_totE_mcE))->Fill(ETot, stack->Particle(0)->Energy());
             // total energy vs HCal energies
-            ((TH2F*)arrTH2F->At(kBx_totEwHCalE_mcE))->Fill(ETotWithEHcalTot, stack->Particle(0)->Energy());
-            ((TH2F*)arrTH2F->At(kBx_totEwIsoR2E_mcE))->Fill(ETotWithEIsoR2Tot, stack->Particle(0)->Energy());
-            ((TH2F*)arrTH2F->At(kBx_totEwIsoR4E_mcE))->Fill(ETotWithEIsoR4Tot, stack->Particle(0)->Energy());
-            ((TH2F*)arrTH2F->At(kBx_totE_totHCalE))->Fill(ETot, EHCalTot);
-            ((TH2F*)arrTH2F->At(kBx_totE_totIsoR2E))->Fill(ETot, EIsoR2Tot);
-            ((TH2F*)arrTH2F->At(kBx_totE_totIsoR4E))->Fill(ETot, EIsoR4Tot);
-            ((TH2F*)arrTH2F->At(kBx_totEFromSegCls_mcE))->Fill(ETotFromSegCls*.001, stack->Particle(0)->Energy());
+            ((TH2F*)arrTH2F->At(kB2_totEwHCalE_mcE))->Fill(ETotWithEHcalTot, stack->Particle(0)->Energy());
+            ((TH2F*)arrTH2F->At(kB2_totEwIsoR2E_mcE))->Fill(ETotWithEIsoR2Tot, stack->Particle(0)->Energy());
+            ((TH2F*)arrTH2F->At(kB2_totEwIsoR4E_mcE))->Fill(ETotWithEIsoR4Tot, stack->Particle(0)->Energy());
+            ((TH2F*)arrTH2F->At(kB2_totE_totHCalE))->Fill(ETot, EHCalTot);
+            ((TH2F*)arrTH2F->At(kB2_totE_totIsoR2E))->Fill(ETot, EIsoR2Tot);
+            ((TH2F*)arrTH2F->At(kB2_totE_totIsoR4E))->Fill(ETot, EIsoR4Tot);
+            ((TH2F*)arrTH2F->At(kB2_totEFromSegCls_mcE))->Fill(ETotFromSegCls*.001, stack->Particle(0)->Energy());
             // MC energy vs maximum cluster energy
-            ((TH2F*)arrTH2F->At(kBx_mcE_maxClE))->Fill(stack->Particle(0)->Energy(), EClMax);
-            ((TH2F*)arrTH2F->At(kBx_maxClE_mcE))->Fill(EClMax, stack->Particle(0)->Energy());
-            ((TProfile*)arrTPrf->At(kBx_mcE_maxClE_prof))->Fill(stack->Particle(0)->Energy(), EClMax);
-            ((TProfile*)arrTPrf->At(kBx_maxClE_mcE_prof))->Fill(EClMax, stack->Particle(0)->Energy());
-            // correlation between MC energy and energies of prefiltered clusters
+            ((TH2F*)arrTH2F->At(kB2_maxClE_mcE))->Fill(EClMax, stack->Particle(0)->Energy());
+            ((TProfile*)arrTPrf->At(kBP_maxClE_mcE))->Fill(EClMax, stack->Particle(0)->Energy());
+            // info per individual prefiltered clusters:
+            // cluster with the highest energy:
+            Float_t xClMaxE(-1.), yClMaxE(-1.);
+            Bool_t isClWithMaxE = kFALSE;
+            if(iClMaxE != -1 && cutM == 0 && cutE == 0 && !doSupercls) {
+                isClWithMaxE = kTRUE;
+                AliFOCALCluster *clustMaxE = (AliFOCALCluster*) listClsPref->At(iClMaxE);
+                xClMaxE = clustMaxE->X();
+                yClMaxE = clustMaxE->Y();
+            }
             for(Int_t iCl = 0; iCl < nClsPref; iCl++)
             {
-                AliFOCALCluster *clust = (AliFOCALCluster*) listClsPref.At(iCl);
-                ((TH2F*)arrTH2F->At(kBx_clE_mcE))->Fill(clust->E(), stack->Particle(0)->Energy());
+                AliFOCALCluster *clust = (AliFOCALCluster*) listClsPref->At(iCl);
+                Float_t xCl = clust->X();
+                Float_t yCl = clust->Y();
+                Float_t zCl = clust->Z();
+                // primary electron:
+                TParticle *part = stack->Particle(0);
+                Float_t x(0.), y(0.);
+                TrackCoordinatesAtZ(part,zCl,x,y);
+                // correlation between MC energy and energies of prefiltered clusters
+                ((TH2F*)arrTH2F->At(kB2_clE_mcE))->Fill(clust->E(), part->Energy());
+                // radial distance between the cluster and the MC track
+                Float_t DeltaX = xCl - x;
+                Float_t DeltaY = yCl - y;
+                Float_t DeltaR = TMath::Sqrt(TMath::Power(DeltaX,2) + TMath::Power(DeltaY,2));
+                ((TH2F*)arrTH2F->At(kB2_clMcDX_clMcDY))->Fill(DeltaX, DeltaY);
+                ((TH2F*)arrTH2F->At(kB2_mcE_clMcSep))->Fill(part->Energy(), DeltaR);
+                // radial distance between the cluster and the cluster with maximum energy
+                if(isClWithMaxE && iCl != iClMaxE) {
+                    Float_t DeltaX_maxE = xCl - xClMaxE;
+                    Float_t DeltaY_maxE = yCl - yClMaxE;
+                    Float_t DeltaR_maxE = TMath::Sqrt(TMath::Power(DeltaX_maxE,2) + TMath::Power(DeltaY_maxE,2));
+                    ((TH2F*)arrTH2F->At(kB2_clMaxClDX_clMaxClDY))->Fill(DeltaX_maxE, DeltaY_maxE);
+                    ((TH2F*)arrTH2F->At(kB2_mcE_clMaxClSep))->Fill(part->Energy(), DeltaR_maxE);
+                }
             }
         }
         // ******************************************************************************************************************
@@ -504,49 +530,57 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
             {
                 TParticle *part = stack->Particle(iTrk);
                 // if J/psi
-                if(part->GetPdgCode() == 443) 
-                {
-                    ((TH1F*)arrTH1F->At(kJp_mcJPt))->Fill(part->Pt());
-                    ((TH2F*)arrTH2F->At(kJp_mcJRap_mcJPt))->Fill(part->Y(), part->Pt());
+                if(part->GetPdgCode() == 443) {
+                    ((TH1F*)arrTH1F->At(kJ1_mcJEn))->Fill(part->Energy());
+                    ((TH1F*)arrTH1F->At(kJ1_mcJPt))->Fill(part->Pt());
+                    ((TH1F*)arrTH1F->At(kJ1_mcJRap))->Fill(part->Y());
+                    ((TH1F*)arrTH1F->At(kJ1_mcJM))->Fill(part->GetCalcMass());
+                    ((TH2F*)arrTH2F->At(kJ2_mcJRap_mcJPt))->Fill(part->Y(), part->Pt());
                 }
                 // if physical primary (pp) electron (i.e., J/psi direct decay product)
-                if(isEleOrPos(part) && stack->IsPhysicalPrimary(iTrk))
-                {
+                if(isEleOrPos(part) && stack->IsPhysicalPrimary(iTrk)) {
                     TParticle* mother = stack->Particle(part->GetMother(0));
-                    if(mother->GetPdgCode() != 443) cout << "Unexpected mother of pp electron, terminating." << endl;
-                    ((TH2F*)arrTH2F->At(kJp_mcJEEta_mcJEPt))->Fill(part->Eta(), part->Pt());
+                    if(mother->GetPdgCode() != 443) cout << "Unexpected mother of a pp electron." << endl;
+                    ((TH2F*)arrTH2F->At(kJ2_mcJElEta_mcJElPt))->Fill(part->Eta(), part->Pt());
                     ppElectrons.AddLast(part);
                 }
             }
+            TParticle* ppEl1 = NULL;
+            TParticle* ppEl2 = NULL;
+            TLorentzVector* lorvJpsiFromEl = new TLorentzVector();
             if(ppElectrons.GetEntries() != 2) {
                 cout << "Unexpected number of pp electrons: " << ppElectrons.GetEntries() << ", terminating..." << endl;
+                runLoader->Delete();
+                fCls->Close();
                 return;
             } else {
-                // fill the histogram showing the correlation between energies of the two pp electrons
-                TParticle *ppe1 = (TParticle*) ppElectrons[0];
-                TParticle *ppe2 = (TParticle*) ppElectrons[1];
-                ((TH2F*)arrTH2F->At(kJp_mcJE1E_mcJE2E))->Fill(ppe1->Energy(), ppe2->Energy());
-                ((TH2F*)arrTH2F->At(kJp_mcJE1Pt_mcJE2Pt))->Fill(ppe1->Pt(), ppe2->Pt());
+                // fill the histogram showing the correlation between energies and transverse momenta of the two pp electrons
+                ppEl1 = (TParticle*) ppElectrons[0];
+                ppEl2 = (TParticle*) ppElectrons[1];
+                ((TH2F*)arrTH2F->At(kJ2_mcJEl1En_mcJEl2En))->Fill(ppEl1->Energy(), ppEl2->Energy());
+                ((TH2F*)arrTH2F->At(kJ2_mcJEl1Pt_mcJEl2Pt))->Fill(ppEl1->Pt(), ppEl2->Pt());
+                // fill the histograms showing kinematics of J/psi reconstructed from the two pp electrons
+                TLorentzVector lorvPPEl1;
+                lorvPPEl1.SetPxPyPzE(ppEl1->Px(),ppEl1->Py(),ppEl1->Pz(),ppEl1->Energy());
+                TLorentzVector lorvPPEl2;
+                lorvPPEl2.SetPxPyPzE(ppEl2->Px(),ppEl2->Py(),ppEl2->Pz(),ppEl2->Energy());
+                TLorentzVector Jpsi = lorvPPEl1 + lorvPPEl2;
+                lorvJpsiFromEl->SetPxPyPzE(Jpsi.Px(),Jpsi.Py(),Jpsi.Pz(),Jpsi.Energy());
+                ((TH1F*)arrTH1F->At(kJ1_mcJElPairEn))->Fill(lorvJpsiFromEl->Energy());
+                ((TH1F*)arrTH1F->At(kJ1_mcJElPairPt))->Fill(lorvJpsiFromEl->Pt());
+                ((TH1F*)arrTH1F->At(kJ1_mcJElPairRap))->Fill(lorvJpsiFromEl->Rapidity());
+                ((TH1F*)arrTH1F->At(kJ1_mcJElPairM))->Fill(lorvJpsiFromEl->M());
             }
 
-            // match each cluster to the closest (in XY distance) MC track, then go by mothers and find its primary physical particle
-            // match each cluster to the closest primary physical MC track
-            std::vector<Int_t> idxMtchP_prim; // vector of indices of physical primary particles which are mothers of particles to which clusters were matched
-            TObjArray arrMtchP_prim; arrMtchP_prim.Clear(); // vector of the above primary particles
-            std::vector<Int_t> idxMtchP_primDir; // vector of indices of physical primary particles to which the clusters were matched directly
-            TObjArray arrMtchP_primDir; arrMtchP_primDir.Clear(); // vector of the above primary particles
-            // initialize the arrays
+            // match clusters to MC tracks
+            std::vector<Int_t> idxMtchP_prim; 
+            TObjArray arrMtchP_prim;
+            MatchClsToPhysPrimP(stack,listClsPref,idxMtchP_prim,&arrMtchP_prim,matchDirectly);
+
+            // fill the histograms
             for(Int_t iCl = 0; iCl < nClsPref; iCl++)
             {
-                idxMtchP_prim.push_back(-1);
-                arrMtchP_prim.AddLast(NULL);
-                idxMtchP_primDir.push_back(-1);
-                arrMtchP_primDir.AddLast(NULL);
-            }
-            // now do the actual matching
-            for(Int_t iCl = 0; iCl < nClsPref; iCl++)
-            {
-                AliFOCALCluster *clust = (AliFOCALCluster*) listClsPref.At(iCl);
+                AliFOCALCluster *clust = (AliFOCALCluster*) listClsPref->At(iCl);
                 if(!clust) continue;
                 // get energy and coordinates of this cluster
                 Float_t xCl = clust->X();
@@ -556,120 +590,27 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
                 TLorentzVector cl = ConvertXYZEtoLorVec(xCl,yCl,zCl,ECl);
 
                 // fill some histograms with cluster kinematics
-                ((TH2F*)arrTH2F->At(kJp_clEta_clPhi))->Fill(cl.Eta(), cl.Phi());
-                ((TH2F*)arrTH2F->At(kJp_clEta_clPt ))->Fill(cl.Eta(), cl.Pt());
+                ((TH2F*)arrTH2F->At(kJ2_clEta_clPhi))->Fill(cl.Eta(), cl.Phi());
+                ((TH2F*)arrTH2F->At(kJ2_clEta_clPt ))->Fill(cl.Eta(), cl.Pt());
 
-                // do the matching
-                Float_t mtchXY(1e3);
-                Float_t mtchXY_dir(1e3);
-                TParticle* mtchP_any = NULL;
-                TParticle* mtchP_prim = NULL;
-                TParticle* mtchP_primDir = NULL;
-                Int_t iMtchP_any = -1;
-                Int_t iMtchP_prim = -1;
-                Int_t iMtchP_primDir = -1;
-                for(Int_t iTrk = 0; iTrk < stack->GetNtrack(); iTrk++)
-                {
-                    TParticle *part = stack->Particle(iTrk);
-                    // during matching, skip photons with very low energy (< 0.2 MeV)
-                    // trajectories of these often overlap with those of pp electron (when projected as straight lines)
-                    // and clusters could very likely be matched with them instead of electrons
-                    if(part->GetPdgCode() == 22 && part->Energy() < 0.2) continue;
-                    // eta cut
-                    Float_t dEta = TMath::Abs(part->Eta() - cl.Eta());
-                    if(dEta > cutdEta) continue;
-                    // phi cut
-                    Float_t dPhi = TMath::Abs(part->Phi() - cl.Phi());
-                    if(dPhi > TMath::Pi()) dPhi = 2*TMath::Pi() - dPhi;
-                    if(dPhi > cutdPhi) continue;
-                    // do matching
-                    Float_t x(0.), y(0.);
-                    TrackCoordinatesAtZ(part,zCl,x,y);
-                    Float_t distXY = TMath::Sqrt(TMath::Power(x-xCl,2) + TMath::Power(y-yCl,2));
-                    if(distXY < mtchXY) {
-                        // a new closest MC particle found
-                        mtchP_any = part;
-                        iMtchP_any = iTrk;
-                        mtchXY = distXY;
-                    }
-                    if((distXY < mtchXY_dir) && stack->IsPhysicalPrimary(iTrk)) {
-                        // a new closest physical primary MC particle found
-                        mtchP_primDir = part;
-                        iMtchP_primDir = iTrk;
-                        mtchXY_dir = distXY;
-                    }
-                }
-                // if a matching particle found
-                if(mtchP_any) {
-                    // find the physical primary particle from which the matched particle originates
-                    mtchP_prim = mtchP_any;
-                    Bool_t physPrimFound = stack->IsPhysicalPrimary(iMtchP_any);
-                    while(!physPrimFound) {
-                        Int_t iNewMother = mtchP_prim->GetMother(0);
-                        mtchP_prim = stack->Particle(iNewMother);
-                        physPrimFound = stack->IsPhysicalPrimary(iNewMother);
-                        iMtchP_any = iNewMother;
-                    }
-                    iMtchP_prim = iMtchP_any;
-                }
-                idxMtchP_prim[iCl] = iMtchP_prim;
-                arrMtchP_prim.AddAt(mtchP_prim, iCl);
-                idxMtchP_primDir[iCl] = iMtchP_primDir;
-                arrMtchP_primDir.AddAt(mtchP_primDir, iCl);
-            }
-            // fill the histograms
-            for(Int_t iCl = 0; iCl < nClsPref; iCl++)
-            {
-                AliFOCALCluster *clust = (AliFOCALCluster*) listClsPref.At(iCl);
-                if(!clust) continue;
-                // get energy and coordinates of this cluster
-                Float_t xCl = clust->X();
-                Float_t yCl = clust->Y();
-                Float_t zCl = clust->Z();
-                Float_t ECl = clust->E();
-                TLorentzVector cl = ConvertXYZEtoLorVec(xCl,yCl,zCl,ECl);
                 TParticle *mtchP_prim = (TParticle*)arrMtchP_prim[iCl];
-                TParticle *mtchP_primDir = (TParticle*)arrMtchP_primDir[iCl];
                 // if matched to a ppp going by mothers
                 if(mtchP_prim) {
-                    ((TH2F*)arrTH2F->At(kJp_clE_mtchE))->Fill(ECl, mtchP_prim->Energy());
-                    ((TH2F*)arrTH2F->At(kJp_clEta_mtchEta))->Fill(cl.Eta(), mtchP_prim->Eta());
-                    ((TH2F*)arrTH2F->At(kJp_clPt_mtchPt))->Fill(cl.Pt(), mtchP_prim->Pt());
+                    ((TH2F*)arrTH2F->At(kJ2_pppClEn_mtchEn))->Fill(ECl, mtchP_prim->Energy());
+                    ((TH2F*)arrTH2F->At(kJ2_pppClEta_mtchEta))->Fill(cl.Eta(), mtchP_prim->Eta());
+                    ((TH2F*)arrTH2F->At(kJ2_pppClPt_mtchPt))->Fill(cl.Pt(), mtchP_prim->Pt());
                     // if electron (ppe)
                     if(isEleOrPos(mtchP_prim)) {
-                        ((TH2F*)arrTH2F->At(kJp_primElClE_mtchE))->Fill(ECl, mtchP_prim->Energy());
-                        ((TH2F*)arrTH2F->At(kJp_primElClEta_mtchEta))->Fill(cl.Eta(), mtchP_prim->Eta());
-                        ((TH2F*)arrTH2F->At(kJp_primElClPt_mtchPt))->Fill(cl.Pt(), mtchP_prim->Pt());
+                        ((TH2F*)arrTH2F->At(kJ2_ppeClEn_mtchEn))->Fill(ECl, mtchP_prim->Energy());
+                        ((TH2F*)arrTH2F->At(kJ2_ppeClEta_mtchEta))->Fill(cl.Eta(), mtchP_prim->Eta());
+                        ((TH2F*)arrTH2F->At(kJ2_ppeClPt_mtchPt))->Fill(cl.Pt(), mtchP_prim->Pt());
                     }
                 }
-                // if matched to a ppp directly
-                if(mtchP_primDir) {
-                    ((TH2F*)arrTH2F->At(kJp_clE_mtchDirE))->Fill(ECl, mtchP_primDir->Energy());
-                    ((TH2F*)arrTH2F->At(kJp_clEta_mtchDirEta))->Fill(cl.Eta(), mtchP_primDir->Eta());
-                    ((TH2F*)arrTH2F->At(kJp_clPt_mtchDirPt))->Fill(cl.Pt(), mtchP_primDir->Pt());
-                    // if electron (ppe)
-                    if(isEleOrPos(mtchP_primDir)) {
-                        ((TH2F*)arrTH2F->At(kJp_primElClE_mtchDirE))->Fill(ECl, mtchP_primDir->Energy());
-                        ((TH2F*)arrTH2F->At(kJp_primElClEta_mtchDirEta))->Fill(cl.Eta(), mtchP_primDir->Eta());
-                        ((TH2F*)arrTH2F->At(kJp_primElClPt_mtchDirPt))->Fill(cl.Pt(), mtchP_primDir->Pt());
-                    }
-                }
-                // if matched to a ppp in both ways
-                if(mtchP_prim && mtchP_primDir) 
-                {
-                    ((TH2F*)arrTH2F->At(kJp_mtchE_mtchDirE))->Fill(mtchP_prim->Energy(), mtchP_primDir->Energy());
-                    // if both matched to ppe
-                    if(isEleOrPos(mtchP_prim) && isEleOrPos(mtchP_primDir)) {
-                        ((TH2F*)arrTH2F->At(kJp_mtchE_mtchDirE_primEl))->Fill(mtchP_prim->Energy(), mtchP_primDir->Energy());
-                        ((TH2F*)arrTH2F->At(kJp_mtchEta_mtchDirEta_primEl))->Fill(mtchP_prim->Eta(), mtchP_primDir->Eta());
-                        ((TH2F*)arrTH2F->At(kJp_mtchPt_mtchDirPt_primEl))->Fill(mtchP_prim->Pt(), mtchP_primDir->Pt());
-                    }
-                } 
             }
             // combine clusters into pairs
             for(Int_t iCl1 = 0; iCl1 < nClsPref; iCl1++) 
             {
-                AliFOCALCluster *clust1 = (AliFOCALCluster*) listClsPref.At(iCl1);
+                AliFOCALCluster *clust1 = (AliFOCALCluster*) listClsPref->At(iCl1);
                 if(!clust1) continue;
                 // get energy and coordinates of this cluster
                 Float_t xCl1 = clust1->X();
@@ -680,7 +621,7 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
                 // go over all possible pairs of clusters
                 for(Int_t iCl2 = iCl1+1; iCl2 < nClsPref; iCl2++) 
                 {
-                    AliFOCALCluster *clust2 = (AliFOCALCluster*) listClsPref.At(iCl2);
+                    AliFOCALCluster *clust2 = (AliFOCALCluster*) listClsPref->At(iCl2);
                     if(!clust2) continue;
                     // get energy and coordinates of this cluster
                     Float_t xCl2 = clust2->X();
@@ -693,52 +634,37 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
                     TLorentzVector cl12 = cl1 + cl2;
                     Double_t mass = cl12.M();
                     // fill some kinematic histograms
-                    ((TH1F*)arrTH1F->At(kJp_clPairM))->Fill(mass);
-                    ((TH1F*)arrTH1F->At(kJp_clPairRap))->Fill(cl12.Rapidity());
-                    ((TH1F*)arrTH1F->At(kJp_clPairPt))->Fill(cl12.Pt());
-                    if(mass > 2.8) ((TH1F*)arrTH1F->At(kJp_clPairPt_massCut))->Fill(cl12.Pt());
+                    ((TH1F*)arrTH1F->At(kJ1_clPairEn))->Fill(cl12.Energy());
+                    ((TH1F*)arrTH1F->At(kJ1_clPairPt))->Fill(cl12.Pt());
+                    if(mass > 2.8) ((TH1F*)arrTH1F->At(kJ1_clPairPt_massCut))->Fill(cl12.Pt());
+                    ((TH1F*)arrTH1F->At(kJ1_clPairRap))->Fill(cl12.Rapidity());
+                    ((TH1F*)arrTH1F->At(kJ1_clPairM))->Fill(mass);
+                    // radial separation between the pairs of clusters
+                    Float_t sepCl = TMath::Sqrt(TMath::Power(xCl1-xCl2,2) + TMath::Power(yCl1-yCl2,2));
+                    ((TH1F*)arrTH1F->At(kJ1_clPairSep))->Fill(sepCl);
+                    // radial separation between cluster pair vs between the pair of ppe
+                    Float_t x1(0.), y1(0.);
+                    TrackCoordinatesAtZ(ppEl1,zCl1,x1,y1);
+                    Float_t x2(0.), y2(0.);
+                    TrackCoordinatesAtZ(ppEl2,zCl2,x2,y2);
+                    Float_t sepMC = TMath::Sqrt(TMath::Power(x1-x2,2) + TMath::Power(y1-y2,2));
+                    ((TH2F*)arrTH2F->At(kJ2_clPairSep_mcJElSep))->Fill(sepCl,sepMC);
                     // if both paired to a different pp electron:
-                    // matching by mothers
                     if((idxMtchP_prim[iCl1] != idxMtchP_prim[iCl2]) && idxMtchP_prim[iCl1] != -1 && idxMtchP_prim[iCl2] != -1)
                     {
-                        ((TH1F*)arrTH1F->At(kJp_primElClPairM))->Fill(mass);
-                    }
-                    // direct matching
-                    if((idxMtchP_primDir[iCl1] != idxMtchP_primDir[iCl2]) && idxMtchP_primDir[iCl1] != -1 && idxMtchP_primDir[iCl2] != -1)
-                    {
-                        ((TH1F*)arrTH1F->At(kJp_primElClPairM_dir))->Fill(mass);
+                        ((TH1F*)arrTH1F->At(kJ1_ppeClPairM))->Fill(mass);
+                        ((TH1F*)arrTH1F->At(kJ1_ppeClPairSep))->Fill(sepCl); 
+                        ((TH2F*)arrTH2F->At(kJ2_ppeClPairEn_mtchEn))->Fill(cl12.Energy(),lorvJpsiFromEl->Energy());
+                        ((TH2F*)arrTH2F->At(kJ2_ppeClPairRap_mtchRap))->Fill(cl12.Rapidity(),lorvJpsiFromEl->Rapidity());
+                        ((TH2F*)arrTH2F->At(kJ2_ppeClPairPt_mtchPt))->Fill(cl12.Pt(),lorvJpsiFromEl->Pt());
+                        ((TH2F*)arrTH2F->At(kJ2_ppeClPairM_mtchM))->Fill(mass,lorvJpsiFromEl->M());
                     }
                 } // end of for over iCl2
             } // end of for over iCl1
+            delete lorvJpsiFromEl;
         }
         of.close();
-
-        /*
-        // go over prefiltered clusters and match them with MC particles
-        for(Int_t iCl1 = 0; iCl1 < listClsPref.GetEntries(); iCl1++) 
-        {
-            // fill the histograms
-            if(isMatchingParticleJpsiEle1) 
-            {
-                hMismtchXY->Fill(matchedE1,matchedXY1); 
-                hMCJpsiEnMtch->Fill(matchedE1);
-                hMCJpsiEnRatio->Fill(matchedE1);
-            }
-
-            // go over all possible pairs of prefiltered clusters and combine them
-            for(Int_t iCl2 = iCl1+1; iCl2 < listClsPref.GetEntries(); iCl2++) 
-            {
-                // fill the histograms
-                if(isMatchingParticleJpsiEle1 && isMatchingParticleJpsiEle2)
-                {
-                    hClPairJpsiEleEta->Fill(cl12.Eta());
-                    hClPairJpsiElePt->Fill(cl12.Pt());
-                    hClPairJpsiEleVsMCJpsiEta->Fill(cl12.Eta(),stack->Particle(0)->Eta());
-                    hClPairJpsiEleVsMCJpsiPt->Fill(cl12.Pt(),stack->Particle(0)->Pt());
-                }
-            }  
-        }  
-        */ 
+        delete listClsPref;
     }  // end of for over events in AliRunLoader
 
     runLoader->Delete();
