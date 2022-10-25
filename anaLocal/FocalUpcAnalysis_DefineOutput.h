@@ -57,8 +57,9 @@ enum kBxPr {
 };
 
 enum kJpH1 {
+    kJ1_clZ = 0,
     // MC J/psi
-    kJ1_mcJEn = 0,
+    kJ1_mcJEn,
     kJ1_mcJPt,
     kJ1_mcJRap,
     kJ1_mcJM,
@@ -77,6 +78,7 @@ enum kJpH1 {
     // matched cl. pairs
     kJ1_ppeClPairM,
     kJ1_ppeClPairSep,
+    kJ1_sameppeClPairSep,
     kJ1_all
 };
 
@@ -219,6 +221,9 @@ void DefineHisto_BxPr(TObjArray* objArr)
 void DefineHisto_JpH1(TObjArray* objArr)
 {
     objArr->SetOwner();
+    TH1F* hJ1_clZ = new TH1F("hJ1_clZ","",60,700.,715.);
+                    hJ1_clZ->SetTitle("#it{z} coordinate of FoCal clusters;#it{z}_{cl} [cm];counts");
+                    objArr->AddAt(hJ1_clZ, kJ1_clZ);
     // MC kinematics
     // J/psi
     TH1F* hJ1_mcJEn = new TH1F("hJ1_mcJEn","",nBinsEn,lowEn,uppEn);
@@ -272,6 +277,9 @@ void DefineHisto_JpH1(TObjArray* objArr)
     TH1F* hJ1_ppeClPairSep = new TH1F("hJ1_ppeClPairSep","",nBinsSep,lowSep,uppSep);
                     hJ1_ppeClPairSep->SetTitle("Radial separation of cluster pairs matched with a pair of pp electrons;#Delta#it{R}_{matched cl pair} [cm];counts");
                     objArr->AddAt(hJ1_ppeClPairSep, kJ1_ppeClPairSep);
+    TH1F* hJ1_sameppeClPairSep = new TH1F("hJ1_sameppeClPairSep","",nBinsSep,lowSep,uppSep);
+                    hJ1_sameppeClPairSep->SetTitle("Radial separation of cluster pairs matched with the same pp electron;#Delta#it{R}_{matched cl pair} [cm];counts");
+                    objArr->AddAt(hJ1_sameppeClPairSep, kJ1_sameppeClPairSep);
     return;
 }
 

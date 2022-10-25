@@ -27,7 +27,7 @@ Bool_t matchDirectly = kFALSE;
 // superclusterizer:
 Bool_t doSupercls = kFALSE; // if true, create superclusters using:
 const Float_t minSeedE = 5; // [GeV]
-const Float_t radius = 8; // [cm]
+const Float_t radius = 15; // [cm]
 // selections:
 const Float_t cutM = 0.0; // [GeV]; if > 0, filter out all (super)cluster pairs having mass below cutM
 const Float_t cutE = 0.0; // [GeV]; if > 0, filter out all (super) clusters having energy below cutE 
@@ -589,6 +589,7 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
                 Float_t ECl = clust->E();
                 TLorentzVector cl = ConvertXYZEtoLorVec(xCl,yCl,zCl,ECl);
 
+                ((TH1F*)arrTH1F->At(kJ1_clZ))->Fill(zCl);
                 // fill some histograms with cluster kinematics
                 ((TH2F*)arrTH2F->At(kJ2_clEta_clPhi))->Fill(cl.Eta(), cl.Phi());
                 ((TH2F*)arrTH2F->At(kJ2_clEta_clPt ))->Fill(cl.Eta(), cl.Pt());
@@ -658,6 +659,8 @@ void DoFocalAnalysis(TString dataset, Int_t pdgSim, Int_t nEv)
                         ((TH2F*)arrTH2F->At(kJ2_ppeClPairRap_mtchRap))->Fill(cl12.Rapidity(),lorvJpsiFromEl->Rapidity());
                         ((TH2F*)arrTH2F->At(kJ2_ppeClPairPt_mtchPt))->Fill(cl12.Pt(),lorvJpsiFromEl->Pt());
                         ((TH2F*)arrTH2F->At(kJ2_ppeClPairM_mtchM))->Fill(mass,lorvJpsiFromEl->M());
+                    } else {
+                        ((TH1F*)arrTH1F->At(kJ1_sameppeClPairSep))->Fill(sepCl); 
                     }
                 } // end of for over iCl2
             } // end of for over iCl1
