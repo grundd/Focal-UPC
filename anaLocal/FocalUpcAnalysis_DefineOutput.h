@@ -32,6 +32,8 @@ enum kBxH2 {
     kB2_mcE_clMcSep,
     kB2_clMaxClDX_clMaxClDY,
     kB2_mcE_clMaxClSep,
+    kB2_clX_clMaxClSep,
+    kB2_clY_clMaxClSep,
     kB2_mcE_nCls,
     kB2_clE_mcE,
     kB2_totE_mcE,
@@ -147,6 +149,12 @@ void DefineHisto_BxH2(TObjArray* objArr)
     TH2F* hB2_mcE_clMaxClSep = new TH2F("hB2_mcE_clMaxClSep","",nBinsEn,lowEn,uppEn,100,0.,20.);
                     hB2_mcE_clMaxClSep->SetTitle("Radial distance #Delta#it{R} = #sqrt{(#Delta#it{x})^{2} + (#Delta#it{y})^{2}} between the cluster and the cluster with maximum energy;#it{E}_{MC} [GeV];#Delta#it{R} [cm]");
                     objArr->AddAt(hB2_mcE_clMaxClSep, kB2_mcE_clMaxClSep);
+    TH2F* hB2_clX_clMaxClSep = new TH2F("hB2_clX_clMaxClSep","",100,-50.,50.,100,0.,20.);
+                    hB2_clX_clMaxClSep->SetTitle("Radial dist. #Delta#it{R} = #sqrt{(#Delta#it{x})^{2} + (#Delta#it{y})^{2}} between the cluster and the cluster with maximum energy vs average X coordinate of the two;#it{X}_{cl} [GeV];#Delta#it{R} [cm]");
+                    objArr->AddAt(hB2_clX_clMaxClSep, kB2_clX_clMaxClSep);
+    TH2F* hB2_clY_clMaxClSep = new TH2F("hB2_clY_clMaxClSep","",100,-50.,50.,100,0.,20.);
+                    hB2_clY_clMaxClSep->SetTitle("Radial dist. #Delta#it{R} = #sqrt{(#Delta#it{x})^{2} + (#Delta#it{y})^{2}} between the cluster and the cluster with maximum energy vs average Y coordinate of the two;#it{Y}_{cl} [GeV];#Delta#it{R} [cm]");
+                    objArr->AddAt(hB2_clY_clMaxClSep, kB2_clY_clMaxClSep);
     // number of clusters, cluster energy, total energy and maximum cluster energy vs MC energy
     TH2F* hB2_mcE_nCls = new TH2F("hB2_mcE_nCls","",nBinsEn,lowEn,uppEn,8,-0.5,7.5);
                     hB2_mcE_nCls->SetTitle("(#it{E}_{MC}, #it{N}_{cls});#it{E}_{MC} [GeV];#it{N}_{cls} [-]");

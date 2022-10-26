@@ -203,24 +203,6 @@ void DoFocalAnalysis(TString sDataset, Int_t pdgSim, Int_t nEv)
     if(!runLoader->TreeE()) runLoader->LoadHeader();
     if(!runLoader->TreeK()) runLoader->LoadKinematics();
 
-    // define output tree
-    TString sTree = Form("%s%s_analysisTree.root", sOut.Data(), sDataset.Data());
-    TFile* fOut = new TFile(sTree.Data(),"RECREATE");
-    TTree* tOut = new TTree("tOut", "output tree containing cluster pairs");
-    // pairs of summed clusters/superclusters
-    Float_t fEnClPair, fPtClPair, fEtaClPair, fPhiClPair;
-    tOut->Branch("fEnClPair", &fEnClPair, "fEnClPair/F");
-    tOut->Branch("fPtClPair", &fPtClPair, "fPtClPair/F");
-    tOut->Branch("fEtaClPair", &fEtaClPair, "fEtaClPair/F");
-    tOut->Branch("fPhiClPair", &fPhiClPair, "fPhiClPair/F");
-    // pairs of J/psi electrons (if cluster pairs was matched with it)
-    Float_t fEnJElPair, fPtJElPair, fEtaJElPair, fPhiJElPair;
-    tOut->Branch("fEnJElPair", &fEnJElPair, "fEnJElPair/F");
-    tOut->Branch("fPtJElPair", &fPtJElPair, "fPtJElPair/F");
-    tOut->Branch("fEtaJElPair", &fEtaJElPair, "fEtaJElPair/F");
-    tOut->Branch("fPhiJElPair", &fPhiJElPair, "fPhiJElPair/F");
-    gROOT->cd();
-
     Int_t nEvents(nEv);
     if(nEv == -1) nEvents = runLoader->GetNumberOfEvents();
     cout << "Analyzing " << nEvents << " events:" << endl;
@@ -529,12 +511,14 @@ void DoFocalAnalysis(TString sDataset, Int_t pdgSim, Int_t nEv)
                 ((TH2F*)arrTH2F->At(kB2_clMcDX_clMcDY))->Fill(DeltaX, DeltaY);
                 ((TH2F*)arrTH2F->At(kB2_mcE_clMcSep))->Fill(part->Energy(), DeltaR);
                 // radial distance between the cluster and the cluster with maximum energy
-                if(isClWithMaxE && iCl != iClMaxE) {
+                if(isClWithMaxE && (iCl != iClMaxE)) {
                     Float_t DeltaX_maxE = xCl - xClMaxE;
                     Float_t DeltaY_maxE = yCl - yClMaxE;
                     Float_t DeltaR_maxE = TMath::Sqrt(TMath::Power(DeltaX_maxE,2) + TMath::Power(DeltaY_maxE,2));
                     ((TH2F*)arrTH2F->At(kB2_clMaxClDX_clMaxClDY))->Fill(DeltaX_maxE, DeltaY_maxE);
                     ((TH2F*)arrTH2F->At(kB2_mcE_clMaxClSep))->Fill(part->Energy(), DeltaR_maxE);
+                    ((TH2F*)arrTH2F->At(kB2_clX_clMaxClSep))->Fill((xCl + xClMaxE)/2., DeltaR_maxE);
+                    ((TH2F*)arrTH2F->At(kB2_clY_clMaxClSep))->Fill((yCl + yClMaxE)/2., DeltaR_maxE);
                 }
             }
         }
@@ -543,6 +527,24 @@ void DoFocalAnalysis(TString sDataset, Int_t pdgSim, Int_t nEv)
         // ******************************************************************************************************************
         else 
         {
+            // define output tree
+            TString sTree = Form("%s%s_analysisTree.root", sOut.Data(), sDataset.Data());
+            TFile* fOut = new TFile(sTree.Data(),"RECREATE");
+            TTree* tOut = new TTree("tOut", "output tree containing cluster pairs");
+            // pairs of summed clusters/superclusters
+            Float_t fEnClPair, fPtClPair, fEtaClPair, fPhiClPair;
+            tOut->Branch("fEnClPair", &fEnClPair, "fEnClPair/F");
+            tOut->Branch("fPtClPair", &fPtClPair, "fPtClPair/F");
+            tOut->Branch("fEtaClPair", &fEtaClPair, "fEtaClPair/F");
+            tOut->Branch("fPhiClPair", &fPhiClPair, "fPhiClPair/F");
+            // pairs of J/psi electrons (if cluster pairs was matched with it)
+            Float_t fEnJElPair, fPtJElPair, fEtaJElPair, fPhiJElPair;
+            tOut->Branch("fEnJElPair", &fEnJElPair, "fEnJElPair/F");
+            tOut->Branch("fPtJElPair", &fPtJElPair, "fPtJElPair/F");
+            tOut->Branch("fEtaJElPair", &fEtaJElPair, "fEtaJElPair/F");
+            tOut->Branch("fPhiJElPair", &fPhiJElPair, "fPhiJElPair/F");
+            gROOT->cd();
+
             // fill histograms with MC kinematics
             TObjArray ppElectrons; // array of physical primary electrons
             for(Int_t iTrk = 0; iTrk < stack->GetNtrack(); iTrk++)
@@ -700,6 +702,9 @@ void DoFocalAnalysis(TString sDataset, Int_t pdgSim, Int_t nEv)
                 } // end of for over iCl2
             } // end of for over iCl1
             delete lvJElPair;
+
+            fOut->Write("",TObject::kWriteDelete);
+            delete fOut;
         }
         of.close();
         delete listClsPref;
@@ -708,9 +713,6 @@ void DoFocalAnalysis(TString sDataset, Int_t pdgSim, Int_t nEv)
     runLoader->Delete();
     fCls->Close();
     delete clusterizer;
-
-    fOut->Write("",TObject::kWriteDelete);
-    delete fOut;
 
     return;
 }
