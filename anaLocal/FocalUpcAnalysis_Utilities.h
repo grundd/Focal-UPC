@@ -260,7 +260,7 @@ void SetTrackStyle(TLine* l, Int_t codePDG, Bool_t isPrimary = kTRUE)
     return;
 }
 
-void DrawTracksMC(AliStack* stack, TCanvas* c, Bool_t withLegend = kTRUE)
+void DrawTracksMC(AliStack* stack, TCanvas* c, Bool_t drawPPDaughters = kFALSE, Bool_t withLegend = kTRUE)
 {
     // calculate the number of primary particles
     Int_t nPrim(0.);
@@ -330,10 +330,8 @@ void DrawTracksMC(AliStack* stack, TCanvas* c, Bool_t withLegend = kTRUE)
                 lY->Draw();
             } 
         }
-        // uncomment the following section to plot also (daughters of pp particles) with at least 500 MeV 
-        /*
-        // daughters of primary particles with at least 500 MeV
-        else if(part->GetMother(0) >= 0 && stack->IsPhysicalPrimary(part->GetMother(0)) && part->Energy() > 1)
+        // daughters of primary particles with at least 1 GeV
+        else if(drawPPDaughters && part->GetMother(0) >= 0 && stack->IsPhysicalPrimary(part->GetMother(0)) && part->Energy() > 1)
         {
             // a rough selection: if transverse coordinates when entering FOCAL larger than x_max = 52 cm, do not plot the track
             if(TMath::Abs(x3) < x_max && TMath::Abs(y3) < x_max)
@@ -348,7 +346,6 @@ void DrawTracksMC(AliStack* stack, TCanvas* c, Bool_t withLegend = kTRUE)
                 lY->Draw();
             }
         }
-        */
     }
     c->cd(1);
     if(withLegend) l->Draw();

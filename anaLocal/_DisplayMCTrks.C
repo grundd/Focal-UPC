@@ -1,4 +1,4 @@
-// DisplayTracksMC.C
+// _DisplayMCTrks.C
 
 #include <iostream>
 // root headers
@@ -6,24 +6,23 @@
 // aliroot headers
 #include "AliRunLoader.h"
 // my headers
-#include "Utilities.h"
+#include "FocalUpcAnalysis_Utilities.h"
 
-void DisplayTracksMC(Int_t iAnalysis)
+void _DisplayMCTrks()
 {
     z_min = -10.;
     z_max = 890.;
-    if(iAnalysis == 0) subfolder = "09-26-2022_kCohJpsiToElRad_1000ev/";
-    if(iAnalysis == 1) subfolder = "10-05-2022_kCohJpsiToElRad_3000ev/";
+    TString sSubfolder = "sim01/kCohJpsiToElRad_001_1000ev/";
 
     gSystem->Load("libpythia6_4_28.so"); 
-    gSystem->Exec(("mkdir -p " + subfolder + "tracksMC/").Data());
+    gSystem->Exec(("mkdir -p results/displayMCTrks/" + sSubfolder).Data());
 
     // define ALICE run loader: open galice.root
     AliRunLoader *runLoader = NULL;
-    runLoader = AliRunLoader::Open((simFolder + subfolder + "galice.root").Data());
+    runLoader = AliRunLoader::Open(("inputData/" + sSubfolder + "galice.root").Data());
     if(!runLoader) 
     {
-        cout << "DisplayTracksMC() ERROR: AliRunLoader not good! Terminating." << endl;
+        cout << "_DisplayMCTrks() ERROR: AliRunLoader not good! Terminating." << endl;
         return;   
     }
     if(!runLoader->GetAliRun()) runLoader->LoadgAlice();
@@ -31,8 +30,8 @@ void DisplayTracksMC(Int_t iAnalysis)
     if(!runLoader->TreeK()) runLoader->LoadKinematics();
 
     // loop over MC events contained within Kinematics.root
-    for(Int_t iEv = 0; iEv < runLoader->GetNumberOfEvents(); iEv++) 
-    //for(Int_t iEv = 0; iEv < 10; iEv++) 
+    //for(Int_t iEv = 0; iEv < runLoader->GetNumberOfEvents(); iEv++) 
+    for(Int_t iEv = 0; iEv < 10; iEv++) 
     {
         // get current MC event
         Int_t isEventOk = runLoader->GetEvent(iEv);
@@ -47,9 +46,9 @@ void DisplayTracksMC(Int_t iAnalysis)
         AliStack *stack = runLoader->Stack();
 
         // plot the tracks
-        TCanvas* c = EventDisplay_PrepareCanvas();
-        EventDisplay_PlotMCTracks(stack,c,kFALSE);
-        c->SaveAs(Form("%stracksMC/Ev%i.pdf",subfolder.Data(),iEv));
+        TCanvas* c = PrepareCanvas();
+        DrawTracksMC(stack,c,kFALSE);
+        c->SaveAs(Form("results/displayMCTrks/%sEv%i.pdf",sSubfolder.Data(),iEv));
         delete c;
     }
 
