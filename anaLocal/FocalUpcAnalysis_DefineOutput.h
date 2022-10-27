@@ -261,7 +261,7 @@ void DefineHisto_JpH1(TObjArray* objArr)
                     objArr->AddAt(hJ1_mcJElPairM, kJ1_mcJElPairM);
     // cluster pair kinematics
     TH1F* hJ1_clPairEn = new TH1F("hJ1_clPairEn","",nBinsEn,lowEn,uppEn);
-                    hJ1_clPairEn->SetTitle("#it{E} of cluster pairs;#it{m}_{cl pair} [GeV];counts");
+                    hJ1_clPairEn->SetTitle("#it{E} of cluster pairs;#it{E}_{cl pair} [GeV];counts");
                     objArr->AddAt(hJ1_clPairEn, kJ1_clPairEn);
     TH1F* hJ1_clPairPt = new TH1F("hJ1_clPairPt","",nBinsPt,lowPt,uppPt);
                     hJ1_clPairPt->SetTitle("#it{p}_{T} of cluster pairs;#it{p}_{T,cl pair} [GeV/#it{c}];counts");

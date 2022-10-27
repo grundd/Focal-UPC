@@ -15,7 +15,8 @@
 
 void _PrintKinematics() 
 {
-    TString dir = "inputData/sim01/BoxElectrons_001_1000ev/"; // add subfolder, if needed
+    TString dir = "inputData/sim02/kIncohJpsiToElRad_001_1000ev/"; // add subfolder, if needed
+    //dir = "inputData/sim01/BoxElectrons_001_1000ev/";
     // get the directory
     TString galiceFile = dir.Data();
     galiceFile += "galice.root";

@@ -31,13 +31,14 @@ const Float_t minSeedE = 5; // [GeV]
 const Float_t radius = 15; // [cm]
 // selections:
 const Float_t cutM = 0.0; // [GeV]; if > 0, filter out all (super)cluster pairs having mass below cutM
-const Float_t cutE = 0.0; // [GeV]; if > 0, filter out all (super) clusters having energy below cutE 
+const Float_t cutE = 30.0; // [GeV]; if > 0, filter out all (super) clusters having energy below cutE
 // *****************************************************************************
 // input files and configuration:
 Int_t vSim = 2;
-const Int_t nInputBoxEl[2] = {16,16};
-const Int_t nInputBoxPh[2] = {6, 0};
-const Int_t nInputJpsi[2] = {11,11};
+const Int_t nInputBoxEle[2] = {16,16};
+const Int_t nInputBoxPho[2] = {6, 0};
+const Int_t nInputCohJpsi[2] = {11,11};
+const Int_t nInputIncJpsi[2] = {0, 1};
 // version of input simulations:
 // 1 -> files produced before Oct 19, 2022
 // 2 -> files produced after Oct 19, 2022, after an update of FoCal&AliRoot
@@ -56,15 +57,16 @@ TObjArray* arrTH2F = NULL;
 TObjArray* arrTPrf = NULL;
 TString sOut = "";
 
-void DoFocalAnalysis(TString sDataset, Int_t pdgSim, Int_t nEv = -1);
+void DoFocalAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv = -1);
 // sDataset -> name of a folder where the input files are stored
 // nEv -> number of events from each input file to be analyzed 
 // (if -1, then analyze all available events)
 
-void FocalUpcAnalysis(Int_t pdgSim, Bool_t testOnly = kFALSE)
-// pdgSim = 11  -> box simulations of electrons
-//        = 22  -> box simulations of photons
-//        = 443 -> kCohJpsiToElRad
+void FocalUpcAnalysis(TString sSim, Bool_t testOnly = kFALSE)
+// sSim = boxEle  -> box simulations of electrons
+//      = boxPho  -> box simulations of photons
+//      = cohJpsi -> kCohJpsiToElRad
+//      = incJpsi -> kIncohJpsiToElRad
 // testOnly = false -> will run over all events in all available input files
 //          = true  -> will run only over 100 events from the first file
 {
@@ -73,36 +75,44 @@ void FocalUpcAnalysis(Int_t pdgSim, Bool_t testOnly = kFALSE)
     Int_t nInputFiles(0.);
     TString sInputFiles = "";
     // box electrons
-    if(pdgSim == 11) {
-        nInputFiles = nInputBoxEl[vSim-1];
+    if(sSim == "boxEle") {
+        nInputFiles = nInputBoxEle[vSim-1];
         sInputFiles = "BoxElectrons_";
     }
     // box photons
-    else if(pdgSim == 22) {
-        nInputFiles = nInputBoxPh[vSim-1];
+    else if(sSim == "boxPho") {
+        nInputFiles = nInputBoxPho[vSim-1];
         sInputFiles = "BoxPhotons_";
     }
     // kCohJpsiToElRad
-    else if(pdgSim == 443) {
-        nInputFiles = nInputJpsi[vSim-1];
+    else if(sSim == "cohJpsi") {
+        nInputFiles = nInputCohJpsi[vSim-1];
         sInputFiles = "kCohJpsiToElRad_";
     }
+    // kIncohJpsiToElRad
+    else if(sSim == "incJpsi") {
+        nInputFiles = nInputIncJpsi[vSim-1];
+        sInputFiles = "kIncohJpsiToElRad_";
+    }
     else {
-        cout << "Configuration not supported. Choose between pdgSim = 11, 22, 443. Terminating..." << endl;
+        cout << "Configuration not supported. Choose between sSim = \"boxEle\",\"boxPho\",\"cohJpsi\",\"incJpsi\". Terminating..." << endl;
         return;
     }
+
+    Bool_t isBoxSim = kFALSE;
+    if(sSim == "boxEle" || sSim == "boxPho") isBoxSim = kTRUE;
 
     // define output
     Int_t nTH1F(-1), nTPrf(-1), nTH2F(-1);
     // if box simulations
-    if(pdgSim == 11 || pdgSim == 22) 
+    if(isBoxSim) 
     {
         arrTH1F = new TObjArray(kB1_all); DefineHisto_BxH1(arrTH1F); nTH1F = kB1_all;
         arrTH2F = new TObjArray(kB2_all); DefineHisto_BxH2(arrTH2F); nTH2F = kB2_all;
         arrTPrf = new TObjArray(kBP_all); DefineHisto_BxPr(arrTPrf); nTPrf = kBP_all;
     } 
-    // if starlight simulations
-    else if(pdgSim == 443)
+    // if starlight J/psi simulations
+    else
     {
         arrTH1F = new TObjArray(kJ1_all); DefineHisto_JpH1(arrTH1F); nTH1F = kJ1_all;
         arrTH2F = new TObjArray(kJ2_all); DefineHisto_JpH2(arrTH2F); nTH2F = kJ2_all; 
@@ -110,21 +120,20 @@ void FocalUpcAnalysis(Int_t pdgSim, Bool_t testOnly = kFALSE)
     }
 
     // mass filtering only for J/psi simulations
-    if(cutM > 0 && (pdgSim == 11 || pdgSim == 22)) {
+    if(cutM > 0 && isBoxSim) {
         cout << "Cannot do mass cleaning for box simulations of electrons/photons. Terminating... " << endl;
         return;
     }
 
     // create output folder
     sOut = Form("results/sim%02i_g%02i_p%02i/",vSim,vGeomFile,vParaFile);
-    if(pdgSim == 11)       sOut += "_boxEle";
-    else if(pdgSim == 22)  sOut += "_boxPho";
-    else if(pdgSim == 443) sOut += "_Jpsi";
+    sOut += "_";
+    sOut += sSim;
     if(doSupercls) sOut += Form("_supCl");
-    if(pdgSim == 443 && matchDirectly) sOut += Form("_dirMtch");
+    if(!isBoxSim && matchDirectly) sOut += Form("_dirMtch");
     if(cutM > 0)   sOut += Form("_cutM%.1f",cutM);
     if(cutE > 0)   sOut += Form("_cutE%.1f",cutE);
-    sOut += "/";    
+    sOut += "/";
     gSystem->Exec("mkdir -p " + sOut);
 
     // run the analysis over selected input data
@@ -132,18 +141,18 @@ void FocalUpcAnalysis(Int_t pdgSim, Bool_t testOnly = kFALSE)
         cout << "No input files to analyze. Terminating... " << endl;
         return;
     } 
-    if(testOnly) DoFocalAnalysis(sInputFiles + "001_1000ev/",pdgSim,100);
-    else for(Int_t i = 0; i < nInputFiles; i++) DoFocalAnalysis(Form("%s%03i_1000ev/",sInputFiles.Data(),i+1),pdgSim);
+    if(testOnly) DoFocalAnalysis(sInputFiles + "001_1000ev/",isBoxSim,100);
+    else for(Int_t i = 0; i < nInputFiles; i++) DoFocalAnalysis(Form("%s%03i_1000ev/",sInputFiles.Data(),i+1),isBoxSim);
 
     // post-analysis of histograms
     ofstream of((sOut + "log.txt").Data());
     // if box simulations
-    if(pdgSim == 11 || pdgSim == 22)
+    if(isBoxSim)
     {
         // ...
     }
     // if starlight simulations
-    else if(pdgSim == 443)
+    else
     {
         // calculate the fraction of coh J/psi -> ee events that have energy of both electron larger than 20 GeV
         Float_t nAll = ((TH2F*)arrTH2F->At(kJ2_mcJEl1En_mcJEl2En))->Integral(1,nBinsEn,1,nBinsEn);
@@ -161,7 +170,7 @@ void FocalUpcAnalysis(Int_t pdgSim, Bool_t testOnly = kFALSE)
     return;
 }
 
-void DoFocalAnalysis(TString sDataset, Int_t pdgSim, Int_t nEv)
+void DoFocalAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv)
 {
     gSystem->Exec(Form("mkdir -p %s%s",sOut.Data(),sDataset.Data()));
 
@@ -462,7 +471,7 @@ void DoFocalAnalysis(TString sDataset, Int_t pdgSim, Int_t nEv)
         // ******************************************************************************************************************
         // analysis of box electron or photon simulations
         // ******************************************************************************************************************
-        if(pdgSim == 11 || pdgSim == 22)
+        if(isBoxSim)
         {
             // general histograms
             ((TH1F*)arrTH1F->At(kB1_mcE))->Fill(stack->Particle(0)->Energy());
@@ -523,9 +532,9 @@ void DoFocalAnalysis(TString sDataset, Int_t pdgSim, Int_t nEv)
             }
         }
         // ******************************************************************************************************************
-        // analysis of J/psi simulations
+        // analysis of starlight J/psi simulations
         // ******************************************************************************************************************
-        else 
+        else
         {
             // define output tree
             TString sTree = Form("%s%s_analysisTree.root", sOut.Data(), sDataset.Data());
