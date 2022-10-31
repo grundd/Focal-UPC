@@ -1,4 +1,4 @@
-// FocalUpcAnalysis_SimulateClusters.C
+// FocalUpc_SimulateClusters.C
 
 #include <iostream>
 // root headers
@@ -15,7 +15,7 @@ void DoSimulation(TString dataset, Int_t opt, Int_t nEv = -1);
 // nEv -> number of events from each input file to be analyzed 
 // (if -1, then analyze all available events)
 
-void FocalUpcAnalysis_SimulateClusters(TString dataset, Int_t nEv = -1)
+void FocalUpc_SimulateClusters(TString dataset, Int_t nEv = -1)
 {
     DoSimulation(dataset,0,nEv);
     DoSimulation(dataset,1,nEv);

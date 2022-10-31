@@ -1,4 +1,4 @@
-// FocalUpcAnalysis_Utilities.h
+// FocalUpc_Utilities.h
 // David Grund, Oct 15, 2022
 
 // root headers
@@ -14,7 +14,6 @@
 #include "TMarker.h"
 #include "TLine.h"
 #include "TLegend.h"
-#include "TString.h"
 // aliroot headers
 #include "AliStack.h"
 #include "AliFOCALGeometry.h"

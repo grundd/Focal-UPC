@@ -1,4 +1,4 @@
-// FocalUpcAnalysisJp_DefineOutput.h
+// FocalUpc_DefineHistograms.h
 // David Grund, Oct 16, 2022
 
 // binning

@@ -1,68 +1,34 @@
-// FocalUpcAnalysisJpsi.C
+// FocalUpc_AnalysisPrimary.C
 // David Grund, Oct 19, 2022
 
 #include <iostream>
 #include <fstream> // print output to txt file
 #include <iomanip> // std::setprecision()
 // root headers
-#include "TROOT.h"
+#include "TString.h"
 #include "TFile.h"
 #include "TTree.h"
-#include "TStyle.h"
 #include "TObjArray.h"
 #include "TLorentzVector.h"
-#include "TSystem.h"
 #include "TROOT.h"
 // aliroot headers
 #include "AliRunLoader.h"
 #include "AliFOCALClusterizerv2.h"
 // my headers
-#include "FocalUpcAnalysis_Utilities.h"
-#include "FocalUpcAnalysis_DefineOutput.h"
-
-// *****************************************************************************
-// options to set:
-Bool_t plotEvInfo = kFALSE;
-Bool_t printEvInfo = kFALSE;
-Bool_t matchDirectly = kFALSE;
-// superclusterizer:
-Bool_t doSupercls = kFALSE; // if true, create superclusters using:
-const Float_t minSeedE = 5; // [GeV]
-const Float_t radius = 15; // [cm]
-// selections:
-const Float_t cutM = 0.0; // [GeV]; if > 0, filter out all (super)cluster pairs having mass below cutM
-const Float_t cutE = 30.0; // [GeV]; if > 0, filter out all (super) clusters having energy below cutE
-// *****************************************************************************
-// input files and configuration:
-Int_t vSim = 2;
-const Int_t nInputBoxEle[2] = {16,16};
-const Int_t nInputBoxPho[2] = {6, 0};
-const Int_t nInputCohJpsi[2] = {11,11};
-const Int_t nInputIncJpsi[2] = {0, 1};
-// version of input simulations:
-// 1 -> files produced before Oct 19, 2022
-// 2 -> files produced after Oct 19, 2022, after an update of FoCal&AliRoot
-Int_t vGeomFile = 2;
-// version of the FoCal software and the "geometry.txt" file using which the clusters were produced 
-// 1 -> "geometry_01.txt" (used before the update on Oct 19, 2022)
-// 2 -> "geometry_02.txt" (used after the update on Oct 19, 2022)
-Int_t vParaFile = 2;
-// version of the "parameters.txt" file using which the clusters were produced
-// 1 -> "parameters_01.txt": Calib.Const1 set to 12900. (currently the official version)
-// 2 -> "parameters_02.txt": Calib.Const1 set to 11220. (old value)
-// *****************************************************************************
+#include "FocalUpc_Utilities.h"
+#include "FocalUpc_DefineHistograms.h"
+#include "FocalUpc_ConfigAnalysis.h"
 
 TObjArray* arrTH1F = NULL;
 TObjArray* arrTH2F = NULL;
 TObjArray* arrTPrf = NULL;
-TString sOut = "";
 
-void DoFocalAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv = -1);
+void DoPrimaryAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv = -1);
 // sDataset -> name of a folder where the input files are stored
 // nEv -> number of events from each input file to be analyzed 
 // (if -1, then analyze all available events)
 
-void FocalUpcAnalysis(TString sSim, Bool_t testOnly = kFALSE)
+void FocalUpc_AnalysisPrimary(TString sSim, Bool_t testOnly = kFALSE)
 // sSim = boxEle  -> box simulations of electrons
 //      = boxPho  -> box simulations of photons
 //      = cohJpsi -> kCohJpsiToElRad
@@ -70,37 +36,10 @@ void FocalUpcAnalysis(TString sSim, Bool_t testOnly = kFALSE)
 // testOnly = false -> will run over all events in all available input files
 //          = true  -> will run only over 100 events from the first file
 {
-    gSystem->Load("libpythia6_4_28.so");
-
-    Int_t nInputFiles(0.);
-    TString sInputFiles = "";
-    // box electrons
-    if(sSim == "boxEle") {
-        nInputFiles = nInputBoxEle[vSim-1];
-        sInputFiles = "BoxElectrons_";
-    }
-    // box photons
-    else if(sSim == "boxPho") {
-        nInputFiles = nInputBoxPho[vSim-1];
-        sInputFiles = "BoxPhotons_";
-    }
-    // kCohJpsiToElRad
-    else if(sSim == "cohJpsi") {
-        nInputFiles = nInputCohJpsi[vSim-1];
-        sInputFiles = "kCohJpsiToElRad_";
-    }
-    // kIncohJpsiToElRad
-    else if(sSim == "incJpsi") {
-        nInputFiles = nInputIncJpsi[vSim-1];
-        sInputFiles = "kIncohJpsiToElRad_";
-    }
-    else {
-        cout << "Configuration not supported. Choose between sSim = \"boxEle\",\"boxPho\",\"cohJpsi\",\"incJpsi\". Terminating..." << endl;
+    if(!ConfigAnalysis(sSim)) {
+        cout << "Wrong configuration. Terminating..." << endl;
         return;
     }
-
-    Bool_t isBoxSim = kFALSE;
-    if(sSim == "boxEle" || sSim == "boxPho") isBoxSim = kTRUE;
 
     // define output
     Int_t nTH1F(-1), nTPrf(-1), nTH2F(-1);
@@ -119,30 +58,13 @@ void FocalUpcAnalysis(TString sSim, Bool_t testOnly = kFALSE)
         arrTPrf = new TObjArray(kpJp_all); DefineHisto_JpPr(arrTPrf); nTPrf = kpJp_all;
     }
 
-    // mass filtering only for J/psi simulations
-    if(cutM > 0 && isBoxSim) {
-        cout << "Cannot do mass cleaning for box simulations of electrons/photons. Terminating... " << endl;
-        return;
-    }
-
-    // create output folder
-    sOut = Form("results/sim%02i_g%02i_p%02i/",vSim,vGeomFile,vParaFile);
-    sOut += "_";
-    sOut += sSim;
-    if(doSupercls) sOut += Form("_supCl");
-    if(!isBoxSim && matchDirectly) sOut += Form("_dirMtch");
-    if(cutM > 0)   sOut += Form("_cutM%.1f",cutM);
-    if(cutE > 0)   sOut += Form("_cutE%.1f",cutE);
-    sOut += "/";
-    gSystem->Exec("mkdir -p " + sOut);
-
     // run the analysis over selected input data
     if(nInputFiles == 0) { 
-        cout << "No input files to analyze. Terminating... " << endl;
+        cout << "No input files to analyze. Terminating..." << endl;
         return;
     } 
-    if(testOnly) DoFocalAnalysis(sInputFiles + "001_1000ev/",isBoxSim,100);
-    else for(Int_t i = 0; i < nInputFiles; i++) DoFocalAnalysis(Form("%s%03i_1000ev/",sInputFiles.Data(),i+1),isBoxSim);
+    if(testOnly) DoPrimaryAnalysis(sInputFiles + "001_1000ev/",isBoxSim,100);
+    else for(Int_t i = 0; i < nInputFiles; i++) DoPrimaryAnalysis(Form("%s%03i_1000ev/",sInputFiles.Data(),i+1),isBoxSim);
 
     // post-analysis of histograms
     ofstream of((sOut + "log.txt").Data());
@@ -170,7 +92,7 @@ void FocalUpcAnalysis(TString sSim, Bool_t testOnly = kFALSE)
     return;
 }
 
-void DoFocalAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv)
+void DoPrimaryAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv)
 {
     gSystem->Exec(Form("mkdir -p %s%s",sOut.Data(),sDataset.Data()));
 
@@ -211,6 +133,41 @@ void DoFocalAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv)
     if(!runLoader->GetAliRun()) runLoader->LoadgAlice();
     if(!runLoader->TreeE()) runLoader->LoadHeader();
     if(!runLoader->TreeK()) runLoader->LoadKinematics();
+
+    // output trees:
+    // define output tree for clusters
+    TString sOutTrees = Form("%s%s_analysisTrees.root", sOut.Data(), sDataset.Data());
+    TFile* fOutTrees = new TFile(sOutTrees.Data(),"RECREATE");
+    TTree* tOutCls = new TTree("tOutCls", "output tree containing prefiltered clusters");
+    Int_t fEvNumber;
+    Float_t fEnCl, fPtCl, fEtaCl, fPhiCl;
+    Float_t fEnJEl, fPtJEl, fEtaJEl, fPhiJEl;
+    // prefiltered clusters
+    tOutCls->Branch("fEvNumber", &fEvNumber, "fEvNumber/I"); 
+    tOutCls->Branch("fEnCl", &fEnCl, "fEnCl/F");
+    tOutCls->Branch("fPtCl", &fPtCl, "fPtCl/F");
+    tOutCls->Branch("fEtaCl", &fEtaCl, "fEtaCl/F");
+    tOutCls->Branch("fPhiCl", &fPhiCl, "fPhiCl/F");
+    // J/psi electrons with which the clusters were matched
+    tOutCls->Branch("fEnJEl", &fEnJEl, "fEnJEl/F");
+    tOutCls->Branch("fPtJEl", &fPtJEl, "fPtJEl/F");
+    tOutCls->Branch("fEtaJEl", &fEtaJEl, "fEtaJEl/F");
+    tOutCls->Branch("fPhiJEl", &fPhiJEl, "fPhiJEl/F");
+    // define output tree for cluster pairs
+    TTree* tOutClPairs = new TTree("tOutClPairs", "output tree containing cluster pairs");
+    Float_t fEnClPair, fPtClPair, fEtaClPair, fPhiClPair;
+    Float_t fEnJElPair, fPtJElPair, fEtaJElPair, fPhiJElPair;
+    // pairs of summed clusters/superclusters
+    tOutClPairs->Branch("fEnClPair", &fEnClPair, "fEnClPair/F");
+    tOutClPairs->Branch("fPtClPair", &fPtClPair, "fPtClPair/F");
+    tOutClPairs->Branch("fEtaClPair", &fEtaClPair, "fEtaClPair/F");
+    tOutClPairs->Branch("fPhiClPair", &fPhiClPair, "fPhiClPair/F");
+    // pairs of J/psi electrons (if cluster pairs was matched with it)
+    tOutClPairs->Branch("fEnJElPair", &fEnJElPair, "fEnJElPair/F");
+    tOutClPairs->Branch("fPtJElPair", &fPtJElPair, "fPtJElPair/F");
+    tOutClPairs->Branch("fEtaJElPair", &fEtaJElPair, "fEtaJElPair/F");
+    tOutClPairs->Branch("fPhiJElPair", &fPhiJElPair, "fPhiJElPair/F");
+    gROOT->cd();
 
     Int_t nEvents(nEv);
     if(nEv == -1) nEvents = runLoader->GetNumberOfEvents();
@@ -536,24 +493,6 @@ void DoFocalAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv)
         // ******************************************************************************************************************
         else
         {
-            // define output tree
-            TString sTree = Form("%s%s_analysisTree.root", sOut.Data(), sDataset.Data());
-            TFile* fOut = new TFile(sTree.Data(),"RECREATE");
-            TTree* tOut = new TTree("tOut", "output tree containing cluster pairs");
-            // pairs of summed clusters/superclusters
-            Float_t fEnClPair, fPtClPair, fEtaClPair, fPhiClPair;
-            tOut->Branch("fEnClPair", &fEnClPair, "fEnClPair/F");
-            tOut->Branch("fPtClPair", &fPtClPair, "fPtClPair/F");
-            tOut->Branch("fEtaClPair", &fEtaClPair, "fEtaClPair/F");
-            tOut->Branch("fPhiClPair", &fPhiClPair, "fPhiClPair/F");
-            // pairs of J/psi electrons (if cluster pairs was matched with it)
-            Float_t fEnJElPair, fPtJElPair, fEtaJElPair, fPhiJElPair;
-            tOut->Branch("fEnJElPair", &fEnJElPair, "fEnJElPair/F");
-            tOut->Branch("fPtJElPair", &fPtJElPair, "fPtJElPair/F");
-            tOut->Branch("fEtaJElPair", &fEtaJElPair, "fEtaJElPair/F");
-            tOut->Branch("fPhiJElPair", &fPhiJElPair, "fPhiJElPair/F");
-            gROOT->cd();
-
             // fill histograms with MC kinematics
             TObjArray ppElectrons; // array of physical primary electrons
             for(Int_t iTrk = 0; iTrk < stack->GetNtrack(); iTrk++)
@@ -620,24 +559,42 @@ void DoFocalAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv)
                 Float_t ECl = clust->E();
                 TLorentzVector cl = ConvertXYZEtoLorVec(xCl,yCl,zCl,ECl);
 
+                fEvNumber = iEv;
+                // cluster kinematics -> tree
+                fEnCl = cl.Energy();
+                fPtCl = cl.Pt();
+                fEtaCl = cl.Eta();
+                fPhiCl = cl.Phi();
+                // pp electron kinematics -> tree
+                fEnJElPair = -1e3;
+                fPtJElPair = -1e3;
+                fEtaJElPair = -1e3;
+                fPhiJElPair = -1e3;
+
                 ((TH1F*)arrTH1F->At(kJ1_clZ))->Fill(zCl);
                 // fill some histograms with cluster kinematics
-                ((TH2F*)arrTH2F->At(kJ2_clEta_clPhi))->Fill(cl.Eta(), cl.Phi());
-                ((TH2F*)arrTH2F->At(kJ2_clEta_clPt ))->Fill(cl.Eta(), cl.Pt());
+                ((TH2F*)arrTH2F->At(kJ2_clEta_clPhi))->Fill(fEtaCl, fPhiCl);
+                ((TH2F*)arrTH2F->At(kJ2_clEta_clPt ))->Fill(fEtaCl, fPtCl);
 
                 TParticle* mtchPhysPrimPart = (TParticle*)arrMtchPhysPrimParts[iCl];
-                // if matched to a ppp going by mothers
-                if(mtchPhysPrimPart) {
+                // if matched to a ppp
+                if(mtchPhysPrimPart) 
+                {
                     ((TH2F*)arrTH2F->At(kJ2_pppClEn_mtchEn))->Fill(ECl, mtchPhysPrimPart->Energy());
-                    ((TH2F*)arrTH2F->At(kJ2_pppClEta_mtchEta))->Fill(cl.Eta(), mtchPhysPrimPart->Eta());
-                    ((TH2F*)arrTH2F->At(kJ2_pppClPt_mtchPt))->Fill(cl.Pt(), mtchPhysPrimPart->Pt());
+                    ((TH2F*)arrTH2F->At(kJ2_pppClEta_mtchEta))->Fill(fEtaCl, mtchPhysPrimPart->Eta());
+                    ((TH2F*)arrTH2F->At(kJ2_pppClPt_mtchPt))->Fill(fPtCl, mtchPhysPrimPart->Pt());
                     // if electron (ppe)
                     if(isEleOrPos(mtchPhysPrimPart)) {
-                        ((TH2F*)arrTH2F->At(kJ2_ppeClEn_mtchEn))->Fill(ECl, mtchPhysPrimPart->Energy());
-                        ((TH2F*)arrTH2F->At(kJ2_ppeClEta_mtchEta))->Fill(cl.Eta(), mtchPhysPrimPart->Eta());
-                        ((TH2F*)arrTH2F->At(kJ2_ppeClPt_mtchPt))->Fill(cl.Pt(), mtchPhysPrimPart->Pt());
+                        fEnJEl = mtchPhysPrimPart->Energy();
+                        fPtJEl = mtchPhysPrimPart->Pt();
+                        fEtaJEl = mtchPhysPrimPart->Eta();
+                        fPhiJEl = mtchPhysPrimPart->Phi();
+                        ((TH2F*)arrTH2F->At(kJ2_ppeClEn_mtchEn))->Fill(ECl, fEnJEl);
+                        ((TH2F*)arrTH2F->At(kJ2_ppeClEta_mtchEta))->Fill(fEtaCl, fEtaJEl);
+                        ((TH2F*)arrTH2F->At(kJ2_ppeClPt_mtchPt))->Fill(fPtCl, fPtJEl);
                     }
                 }
+                tOutCls->Fill();
             }
             // combine clusters into pairs
             for(Int_t iCl1 = 0; iCl1 < nClsPref; iCl1++) 
@@ -707,17 +664,17 @@ void DoFocalAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv)
                     } else {
                         ((TH1F*)arrTH1F->At(kJ1_sameppeClPairSep))->Fill(sepCl); 
                     }
-                    tOut->Fill();
+                    tOutClPairs->Fill();
                 } // end of for over iCl2
             } // end of for over iCl1
             delete lvJElPair;
-
-            fOut->Write("",TObject::kWriteDelete);
-            delete fOut;
         }
         of.close();
         delete listClsPref;
     }  // end of for over events in AliRunLoader
+
+    if(!isBoxSim) fOutTrees->Write("",TObject::kWriteDelete);
+    delete fOutTrees;
 
     runLoader->Delete();
     fCls->Close();
