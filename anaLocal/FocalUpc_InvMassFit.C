@@ -2,7 +2,15 @@
 // David Grund, Nov 01, 2022
 
 // roofit headers
-
+#include "RooRealVar.h"
+#include "RooDataSet.h"
+#include "RooFitResult.h"
+#include "RooPlot.h"
+#include "RooGenericPdf.h"
+#include "RooBinning.h"
+#include "RooCBShape.h"
+#include "RooAddPdf.h"
+#include "RooExtendPdf.h"
 // my headers
 #include "FocalUpc_Utilities.h"
 #include "FocalUpc_ConfigAnalysis.h"
@@ -11,6 +19,7 @@ using namespace RooFit;
 
 Float_t fM,fPt,fRap;
 Bool_t fixNParameters = kFALSE;
+Bool_t fitWithDSCB = kTRUE;
 
 void PrepareTree(TString sIn)
 {
@@ -168,16 +177,19 @@ void DoFit(TString sSim)
         n_R.setConstant(kTRUE);
     }
 
-    RooCBShape CB_left("CB_left","CB_left",fM,mean_L,sigma_L,alpha_L,n_L);
-    RooCBShape CB_right("CB_right","CB_right",fM,mean_R,sigma_R,alpha_R,n_R);
+    RooCBShape CB_L("CB_L","CB_L",fM,mean_L,sigma_L,alpha_L,n_L);
+    RooCBShape CB_R("CB_R","CB_R",fM,mean_R,sigma_R,alpha_R,n_R);
     RooRealVar frac("frac","fraction of CBs",0.5);
-    RooAddPdf DoubleSidedCB("DoubleSidedCB","DoubleSidedCB",RooArgList(CB_left,CB_right),RooArgList(frac));
+    RooAddPdf DoubleSidedCB("DoubleSidedCB","DoubleSidedCB",RooArgList(CB_L,CB_R),RooArgList(frac));
 
     // create the model
     RooRealVar norm("norm","N(J/#psi)",nEv,0,1e04);
-    RooExtendPdf DSCBExtended("DSCBExtended","Extended DSCB",DoubleSidedCB,norm);
+    RooExtendPdf ExtendedDSCB("ExtendedDSCB","Extended DSCB function",DoubleSidedCB,norm);
+    RooExtendPdf ExtendedCB("ExtendedCB","Extended CB function",CB_L,norm);
     // perform the fit
-    RooFitResult* fResFit = DSCBExtended.fitTo(*fDataSet,Extended(kTRUE),Range(fMCutLow,fMCutUpp),Save());
+    RooFitResult* fResFit = NULL;
+    if(fitWithDSCB) fResFit = ExtendedDSCB.fitTo(*fDataSet,Extended(kTRUE),Range(fMCutLow,fMCutUpp),Save());
+    else            fResFit = ExtendedCB.fitTo(*fDataSet,Extended(kTRUE),Range(fMCutLow,fMCutUpp),Save());
 
     // ##########################################################
     // plot the results
@@ -191,7 +203,8 @@ void DoFit(TString sSim)
     
     RooPlot* fr = fM.frame(Title("invariant mass fit")); 
     fDataSet->plotOn(fr,Name("fDataSet"),Binning(binningM),MarkerStyle(20),MarkerSize(1.));
-    DSCBExtended.plotOn(fr,Name("DSCBExtended"),LineColor(215),LineWidth(3),LineStyle(9));
+    if(fitWithDSCB) ExtendedDSCB.plotOn(fr,Name("ExtendedDSCB"),LineColor(215),LineWidth(3),LineStyle(9));
+    else            ExtendedCB.plotOn(fr,Name("ExtendedCB"),LineColor(215),LineWidth(3),LineStyle(9));
     // Y axis
     // title
     fr->GetYaxis()->SetTitle(Form("Counts per %.0f MeV/#it{c}^{2}", binSize));
@@ -203,7 +216,7 @@ void DoFit(TString sSim)
     fr->GetYaxis()->SetMaxDigits(3);
     // X axis
     // title
-    fr->GetXaxis()->SetTitle("#it{m}_{cl. pair} [GeV/#it{c}^{2}]");
+    fr->GetXaxis()->SetTitle("#it{m}_{cl pair} [GeV/#it{c}^{2}]");
     fr->GetXaxis()->SetTitleSize(0.045);
     fr->GetXaxis()->SetTitleOffset(1.1);
     // label
@@ -213,28 +226,31 @@ void DoFit(TString sSim)
     fr->Draw();
 
     // get chi2 
-    Float_t chi2 = fr->chiSquare("DSCBExtended","fDataSet",fResFit->floatParsFinal().getSize());
+    Float_t chi2;
+    if(fitWithDSCB) chi2 = fr->chiSquare("ExtendedDSCB","fDataSet",fResFit->floatParsFinal().getSize());
+    else            chi2 = fr->chiSquare("ExtendedCB","fDataSet",fResFit->floatParsFinal().getSize());
     Printf("********************");
     Printf("chi2/NDF = %.3f", chi2);
     Printf("NDF = %i", fResFit->floatParsFinal().getSize());
     Printf("chi2/NDF = %.3f/%i", chi2*fResFit->floatParsFinal().getSize(), fResFit->floatParsFinal().getSize());
     Printf("********************");   
 
-    TLegend *l = new TLegend(0.10,0.42,0.40,0.96);
+    TLegend *l = new TLegend(0.10,0.38,0.40,0.96);
     l->AddEntry((TObject*)0,Form("%.1f < #it{p}_{T} < %.1f GeV/#it{c}",fPtCutLow,fPtCutUpp),"");
     l->AddEntry((TObject*)0,Form("%.1f < #it{y} < %.1f",fRapCutLow,fRapCutUpp),"");
+    l->AddEntry((TObject*)0,Form("#it{E}_{cl} > %.0f GeV",cutE),"");
     l->AddEntry((TObject*)0,Form("#chi^{2}/NDF = %.3f",chi2),"");
     l->AddEntry((TObject*)0,Form("#it{N} = %.f #pm %.f", norm.getVal(), norm.getError()),"");
     l->AddEntry((TObject*)0,Form("#mu = %.2f GeV/#it{c}^{2}", mean_L.getVal()),""); // mean_L.getError()
     l->AddEntry((TObject*)0,Form("#sigma = %.2f GeV/#it{c}^{2}", sigma_L.getVal()),""); // sigma_L.getError()
     l->AddEntry((TObject*)0,Form("#alpha_{L} = %.2f #pm %.2f", alpha_L.getVal(), alpha_L.getError()),"");
-    l->AddEntry((TObject*)0,Form("#alpha_{R} = %.2f #pm %.2f", (-1)*(alpha_R.getVal()), alpha_R.getError()),"");
+    if(fitWithDSCB) l->AddEntry((TObject*)0,Form("#alpha_{R} = %.2f #pm %.2f", (-1)*(alpha_R.getVal()), alpha_R.getError()),"");
     if(!fixNParameters) {
         l->AddEntry((TObject*)0,Form("#it{n}_{L} = %.0f #pm %.0f", n_L.getVal(), n_L.getError()),"");
-        l->AddEntry((TObject*)0,Form("#it{n}_{R} = %.0f #pm %.0f", n_R.getVal(), n_R.getError()),"");
+        if(fitWithDSCB) l->AddEntry((TObject*)0,Form("#it{n}_{R} = %.0f #pm %.0f", n_R.getVal(), n_R.getError()),"");
     } else {
         l->AddEntry((TObject*)0,Form("#it{n}_{L} = %.1f", n_L.getVal()),"");
-        l->AddEntry((TObject*)0,Form("#it{n}_{R} = %.1f", n_R.getVal()),"");
+        if(fitWithDSCB) l->AddEntry((TObject*)0,Form("#it{n}_{R} = %.1f", n_R.getVal()),"");
     }
     l->SetTextSize(0.042);
     l->SetBorderSize(0);
@@ -247,9 +263,9 @@ void DoFit(TString sSim)
     fr->Draw();
 
     // save the plots
-    c->Print((sOut + "invMassFit/invMassFit.pdf").Data());
-    cLog->Print((sOut + "invMassFit/invMassFit_log.pdf").Data());
-    cCM->Print((sOut + "invMassFit/invMassFit_cm.pdf").Data());
+    c->Print(Form("%sinvMassFit/fit.pdf",sOut.Data()));
+    cLog->Print(Form("%sinvMassFit/fit_log.pdf",sOut.Data()));
+    cCM->Print(Form("%sinvMassFit/fit_CM.pdf",sOut.Data()));
 
     delete c;
     delete cLog;

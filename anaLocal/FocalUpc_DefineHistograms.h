@@ -339,16 +339,16 @@ void DefineHisto_JpH2(TObjArray* objArr)
                     objArr->AddAt(hJ2_ppeClPt_mtchPt, kJ2_ppeClPt_mtchPt);
     // cluster pair kinematics vs kinematics of matched ppe pair
     TH2F* hJ2_ppeClPairEn_mtchEn = new TH2F("hJ2_ppeClPairEn_mtchEn","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
-                    hJ2_ppeClPairEn_mtchEn->SetTitle("energy of a cluster pair matched with a pair of pp electrons vs energy of ppe pair;#it{E}_{cl. pair} [GeV];#it{E}_{matched ppe pair} [GeV]");
+                    hJ2_ppeClPairEn_mtchEn->SetTitle("energy of a cluster pair matched with a pair of pp electrons vs energy of ppe pair;#it{E}_{cl pair} [GeV];#it{E}_{matched ppe pair} [GeV]");
                     objArr->AddAt(hJ2_ppeClPairEn_mtchEn, kJ2_ppeClPairEn_mtchEn);
     TH2F* hJ2_ppeClPairRap_mtchRap = new TH2F("hJ2_ppeClPairRap_mtchRap","",nBinsYEta,lowYEta,uppYEta,nBinsYEta,lowYEta,uppYEta);
-                    hJ2_ppeClPairRap_mtchRap->SetTitle("#it{y} of a cluster pair matched with a pair of pp electrons vs #it{y} of ppe pair;#it{y}_{cl. pair} [-];#it{y}_{matched ppe pair} [-]");
+                    hJ2_ppeClPairRap_mtchRap->SetTitle("#it{y} of a cluster pair matched with a pair of pp electrons vs #it{y} of ppe pair;#it{y}_{cl pair} [-];#it{y}_{matched ppe pair} [-]");
                     objArr->AddAt(hJ2_ppeClPairRap_mtchRap, kJ2_ppeClPairRap_mtchRap);
     TH2F* hJ2_ppeClPairPt_mtchPt = new TH2F("hJ2_ppeClPairPt_mtchPt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
-                    hJ2_ppeClPairPt_mtchPt->SetTitle("#it{p}_{T} of a cluster pair matched with a pair of pp electrons vs #it{p}_{T} of ppe pair;#it{p}_{T,cl. pair} [GeV/#it{c}];#it{p}_{T,matched ppe pair} [GeV/#it{c}]");
+                    hJ2_ppeClPairPt_mtchPt->SetTitle("#it{p}_{T} of a cluster pair matched with a pair of pp electrons vs #it{p}_{T} of ppe pair;#it{p}_{T,cl pair} [GeV/#it{c}];#it{p}_{T,matched ppe pair} [GeV/#it{c}]");
                     objArr->AddAt(hJ2_ppeClPairPt_mtchPt, kJ2_ppeClPairPt_mtchPt);
     TH2F* hJ2_ppeClPairM_mtchM = new TH2F("hJ2_ppeClPairM_mtchM","",nBinsM,lowM,uppM,nBinsM,lowM,uppM);
-                    hJ2_ppeClPairM_mtchM->SetTitle("#it{m} of a cluster pair matched with a pair of pp electrons vs #it{m} of ppe pair;#it{m}_{cl. pair} [GeV/#it{c}];#it{m}_{matched ppe pair} [GeV/#it{c}]");
+                    hJ2_ppeClPairM_mtchM->SetTitle("#it{m} of a cluster pair matched with a pair of pp electrons vs #it{m} of ppe pair;#it{m}_{cl pair} [GeV/#it{c}];#it{m}_{matched ppe pair} [GeV/#it{c}]");
                     objArr->AddAt(hJ2_ppeClPairM_mtchM, kJ2_ppeClPairM_mtchM);
     TH2F* hJ2_clPairSep_mcJElSep = new TH2F("hJ2_clPairSep_mcJElSep","",nBinsSep,lowSep,uppSep,nBinsSep,lowSep,uppSep);
                     hJ2_clPairSep_mcJElSep->SetTitle("Radial separation of cluster pairs vs radial separation of ppe pair;#Delta#it{R}_{cl pair} [cm];#Delta#it{R}_{ppe pair} [cm]");
