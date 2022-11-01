@@ -30,8 +30,8 @@ Float_t x_min = -52.;
 Float_t x_max = 52.;
 // x_min and x_max will be used for y as well
 
-Float_t etaFOClow = 3.4;
-Float_t etaFOCupp = 5.8;
+Float_t fEtaFOClow = 3.4;
+Float_t fEtaFOCupp = 5.8;
 
 // cuts used during matching with MC particles:
 const Float_t cutdEta = 0.4; // [-] difference in eta of a MC particle and a (super)cluster
@@ -351,6 +351,42 @@ void DrawTracksMC(AliStack* stack, TCanvas* c, Bool_t drawPPDaughters = kFALSE, 
 }
 
 // ******************************************************************************************************************
+// Functions to plot 1d and 2d histograms 
+// ******************************************************************************************************************
+
+template <typename TH> // for TH1 and TProfile
+void DrawHisto(TH* h, TString subfolder)
+{
+    TCanvas c("c","c",700,600);
+    h->GetYaxis()->SetMaxDigits(3);
+    h->GetXaxis()->SetTitleOffset(1.2);
+    h->SetLineColor(kBlue+1);
+    h->SetFillColor(kBlue);
+    h->SetFillStyle(3012);
+    TString path_out = subfolder + h->GetName() + ".pdf";
+    c.cd();
+    h->Draw();
+    c.Print(path_out.Data());
+    return;
+}
+
+void DrawHistoCOLZ(TH2F* h, TString subfolder) // for TH2F
+{
+    TCanvas c("c","c",700,600);
+    c.SetGrid();
+    c.SetLogz();
+    h->GetYaxis()->SetMaxDigits(3);
+    h->GetXaxis()->SetTitleOffset(1.2);
+    Float_t hMax = h->GetMaximum();
+    h->GetZaxis()->SetRangeUser(1.,hMax);
+    TString path_out = subfolder + h->GetName() + ".pdf";
+    c.cd();
+    h->Draw("COLZ");
+    c.Print(path_out.Data());
+    return;
+}
+
+// ******************************************************************************************************************
 // Function to match clusters with physical primary MC particles
 // ******************************************************************************************************************
 
@@ -442,5 +478,44 @@ void MatchClsToPhysPrimP(AliStack* stack, TList* listClsPref, vector<Int_t>& idx
             arrMtchPhysPrimP->AddAt(mtchP_primDir, iCl);
         }
     }    
+    return;
+}
+
+// ******************************************************************************************************************
+// Functions to manage analysis trees
+// ******************************************************************************************************************
+
+Int_t fEvNumber;
+Float_t fEnCl, fPtCl, fEtaCl, fPhiCl;
+Float_t fEnJEl, fPtJEl, fEtaJEl, fPhiJEl;
+Float_t fEnClPair, fPtClPair, fEtaClPair, fPhiClPair;
+Float_t fEnJElPair, fPtJElPair, fEtaJElPair, fPhiJElPair;
+
+void SetBranchAddresses_tCls(TTree* t)
+{
+    t->SetBranchAddress("fEvNumber", &fEvNumber);
+    t->SetBranchAddress("fEnCl", &fEnCl);
+    t->SetBranchAddress("fPtCl", &fPtCl);
+    t->SetBranchAddress("fEtaCl", &fEtaCl);
+    t->SetBranchAddress("fPhiCl", &fPhiCl);
+    t->SetBranchAddress("fEnJEl", &fEnJEl);
+    t->SetBranchAddress("fPtJEl", &fPtJEl);
+    t->SetBranchAddress("fEtaJEl", &fEtaJEl);
+    t->SetBranchAddress("fPhiJEl", &fPhiJEl);
+    Printf("Branch addresses of %s set.", t->GetName());
+    return;
+}
+
+void SetBranchAddresses_tClPairs(TTree* t)
+{
+    t->SetBranchAddress("fEnClPair", &fEnClPair);
+    t->SetBranchAddress("fPtClPair", &fPtClPair);
+    t->SetBranchAddress("fEtaClPair", &fEtaClPair);
+    t->SetBranchAddress("fPhiClPair", &fPhiClPair);
+    t->SetBranchAddress("fEnJElPair", &fEnJElPair);
+    t->SetBranchAddress("fPtJElPair", &fPtJElPair);
+    t->SetBranchAddress("fEtaJElPair", &fEtaJElPair);
+    t->SetBranchAddress("fPhiJElPair", &fPhiJElPair);
+    Printf("Branch addresses of %s set.", t->GetName());
     return;
 }

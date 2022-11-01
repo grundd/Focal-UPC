@@ -139,9 +139,6 @@ void DoPrimaryAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv)
     TString sOutTrees = Form("%s%s_analysisTrees.root", sOut.Data(), sDataset.Data());
     TFile* fOutTrees = new TFile(sOutTrees.Data(),"RECREATE");
     TTree* tOutCls = new TTree("tOutCls", "output tree containing prefiltered clusters");
-    Int_t fEvNumber;
-    Float_t fEnCl, fPtCl, fEtaCl, fPhiCl;
-    Float_t fEnJEl, fPtJEl, fEtaJEl, fPhiJEl;
     // prefiltered clusters
     tOutCls->Branch("fEvNumber", &fEvNumber, "fEvNumber/I"); 
     tOutCls->Branch("fEnCl", &fEnCl, "fEnCl/F");
@@ -155,8 +152,6 @@ void DoPrimaryAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv)
     tOutCls->Branch("fPhiJEl", &fPhiJEl, "fPhiJEl/F");
     // define output tree for cluster pairs
     TTree* tOutClPairs = new TTree("tOutClPairs", "output tree containing cluster pairs");
-    Float_t fEnClPair, fPtClPair, fEtaClPair, fPhiClPair;
-    Float_t fEnJElPair, fPtJElPair, fEtaJElPair, fPhiJElPair;
     // pairs of summed clusters/superclusters
     tOutClPairs->Branch("fEnClPair", &fEnClPair, "fEnClPair/F");
     tOutClPairs->Branch("fPtClPair", &fPtClPair, "fPtClPair/F");
@@ -566,10 +561,10 @@ void DoPrimaryAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv)
                 fEtaCl = cl.Eta();
                 fPhiCl = cl.Phi();
                 // pp electron kinematics -> tree
-                fEnJElPair = -1e3;
-                fPtJElPair = -1e3;
-                fEtaJElPair = -1e3;
-                fPhiJElPair = -1e3;
+                fEnJEl = -1e3;
+                fPtJEl = -1e3;
+                fEtaJEl = -1e3;
+                fPhiJEl = -1e3;
 
                 ((TH1F*)arrTH1F->At(kJ1_clZ))->Fill(zCl);
                 // fill some histograms with cluster kinematics
@@ -580,7 +575,7 @@ void DoPrimaryAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv)
                 // if matched to a ppp
                 if(mtchPhysPrimPart) 
                 {
-                    ((TH2F*)arrTH2F->At(kJ2_pppClEn_mtchEn))->Fill(ECl, mtchPhysPrimPart->Energy());
+                    ((TH2F*)arrTH2F->At(kJ2_pppClEn_mtchEn))->Fill(fEnCl, mtchPhysPrimPart->Energy());
                     ((TH2F*)arrTH2F->At(kJ2_pppClEta_mtchEta))->Fill(fEtaCl, mtchPhysPrimPart->Eta());
                     ((TH2F*)arrTH2F->At(kJ2_pppClPt_mtchPt))->Fill(fPtCl, mtchPhysPrimPart->Pt());
                     // if electron (ppe)
@@ -589,7 +584,7 @@ void DoPrimaryAnalysis(TString sDataset, Bool_t isBoxSim, Int_t nEv)
                         fPtJEl = mtchPhysPrimPart->Pt();
                         fEtaJEl = mtchPhysPrimPart->Eta();
                         fPhiJEl = mtchPhysPrimPart->Phi();
-                        ((TH2F*)arrTH2F->At(kJ2_ppeClEn_mtchEn))->Fill(ECl, fEnJEl);
+                        ((TH2F*)arrTH2F->At(kJ2_ppeClEn_mtchEn))->Fill(fEnCl, fEnJEl);
                         ((TH2F*)arrTH2F->At(kJ2_ppeClEta_mtchEta))->Fill(fEtaCl, fEtaJEl);
                         ((TH2F*)arrTH2F->At(kJ2_ppeClPt_mtchPt))->Fill(fPtCl, fPtJEl);
                     }

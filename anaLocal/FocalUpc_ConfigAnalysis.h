@@ -10,12 +10,12 @@ Bool_t plotEvInfo = kFALSE;
 Bool_t printEvInfo = kFALSE;
 Bool_t matchDirectly = kFALSE;
 // superclusterizer:
-Bool_t doSupercls = kFALSE; // if true, create superclusters using:
+Bool_t doSupercls = kTRUE; // if true, create superclusters using:
 const Float_t minSeedE = 5; // [GeV]
 const Float_t radius = 15; // [cm]
 // selections:
 const Float_t cutM = 0.0; // [GeV]; if > 0, filter out all (super)cluster pairs having mass below cutM
-const Float_t cutE = 0.0; // [GeV]; if > 0, filter out all (super) clusters having energy below cutE
+const Float_t cutE = 50.0; // [GeV]; if > 0, filter out all (super) clusters having energy below cutE
 // *****************************************************************************
 // input files and configuration:
 Int_t vSim = 2;

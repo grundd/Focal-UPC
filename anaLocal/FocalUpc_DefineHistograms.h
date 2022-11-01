@@ -362,39 +362,3 @@ void DefineHisto_JpPr(TObjArray* objArr)
 
     return;
 }
-
-// ******************************************************************************************************************
-// Functions to plot 1d and 2d histograms 
-// ******************************************************************************************************************
-
-template <typename TH> // for TH1 and TProfile
-void DrawHisto(TH* h, TString subfolder)
-{
-    TCanvas c("c","c",700,600);
-    h->GetYaxis()->SetMaxDigits(3);
-    h->GetXaxis()->SetTitleOffset(1.2);
-    h->SetLineColor(kBlue+1);
-    h->SetFillColor(kBlue);
-    h->SetFillStyle(3012);
-    TString path_out = subfolder + h->GetName() + ".pdf";
-    c.cd();
-    h->Draw();
-    c.Print(path_out.Data());
-    return;
-}
-
-void DrawHistoCOLZ(TH2F* h, TString subfolder) // for TH2F
-{
-    TCanvas c("c","c",700,600);
-    c.SetGrid();
-    c.SetLogz();
-    h->GetYaxis()->SetMaxDigits(3);
-    h->GetXaxis()->SetTitleOffset(1.2);
-    Float_t hMax = h->GetMaximum();
-    h->GetZaxis()->SetRangeUser(1.,hMax);
-    TString path_out = subfolder + h->GetName() + ".pdf";
-    c.cd();
-    h->Draw("COLZ");
-    c.Print(path_out.Data());
-    return;
-}
