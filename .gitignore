@@ -4,3 +4,4 @@ _documents/
 # File extensions to be ignored:
 *.root
 *.txt
+*.out

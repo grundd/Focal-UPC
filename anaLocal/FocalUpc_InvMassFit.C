@@ -161,13 +161,13 @@ void DoFit(TString sSim)
 
     RooRealVar mean_L("m","m_{J/#psi}",3.097,2.8,3.3);
     RooRealVar sigma_L("sig","#sigma_{J/#psi}",0.1,0.01,0.2);
-    RooRealVar alpha_L("#alpha_{L}","alpha_{L}",1.,0.0,20.0);
-    RooRealVar n_L("n_{L}","n_{L}",10.,0,40);
+    RooRealVar alpha_L("#alpha_{L}","alpha_{L}",1.,0.,20.);
+    RooRealVar n_L("n_{L}","n_{L}",1.,0.,40.);
 
     RooGenericPdf mean_R("mean_R","m_{J/#psi}","m",RooArgSet(mean_L));
     RooGenericPdf sigma_R("sigma_R","#sigma_{J/#psi}","sig",RooArgSet(sigma_L));
-    RooRealVar alpha_R("#alpha_{R}","alpha_{R}",-1.,-20.0,0.0); 
-    RooRealVar n_R("n_{R}","n_{R}",10.,0,40);
+    RooRealVar alpha_R("#alpha_{R}","alpha_{R}",-1.,-20.,0.);
+    RooRealVar n_R("n_{R}","n_{R}",1.,0.,40.);
     
     if(fixNParameters)
     {
@@ -257,7 +257,7 @@ void DoFit(TString sSim)
     l->SetFillStyle(0);
     l->Draw();
 
-    // draw Histogram with log scale
+    // draw histogram with log scale
     TCanvas *cLog = new TCanvas("cLog","cLog",800,600);
     SetCanvas(cLog,kTRUE);
     fr->Draw();
