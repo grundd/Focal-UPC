@@ -23,7 +23,7 @@ User = "dgrund";
 # https://alimonitor.cern.ch/packages/:
 Packages =
 {
-  "VO_ALICE@AliDPG::prod-202210-01-1",
+  "VO_ALICE@AliDPG::prod-202201-02-1",
   "VO_ALICE@FOCAL::v1.3-1",
   "VO_ALICE@jemalloc::latest"
 };

@@ -22,9 +22,9 @@ Float_t phi(TParticle* );
 
 void AnalyzeJpsiGrid() {
         
-  gSystem->Load("libpythia6_4_28.so");      
+  gSystem->Load("libpythia6_4_28.so");
   // Run the clusterizer ------------------------------------------------------------------      
-  gROOT->ProcessLine(".x ClusterizeGrid.C");      
+  gROOT->ProcessLine(".x ClusterizeGrid.C");
 
   const Float_t Ecut = 50.0; //[GeV] cut on cluster energy for pi0 candidate pairs
   const Float_t kPi0Mass = 0.135;

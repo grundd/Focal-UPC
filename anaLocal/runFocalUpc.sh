@@ -3,10 +3,30 @@
 # to run it do (inside ali shell):
 # ./run.sh
 
-option="cohJpsi"
+# version as of Nov 07, 2022
 
-#aliroot -q 'FocalUpc_SimulateClusters.C("sim01/kCohJpsiToElRad_001_1000ev/")'
+# run primary analysis over all input data: box electrons
+sim="cohJpsi"
+if true; then 
+    aliroot -q 'FocalUpcGrid_RunAnalysis.C("'$sim'")'
+fi
 
-#aliroot -q 'FocalUpc_AnalysisPrimary.C("'$option'")'
-aliroot -q 'FocalUpc_AnalysisSecondary.C("'$option'")'
-aliroot -q 'FocalUpc_InvMassFit.C("'$option'")'
+# plot event displays: cohJpsi
+if false; then 
+    aliroot -q 'FocalUpcEventDisplay.C("cohJpsi")'
+fi
+
+# plot event displays: box electrons
+if false; then 
+    aliroot -q 'FocalUpcEventDisplay.C("boxEle")'
+fi
+
+# run primary analysis over a selected input: cohJpsi
+if false; then 
+    aliroot -q 'FocalUpcGrid.C(kTRUE,kFALSE,"inputData/sim02/kCohJpsiToElRad_001_1000ev/","results/sim02_g02_p02/cohJpsi/001/")'
+fi
+
+# run primary analysis over a selected input: box electrons
+if false; then 
+    aliroot -q 'FocalUpcGrid.C(kTRUE,kTRUE,"inputData/sim02/BoxElectrons_001_1000ev/","results/sim02_g02_p02/boxEle/001/")'
+fi
