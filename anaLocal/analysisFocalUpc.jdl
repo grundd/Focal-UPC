@@ -1,0 +1,77 @@
+Jobtag = {
+   "comment: Analyze FOCAL simulations"
+};
+
+# Input xml collection (list of input simulation files, root_archive.zip, to be analyzed)
+# Created using the alien find command
+InputDataCollection = {
+   "LF:$1"
+};
+
+# Output directory, $2 is the working directory and $3 is the subdirectory where the output will be stored
+OutputDir = "$2/$3/#alien_counter_03i#";
+
+# List of requested packages. For simulation analysis we tipically need just the FOCAL package (which loads aliroot implicitly)
+Packages = {
+   "VO_ALICE@FOCAL::v1.4-1",
+   "VO_ALICE@APISCONFIG::V1.1x"
+};
+
+# List of input files to be uploaded to workers. Here include all the needed files required for analyzing the simulations
+# The $4 should be the main macro called by the executable. The main function inside needs to have the same name as the macro
+#  and work assuming that all the needed files are in the same working directory.
+InputFile = {
+   "LF:$2/$4",
+   "LF:$2/FocalUpcGrid_Config.h",
+   "LF:$2/FocalUpcGrid_CreateHistograms.h",
+   "LF:$2/FocalUpcGrid_RunAnalysis.C",
+   "LF:$2/FocalUpcGrid.C",
+   "LF:$2/FocalUpcGrid.h",
+   "LF:$2/ClusterizeGrid.C",
+   "LF:$2/geometry_02.txt",
+   "LF:$2/parameters_02.txt"
+};
+
+# This is the startup script. It runs the main macro, provided via argument $4
+Executable = "$2/runFocalUpcGrid.sh";
+# The command line arguments provided to the above bash script
+SplitArguments = "$4";
+
+# We split per SE or file
+Split = "se";
+
+# Time after which the job is killed. Adapt to your needs. The smaller, the better, as small jobs tend to be prioritized on worker nodes
+TTL = "2000";
+
+# Maximum number of input files to be processed per subjob. This should be always 1, due to technical reasons.
+# There will be just one job per input simulation file
+SplitMaxInputFileNumber = "1";
+
+# Format of input data
+InputDataListFormat = "xml-single";
+
+# Collection name to be processed on each worker node
+InputDataList = "wn.xml";
+
+# List of output files and archivesList of output files and archives.
+# Here add all the files that will be produced by the analysis macros and which you want to have in your output directory.
+Output = {
+   "std*@disk=1",
+   #"log_archive.zip:analysis.log,std*@disk=1",
+   "focalClusters.root@disk=1"
+   #"focalClusters.root,analysisResults.root@disk=1"
+};
+
+# AliEn price for this job
+Price = "1";
+
+# Replace with your grid username
+User = "dgrund"; # was "iarsene"
+
+# JDL variables
+JDLVariables = 
+{
+   "Packages",
+   "OutputDir"
+};
+Workdirectorysize = {"5000MB"};

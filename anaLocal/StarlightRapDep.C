@@ -1,4 +1,4 @@
-// _STARlight_RapDependence.C
+// StarlightRapDep.C
 // David Grund, Nov 02, 2022
 
 // cpp headers
@@ -14,12 +14,12 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 // my headers
-#include "_STARlight_Utilities.h"
+#include "StarlightRapDep.h"
 
 Float_t fRapLow = -6.;
 Float_t fRapUpp = +6.;
 Float_t fRapStep = 0.2; // [-]
-Float_t fLumiRun4 = 10; // [nb^(-1)]
+Float_t fLumiRun4 = 6.9; // [nb^(-1)]
 Float_t fTotalCS[6] = {38.8, // [mb]
                        17.8,
                        7.5,
@@ -51,6 +51,7 @@ Float_t BR[6] = {0.0594, // J/psi to e^(+)e^(-)
 
 void CalculateRapDep(Int_t opt)
 {
+    gSystem->Exec("mkdir -p results/starlightRapDep/");
     Bool_t isUpsilon = kFALSE;
     if(opt >= 4) isUpsilon = kTRUE;
 
@@ -60,7 +61,7 @@ void CalculateRapDep(Int_t opt)
     TH1F* hRap_all = NULL;
     TH1F* hRap_twoEl = NULL;
     TH1F* hRap_accFo = NULL;
-    TFile* fOut = TFile::Open("inputData/pureStarlightSim/h" + sMC[opt] + ".root","read");
+    TFile* fOut = TFile::Open("results/starlightRapDep/h" + sMC[opt] + ".root","read");
     if(fOut)
     {
         Printf("Histogram hRap_all already created.");
@@ -118,7 +119,7 @@ void CalculateRapDep(Int_t opt)
             }
             hRap_all->Fill(parent->Rapidity());
         }
-        fOut = new TFile("inputData/pureStarlightSim/h" + sMC[opt] + ".root","RECREATE");
+        fOut = new TFile("results/starlightRapDep/h" + sMC[opt] + ".root","RECREATE");
         l->Write("HistList", TObject::kSingleKey);
         l->ls();
         fOut->ls();
@@ -196,7 +197,7 @@ void CalculateRapDep(Int_t opt)
     Float_t lumi = fLumiRun4 * 1e6; // mb^(-1)
     Float_t yield = lumi * sigmaTotal * BR[opt] * acc;
     ofstream of;
-    of.open("inputData/pureStarlightSim/log" + sMC[opt] + ".txt");
+    of.open("results/starlightRapDep/log" + sMC[opt] + ".txt");
     of << Form("generated events: %.0f\n", nEvTot);
     of << Form("gen ev with 2 ele: %.0f\n", nEv2El);
     of << Form("gen ev with 2 ele in Foc acc: %.0f\n", nEvAcc);
@@ -219,13 +220,13 @@ void CalculateRapDep(Int_t opt)
     l2->SetMargin(0.);
     l2->Draw();
     // save the canvas
-    c->Print("inputData/pureStarlightSim/gr" + sMC[opt] + ".pdf");
+    c->Print("results/starlightRapDep/gr" + sMC[opt] + ".pdf");
     delete c;
     delete gr;
     return;
 }
 
-void _STARlight_RapDependence()
+void StarlightRapDep()
 {
     for(Int_t i = 0; i < 6; i ++) {
         ConvertStarlightAsciiToTree(5e6,"inputData/pureStarlightSim/" + sMC[i] + "/");

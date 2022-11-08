@@ -36,7 +36,7 @@ Float_t Calibration(Float_t signal, Int_t segment, Float_t * pars, bool calibrat
 Bool_t LoadLibs();
 
 //____________________________________________________________________________________________
-void ClusterizeGrid(TString geomFile = "geometry.txt", TString paraFile = "parameters.txt", TString inDir = "", TString outDir = "") 
+void ClusterizeGrid(Bool_t isLocal, TString geomFile = "geometry.txt", TString paraFile = "parameters.txt", TString inDir = "", TString outDir = "") 
 {
     gSystem->Load("libpythia6_4_28.so");
        
@@ -94,25 +94,25 @@ void ClusterizeGrid(TString geomFile = "geometry.txt", TString paraFile = "param
     Int_t firstFineSeed   = -1;
     Int_t firstCoarseSeed = -1;
   
-    /*
-    if(gSystem->AccessPathName("root_archive.zip")) {
-        cout << "ClusterizeGrid() ERROR: galice.root file not found!" << endl;  
-        return;
+    if(!isLocal) {
+        if(gSystem->AccessPathName("root_archive.zip")) {
+            cout << "ClusterizeGrid() ERROR: galice.root file not found!" << endl;
+            return;
+        }
     }
-    */
 
     TString clustFile = "focalClusters.root";
     TFile * outputFile = clusterizer->CreateOutputFile((outDir + clustFile).Data());
             
-  //Alice run loader
-  if (runLoader)
-    runLoader->Delete();
+    // Alice run loader
+    if(runLoader) runLoader->Delete();
   
-  runLoader = AliRunLoader::Open(inDir + "galice.root");
-  if (!runLoader) {
-    cout << "ClusterizeGrid() ERROR: run loader could not be initialized" << endl;
-    return;
-  }
+    if(!isLocal) runLoader = AliRunLoader::Open(inDir + "root_archive.zip#galice.root");
+    else         runLoader = AliRunLoader::Open(inDir + "galice.root");
+    if (!runLoader) {
+        cout << "ClusterizeGrid() ERROR: run loader could not be initialized" << endl;
+        return;
+    }
   if (!runLoader->GetAliRun()) runLoader->LoadgAlice();
   if (!runLoader->TreeE()) runLoader->LoadHeader();
   if (!runLoader->TreeK()) runLoader->LoadKinematics();

@@ -36,7 +36,9 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString inDir = "", TString o
     cout << " MESSAGE: Loading clusters from: " << fCls->GetName() << endl;
 
     // define ALICE run loader: open galice.root
-    AliRunLoader* runLoader = AliRunLoader::Open(inDir + "galice.root");
+    AliRunLoader* runLoader = NULL;
+    if(!isLocal) runLoader = AliRunLoader::Open(inDir + "root_archive.zip#galice.root");
+    else         runLoader = AliRunLoader::Open(inDir + "galice.root");
     if(!runLoader) 
     {
         cout << " ERROR: AliRunLoader not good! Terminating." << endl;
@@ -67,7 +69,7 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString inDir = "", TString o
     }
 
     // output file
-    TString sFile = Form("%s%sanalysisTree.root",outDir.Data(),outSubDir.Data());
+    TString sFile = Form("%s%sanalysisResults.root",outDir.Data(),outSubDir.Data());
     TFile* fOut = new TFile(sFile.Data(),"RECREATE");
     // output tree
     TTree* tOut = new TTree("tOut", "output tree containing prefiltered clusters");

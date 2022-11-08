@@ -5,7 +5,7 @@
 #include "TSystem.h"
 #include "TROOT.h"
 
-Bool_t isLocal = kTRUE;
+Bool_t isLocal = kFALSE;
 // which version of MC simulations:
 // (matters only for local analysis)
 Int_t simFiles = 2; 
@@ -88,7 +88,7 @@ void FocalUpcGrid_RunAnalysis(TString sim = "")
             if(gSystem->AccessPathName(sClFile.Data()))
             {
                 cout << " MESSAGE: cluster file not found! Runing the clusterizer now." << endl;
-                TString sCmd = Form("ClusterizeGrid(\"%s\",\"%s\",\"%s\",\"%s\")",
+                TString sCmd = Form("ClusterizeGrid(kTRUE,\"%s\",\"%s\",\"%s\",\"%s\")",
                     sGeomFile.Data(),sParaFile.Data(),sIn.Data(),sOut.Data());
                 gROOT->ProcessLine(sCmd.Data());
             }
@@ -106,9 +106,9 @@ void FocalUpcGrid_RunAnalysis(TString sim = "")
     else 
     {
         // run the clusterizer:
-        gROOT->ProcessLine(Form(".x ClusterizeGrid.C(\"%s\",\"%s\")",sGeomFile.Data(),sParaFile.Data()));
+        gROOT->ProcessLine(Form(".x ClusterizeGrid.C(kFALSE,\"%s\",\"%s\")",sGeomFile.Data(),sParaFile.Data()));
         // run the analysis:
-        gROOT->ProcessLine(".x FocalUpcGrid_Analysis.C(kFALSE,kFALSE)");
+        gROOT->ProcessLine(".x FocalUpcGrid.C(kFALSE,kFALSE)");
         return;
     }
 }

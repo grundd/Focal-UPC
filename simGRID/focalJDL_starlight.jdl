@@ -1,12 +1,16 @@
 # To submit this .jdl file, execute:
-# submit focalJDL_starlight.jdl 
-# It needs  arguments:
-# $1 -> GRID output directory, e.g.: /alice/cern.ch/user/d/dgrund/FOCAL_kCohJpsiToElRad_2022-10-31/
-# $2 -> FOCAL geometry file, e.g.: geometry_02.txt
-# $3 -> STARlight process, e.g.: kCohJpsiToElRad
-# $4 -> subdirectory in the GRID output directory, e.g.: output
-# $5 -> number of events per ...., e.g.: 10
-# $6 -> how many times the simulation will be run, e.g.: 10
+# submit focalJDL_starlight.jdl
+# It requires six arguments:
+# $1 -> GRID output directory:
+#   /alice/cern.ch/user/d/dgrund/FocalSimulations/
+# $2 -> FOCAL geometry file:
+#   geometry_02.txt
+# $3 -> STARlight process:
+#   kCohJpsiToElRad, kIncohJpsiToElRad, ...
+# $4 -> subdirectory in the GRID output directory:
+#   OutputCohJpsiToElRad OutputIncohJpsiToElRad, ...
+# $5 -> number of events per one job: 10
+# $6 -> how many jobs will be run: 10
 
 Executable = "/alice/cern.ch/user/a/aliprod/bin/aliroot_dpgsim.sh";
 
@@ -23,15 +27,15 @@ User = "dgrund";
 # https://alimonitor.cern.ch/packages/:
 Packages =
 {
-  "VO_ALICE@AliDPG::prod-202201-02-1",
-  "VO_ALICE@FOCAL::v1.3-1",
+  #"VO_ALICE@AliDPG::prod-202210-01-1",
+  "VO_ALICE@FOCAL::v1.4-1",
   "VO_ALICE@jemalloc::latest"
 };
 
 Output =
 {
   "log_archive:stdout,stderr,*.log@disk=1",
-  "root_archive.zip:galice.root,Kinematics.root,FOCAL.Hits.root,FIT.Hits.root@disk=1"
+  #"root_archive.zip:galice.root,Kinematics.root,FOCAL.Hits.root,FIT.Hits.root@disk=1"
 };
 
 #Store ERROR_E jobs output
@@ -45,7 +49,7 @@ OutputDir = "$1/$4/#alien_counter_03i#";
 # OCDB snapshots should be placed in the working directory before launching the jdl
 # Similarly for the FOCAL geometry file
 InputFile = {
-#"LF:$1/alidpg.tgz",
+"LF:$1/alidpg.tgz",
 "LF:$1/OCDBsim.root",
 "LF:$1/OCDBrec.root",
 "LF:$1/$2"
