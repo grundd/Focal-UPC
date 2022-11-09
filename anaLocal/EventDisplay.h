@@ -1,4 +1,4 @@
-// FocalUpcEventDisplay_Utilities.h
+// EventDisplay.h
 // David Grund, Nov 07, 2022
 
 // my headers

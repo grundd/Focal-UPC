@@ -1,11 +1,11 @@
 // FocalUpcGrid.C
 // David Grund, Nov 05, 2022
 
-#include "FocalUpcGrid_Config.h"
+#include "ConfigParameters.h"
 #include "FocalUpcGrid.h"
 #include "FocalUpcGrid_CreateHistograms.h"
 
-void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString inDir = "", TString outDir = "")
+void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOut = "")
 {
     TString outSubDir = "";
     // mass filtering only for J/psi simulations
@@ -15,17 +15,12 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString inDir = "", TString o
     }
     if(isLocal) 
     {
-        outSubDir = "output";
-        if(doSupercls) outSubDir += Form("_supCl");
-        if(!isBoxSim && matchDirectly) outSubDir += Form("_dirMtch");
-        if(cutM > 0)   outSubDir += Form("_cutM%.1f",cutM);
-        if(cutE > 0)   outSubDir += Form("_cutE%.1f",cutE);
-        outSubDir += "/";
-        gSystem->Exec("mkdir -p " + outDir + outSubDir);
+        outSubDir = CreateOutputSubDir();
+        gSystem->Exec("mkdir -p " + sOut + outSubDir);
     }
 
     // check if focalClusters.root were produced properly
-    TString sClFile = Form("%sfocalClusters.root",outDir.Data());
+    TString sClFile = Form("%sfocalClusters.root",sOut.Data());
     if(gSystem->AccessPathName(sClFile.Data()))
     {
         cout << " ERROR: cluster file not found! Terminating." << endl;
@@ -37,8 +32,8 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString inDir = "", TString o
 
     // define ALICE run loader: open galice.root
     AliRunLoader* runLoader = NULL;
-    if(!isLocal) runLoader = AliRunLoader::Open(inDir + "root_archive.zip#galice.root");
-    else         runLoader = AliRunLoader::Open(inDir + "galice.root");
+    if(!isLocal) runLoader = AliRunLoader::Open(sIn + "root_archive.zip#galice.root");
+    else         runLoader = AliRunLoader::Open(sIn + "galice.root");
     if(!runLoader) 
     {
         cout << " ERROR: AliRunLoader not good! Terminating." << endl;
@@ -69,7 +64,7 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString inDir = "", TString o
     }
 
     // output file
-    TString sFile = Form("%s%sanalysisResults.root",outDir.Data(),outSubDir.Data());
+    TString sFile = Form("%s%sanalysisResults.root",sOut.Data(),outSubDir.Data());
     TFile* fOut = new TFile(sFile.Data(),"RECREATE");
     // output tree
     TTree* tOut = new TTree("tOut", "output tree containing prefiltered clusters");
@@ -90,7 +85,7 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString inDir = "", TString o
     gROOT->cd();    
 
     // output log file
-    TString sLog = Form("%s%sanalysis.log",outDir.Data(),outSubDir.Data());
+    TString sLog = Form("%s%sanalysis.log",sOut.Data(),outSubDir.Data());
     ofstream of(sLog);
     of << "create supercls: " << doSupercls << "\n"
        << std::fixed << std::setprecision(1)

@@ -33,7 +33,7 @@ InputFile = {
 };
 
 # This is the startup script. It runs the main macro, provided via argument $4
-Executable = "$2/runFocalUpcGrid.sh";
+Executable = "$2/runGrid.sh";
 # The command line arguments provided to the above bash script
 SplitArguments = "$4";
 

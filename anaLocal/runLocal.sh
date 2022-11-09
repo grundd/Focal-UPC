@@ -3,22 +3,34 @@
 # to run it do (inside ali shell):
 # ./run.sh
 
-# version as of Nov 07, 2022
+# version as of Nov 09, 2022
 
-# run primary analysis over all input data: box electrons
 sim="cohJpsi"
+
+# calculate rapidity dependence of Starlight cross sections
+# calculate expected yields of J/psi, psi' and Y(1S) in Run 4
+if false; then 
+    aliroot -q 'StarlightRapDep.C'
+fi
+
+# run primary analysis over all input data for a selected process
+if false; then 
+    aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$sim'")'
+fi
+
+# run secondary analysis over all input data for a selected process
 if true; then 
-    aliroot -q 'FocalUpcGrid_RunAnalysis.C("'$sim'")'
+    aliroot -q 'AnaMain.C("'$sim'")'
 fi
 
 # plot event displays: cohJpsi
 if false; then 
-    aliroot -q 'FocalUpcEventDisplay.C("cohJpsi")'
+    aliroot -q 'EventDisplay.C("cohJpsi")'
 fi
 
 # plot event displays: box electrons
 if false; then 
-    aliroot -q 'FocalUpcEventDisplay.C("boxEle")'
+    aliroot -q 'EventDisplay.C("boxEle")'
 fi
 
 # run primary analysis over a selected input: cohJpsi

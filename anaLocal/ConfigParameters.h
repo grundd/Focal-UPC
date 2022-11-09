@@ -21,3 +21,15 @@ Bool_t matchDirectly = kFALSE;
 // selections used when matching:
 const Float_t cutdEta = 0.4; // [-] difference in eta of a MC particle and a (super)cluster
 const Float_t cutdPhi = 0.4; // [-] difference in phi angles of a MC particle and a (super)cluster
+
+TString CreateOutputSubDir()
+{
+    TString outSubDir = "";
+    outSubDir = "output";
+    if(doSupercls)    outSubDir += Form("_supCl");
+    if(matchDirectly) outSubDir += Form("_dirMtch");
+    if(cutM > 0)      outSubDir += Form("_cutM%.1f",cutM);
+    if(cutE > 0)      outSubDir += Form("_cutE%.1f",cutE);
+    outSubDir += "/";
+    return outSubDir;
+}

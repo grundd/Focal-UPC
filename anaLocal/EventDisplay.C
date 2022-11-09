@@ -1,4 +1,4 @@
-// FocalUpcEventDisplay.C
+// EventDisplay.C
 // David Grund, Nov 07, 2022
 
 // root headers
@@ -11,7 +11,7 @@
 // focal headers
 #include "AliFOCALClusterizerv2.h"
 // my headers
-#include "FocalUpcEventDisplay.h"
+#include "EventDisplay.h"
 
 // which version of MC simulations:
 // (matters only for local analysis)
@@ -32,7 +32,7 @@ Int_t filePara = 2;
 
 void PlotEventDisplays(TString, TString, TString, Bool_t);
 
-void FocalUpcEventDisplay(TString sim)
+void EventDisplay(TString sim)
 {
     // set the input folder:
     TString inDir = Form("inputData/sim%02i/",simFiles);
