@@ -67,7 +67,7 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
     TString sFile = Form("%s%sanalysisResults.root",sOut.Data(),outSubDir.Data());
     TFile* fOut = new TFile(sFile.Data(),"RECREATE");
     // output tree
-    TTree* tOut = new TTree("tOut", "output tree containing prefiltered clusters");
+    TTree* tOut = new TTree("tCls", "output tree containing prefiltered clusters");
     // prefiltered clusters
     Int_t fEvNumber;
     Float_t fEnCl, fPtCl, fEtaCl, fPhiCl;
@@ -77,7 +77,9 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
     tOut->Branch("fEtaCl", &fEtaCl, "fEtaCl/F");
     tOut->Branch("fPhiCl", &fPhiCl, "fPhiCl/F");
     // J/psi electrons with which the clusters were matched
+    Int_t fIdxJEl;
     Float_t fEnJEl, fPtJEl, fEtaJEl, fPhiJEl;
+    tOut->Branch("fIdxJEl", &fIdxJEl, "fIdxJEl/I"); 
     tOut->Branch("fEnJEl", &fEnJEl, "fEnJEl/F");
     tOut->Branch("fPtJEl", &fPtJEl, "fPtJEl/F");
     tOut->Branch("fEtaJEl", &fEtaJEl, "fEtaJEl/F");
@@ -448,6 +450,7 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
                     ((TH2F*)arrTH2F->At(kJ2_pppClPt_mtchPt))->Fill(fPtCl, mtchPhysPrimPart->Pt());
                     // if electron (ppe)
                     if(isEleOrPos(mtchPhysPrimPart)) {
+                        fIdxJEl = idxMtchPhysPrimParts[iCl];
                         fEnJEl = mtchPhysPrimPart->Energy();
                         fPtJEl = mtchPhysPrimPart->Pt();
                         fEtaJEl = mtchPhysPrimPart->Eta();

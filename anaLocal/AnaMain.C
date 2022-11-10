@@ -6,6 +6,7 @@
 #include "TFileMerger.h"
 #include "TFile.h"
 #include "TList.h"
+#include "TLorentzVector.h"
 // my headers
 #include "ConfigAnalysis.h"
 #include "ConfigParameters.h"
@@ -16,7 +17,7 @@ TString outSubDir = "";
 void MergeOutputFiles()
 {
     TFileMerger m;
-    m.OutputFile(Form("%smerged_%sanalysisJpsi_merged.root",outDir.Data(),outSubDir.Data()));
+    m.OutputFile(Form("%smerged_%sanalysisResults.root",outDir.Data(),outSubDir.Data()));
     for(Int_t i = 0; i < nFiles; i++) 
     {
         TString sFile = Form("%s%03i/%sanalysisResults.root",outDir.Data(),i+1,outSubDir.Data());
@@ -75,61 +76,139 @@ void PrintHistograms(TString sFile)
     return;
 }
 
-void AnalyzeClPairs(Bool_t debug = kFALSE)
+void AnalyzeClPairs(TString sDir, Bool_t debug = kFALSE)
 {
-    TFile* f = TFile::Open(sFile.Data(), "read");
+    // access input file
+    TFile* f = TFile::Open(sDir + "analysisResults.root", "read");
     if(f) Printf("File %s loaded.", f->GetName());
-    TTree* tCls = dynamic_cast<TTree*>(fTrees->Get("tOut"));
+    TTree* tCls = dynamic_cast<TTree*>(f->Get("tCls"));
     if(tCls) Printf("Tree %s loaded.", tCls->GetName());
     SetBranchAddresses_tCls(tCls);
 
-    // loop over entries in the tree
-    Int_t i = 0;
-    while(i < tCls->Entries())
+    // print first 100 tree entries
+    if(debug)
     {
-        // get i-th cluster
-        tCls->GetEntry(i);
-        Int_t EvNumberCl1 = fEvNumber;
-        Float_t EnCl1 = fEnCl;
-        Float_t PtCl1 = fPtCl;
-        Float_t EtaCl1 = fEtaCl;
-        Float_t PhiCl1 = fPhiCl;
+        for(Int_t i = 0; i < 100; i++)
+        {
+            tCls->GetEntry(i);
+            cout << Form("Cl %i: ev %03i\n", i, fEvNumber);
+        }
+        cout << "\n";
+    }
+
+    // create output file containing a tree of cl pairs
+    Float_t fEnClPair, fPtClPair, fEtaClPair, fPhiClPair;
+    Float_t fEnJElPair, fPtJElPair, fEtaJElPair, fPhiJElPair;
+    TFile* fClPairs = new TFile(sDir + "tClPairs.root","RECREATE");
+    TTree* tClPairs = new TTree("tClPairs", "output tree containing cluster pairs");
+    // pairs of summed clusters/superclusters
+    tClPairs->Branch("fEnClPair", &fEnClPair, "fEnClPair/F");
+    tClPairs->Branch("fPtClPair", &fPtClPair, "fPtClPair/F");
+    tClPairs->Branch("fEtaClPair", &fEtaClPair, "fEtaClPair/F");
+    tClPairs->Branch("fPhiClPair", &fPhiClPair, "fPhiClPair/F");
+    // pairs of J/psi electrons (if cluster pairs was matched with it)
+    tClPairs->Branch("fEnJElPair", &fEnJElPair, "fEnJElPair/F");
+    tClPairs->Branch("fPtJElPair", &fPtJElPair, "fPtJElPair/F");
+    tClPairs->Branch("fEtaJElPair", &fEtaJElPair, "fEtaJElPair/F");
+    tClPairs->Branch("fPhiJElPair", &fPhiJElPair, "fPhiJElPair/F");
+    gROOT->cd();
+
+    // loop over entries in the tree
+    Int_t iCl = 0;
+    Int_t nCls = tCls->GetEntries();
+    if(debug) cout << "Tree contains " << nCls << " cls" << endl;
+    while(iCl < nCls-1)
+    {
+        // get the first cluster cluster
+        tCls->GetEntry(iCl);
+        Int_t EvNumberThisCl = fEvNumber;
+        if(debug) cout << Form("   Cl %i: ev %03i\n", iCl, fEvNumber);
         // create its 4-vector
-        LorentzVector Cl1;
-        Cl1.SetPtEtaPhiE(PtCl1,EtaCl1,PhiCl1,EnCl1);
-        // create TList where all clusters from the same event will be stored
-        TList l;
-        l.Add(Cl1);
+        TLorentzVector* thisCl = new TLorentzVector();
+        thisCl->SetPtEtaPhiE(fPtCl,fEtaCl,fPhiCl,fEnCl);
+        // create 4-vector of the matched physical primary electron
+        TLorentzVector* thisEl = new TLorentzVector();
+        thisEl->SetPtEtaPhiE(fPtJEl,fEtaJEl,fPhiJEl,fEnJEl);
+        // create TLists where all clusters and pp electrons from the same event will be stored
+        TList lCls;
+        TList lEls;
+        lCls.SetOwner(kTRUE);
+        lEls.SetOwner(kTRUE);
+        // using this command, the list is an owner of its content
+        // content will be deleted whenever the list itself is deleted
+        lCls.AddLast(thisCl);
+        lEls.AddLast(thisEl);
+        // create a vector to store indices of phys. prim. electrons matched with the clusters
+        std::vector<Int_t> idxMtchJEl;
+        idxMtchJEl.push_back(fIdxJEl);
         Int_t nClThisEvent(1.);
         // is next cluster from the same event?
-        tCls->GetEntry(i+1);
+        tCls->GetEntry(iCl+1);
         Int_t EvNumberNextCl = fEvNumber;
-        while(EvNumberNextCl == EvNumberCl1)
+        while(EvNumberNextCl == EvNumberThisCl)
         {
-            i++;
+            iCl++;
             nClThisEvent++;
-            // get next cluster
-            tCls->GetEntry(i);
-            EvNumberNextCl = fEvNumber;
-            Float_t EnNextCl = fEnCl;
-            Float_t PtNextCl = fPtCl;
-            Float_t EtaNextCl = fEtaCl;
-            Float_t PhiNextCl = fPhiCl;
+            if(debug) cout << Form(" + Cl %i: ev %03i\n", iCl, fEvNumber);
             // create its 4-vector
-            LorentzVector NextCl;
-            NextCl.SetPtEtaPhiE(PtNextCl,EtaNextCl,PhiNextCl,EnNextCl);
-            // add it to the list
-            l.Add(NextCl);
+            TLorentzVector* nextCl = new TLorentzVector();
+            nextCl->SetPtEtaPhiE(fPtCl,fEtaCl,fPhiCl,fEnCl);
+            // create 4-vector of the matched physical primary electron
+            TLorentzVector* nextEl = new TLorentzVector();
+            nextEl->SetPtEtaPhiE(fPtJEl,fEtaJEl,fPhiJEl,fEnJEl);
+            // add them to the lists
+            lCls.AddLast(nextCl);
+            lEls.AddLast(nextEl);
+            // store the electron index
+            idxMtchJEl.push_back(fIdxJEl);
+            // is next cluster from the same event?
+            if(tCls->GetEntry(iCl+1) == 0) break;
+            else EvNumberNextCl = fEvNumber;
         }
         // analyze the list of clusters from this event
-        if(debug) cout << "Ev " << fEvNumber << " contains " << nClThisEvent << " clusters" << endl;
-        // combine clusters from this event into pairs
+        if(debug) cout << Form("-> Event %03i contains %i cls\n", EvNumberThisCl, nClThisEvent);
+        // go over the cluster list 
+        for(Int_t iCl1 = 0; iCl1 < nClThisEvent; iCl1++)
+        {
+            TLorentzVector* Cl1 = (TLorentzVector*)lCls.At(iCl1);
+            if(!Cl1) continue;
+            TLorentzVector* El1 = (TLorentzVector*)lEls.At(iCl1);
+            if(!El1) continue;     
+            // go over all possible pairs of clusters
+            for(Int_t iCl2 = iCl1+1; iCl2 < nClThisEvent; iCl2++) 
+            {
+                TLorentzVector* Cl2 = (TLorentzVector*)lCls.At(iCl2);
+                if(!Cl2) continue;
+                TLorentzVector* El2 = (TLorentzVector*)lEls.At(iCl2);
+                if(!El2) continue;
+                // add the momentum vectors of the two clusters
+                TLorentzVector Cl12 = *Cl1 + *Cl2;
+                // cluster pair kinematics -> tree
+                fEnClPair = Cl12.Energy();
+                fPtClPair = Cl12.Pt();
+                fEtaClPair = Cl12.Eta();
+                fPhiClPair = Cl12.Phi();
+                // add the momentum vector of the two electrons
+                TLorentzVector El12 = *El1 + *El2;
+                // electron pair kinematics -> tree
+                fEnJElPair = El12.Energy();
+                fPtJElPair = El12.Pt();
+                fEtaJElPair = El12.Eta();
+                fPhiJElPair = El12.Phi();
+                // if both clusters are paired to a different physical primary electron
+                if(idxMtchJEl[iCl1] != idxMtchJEl[iCl2]) {
 
-        // ...
-
+                }
+                tClPairs->Fill();
+            }
+        }
         // increase the iterator for the next cluster that will be loaded
-        i++;
+        iCl++;
     }
+    // save the file with the output tree
+    fClPairs->Write("",TObject::kWriteDelete);
+    delete fClPairs;
+
     /*
     // combine clusters into pairs
     for(Int_t iCl1 = 0; iCl1 < nClsPref; iCl1++) 
@@ -208,17 +287,18 @@ void AnalyzeClPairs(Bool_t debug = kFALSE)
 
 void AnaMain(TString sim)
 {
+    ConfigLocalAnalysis(sim);
     outSubDir = CreateOutputSubDir();
     gSystem->Exec(Form("mkdir -p %smerged_%s",outDir.Data(),outSubDir.Data()));
-    ConfigLocalAnalysis(sim);
 
     // merge all output files produced by FocalUpcGrid
-    MergeOutputFiles();
+    //MergeOutputFiles();
 
     // print all histograms from the merged output file
-    PrintHistograms(Form("%smerged_%sanalysisJpsi.root",outDir.Data(),outSubDir.Data()));
+    //PrintHistograms(Form("%smerged_%sanalysisResults.root",outDir.Data(),outSubDir.Data()));
 
     // open merged output file, go over clusters and create cluster pairs
     // store cluster pairs in a tree
-    AnalyzeClPairsForm("%smerged_%sanalysisJpsi.root",outDir.Data(),outSubDir.Data()));
+    //AnalyzeClPairs(Form("%s001/%s",outDir.Data(),outSubDir.Data()),kTRUE);
+    AnalyzeClPairs(Form("%smerged_%s",outDir.Data(),outSubDir.Data()),kTRUE);
 }

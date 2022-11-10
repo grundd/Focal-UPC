@@ -48,7 +48,7 @@ void DrawHistoCOLZ(TH2F* h, TString sDir) // for TH2F
 // Functions to manage analysis trees
 // ******************************************************************************************************************
 
-Int_t fEvNumber;
+Int_t fEvNumber, fIdxJEl;
 Float_t fEnCl, fPtCl, fEtaCl, fPhiCl;
 Float_t fEnJEl, fPtJEl, fEtaJEl, fPhiJEl;
 
@@ -59,6 +59,7 @@ void SetBranchAddresses_tCls(TTree* t)
     t->SetBranchAddress("fPtCl", &fPtCl);
     t->SetBranchAddress("fEtaCl", &fEtaCl);
     t->SetBranchAddress("fPhiCl", &fPhiCl);
+    t->SetBranchAddress("fIdxJEl", &fIdxJEl);
     t->SetBranchAddress("fEnJEl", &fEnJEl);
     t->SetBranchAddress("fPtJEl", &fPtJEl);
     t->SetBranchAddress("fEtaJEl", &fEtaJEl);
