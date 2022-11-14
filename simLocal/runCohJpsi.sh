@@ -1,9 +1,9 @@
 # shell script must be first allowed: chmod +x runJpsiSim.sh
 #!/bin/bash
 # to run it do (inside ali shell):
-# ./runJpsiSim.sh
+# ./runCohJpsi.sh
 
-nSim=1
+nSim=10
 nEvPerSim=1000
 
 echo "${nSim} simulation(s) will be performed with ${nEvPerSim} event per each"

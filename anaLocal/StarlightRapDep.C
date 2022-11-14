@@ -20,34 +20,47 @@ Float_t fRapLow = -6.;
 Float_t fRapUpp = +6.;
 Float_t fRapStep = 0.2; // [-]
 Float_t fLumiRun4 = 6.9; // [nb^(-1)]
-Float_t fTotalCS[6] = {38.8, // [mb]
+Float_t fTotalCS[7] = {38.8, // [mb]
                        17.8,
                        7.5,
                        3.1,
                        0.094,
-                       0.041
+                       0.041,
+                       3829
 }; 
-TString sLabel[6] = {"coherent J/#psi",
+TString sLabel[7] = {"coherent J/#psi",
                   "incoherent J/#psi",
                   "coherent #psi'",
                   "incoherent #psi'",
                   "coherent #Upsilon(1S)",
-                  "incoherent #Upsilon(1S)"
+                  "incoherent #Upsilon(1S)",
+                  "low-mass continuum"
 };
-TString sMC[6] = {"CohJ",
+TString sMC[7] = {"CohJ",
                   "IncJ",
                   "CohP",
                   "IncP",
                   "CohU",
-                  "IncU"
+                  "IncU",
+                  "BkgLow"
 };
-Float_t BR[6] = {0.0594, // J/psi to e^(+)e^(-)
+Float_t BR[7] = {0.0594, // J/psi to e^(+)e^(-)
                  0.0594, 
                  0.00772, // psi' to e^(+)e^(-)
                  0.00772, 
                  0.0238, // Upsilon to e^(+)e^(-)
-                 0.0238  
+                 0.0238,
+                 1.0
 };
+
+Float_t roundFloat(Float_t N)
+{
+    Int_t divisor = 1;
+    if(N > 1e4) divisor = 1000;
+    else if(N > 1e3) divisor = 100;
+    else if(N > 1e2) divisor = 10;
+    return (Int_t)N - ((Int_t)N % divisor);
+}
 
 void CalculateRapDep(Int_t opt)
 {
@@ -78,7 +91,7 @@ void CalculateRapDep(Int_t opt)
     {
         Printf("Histogram hRap_all will be created.");
 
-        TFile* fSL = TFile::Open("inputData/pureStarlightSim/" + sMC[opt] + "/tSTARlight.root", "read");
+        TFile* fSL = TFile::Open("inputData/starlight/" + sMC[opt] + "/tSTARlight.root", "read");
         if(fSL) Printf("File %s loaded.", fSL->GetName());
 
         TTree* tSL = dynamic_cast<TTree*> (fSL->Get("starlightTree"));
@@ -163,7 +176,6 @@ void CalculateRapDep(Int_t opt)
     c->SetLeftMargin(0.12);
     gr->Draw("AC");
 
-    // legend
     Int_t binNegLow = 2; Printf("Low edge of bin %i: %.1f", binNegLow, hRap_CS->GetBinLowEdge(binNegLow));
     Int_t binNegUpp = 13; Printf("Upp edge of bin %i: %.1f", binNegUpp, hRap_CS->GetBinLowEdge(binNegUpp+1));
     Int_t binPosLow = 48; Printf("Low edge of bin %i: %.1f", binPosLow, hRap_CS->GetBinLowEdge(binPosLow));
@@ -172,48 +184,65 @@ void CalculateRapDep(Int_t opt)
     Float_t sigmaForwd = hRap_CS->Integral(binNegLow,binNegUpp,"width") + hRap_CS->Integral(binPosLow,binPosUpp,"width");
     Float_t sigmaFocal = hRap_CS->Integral(binPosLow,binPosUpp,"width");
 
-    TLegend *l1 = new TLegend(0.62,0.76,0.97,0.94);
+    // calculate expected yields of J/psi, psi' and Y in FoCal in Run 4
+    // convert lumi from nb^(-1) to mb^(-1)
+    Float_t N1 = hRap_all->Integral(); // # of generated events
+    Float_t N2 = hRap_twoEl->Integral(); // # of events with two electrons in daughter particles
+    Float_t N3 = hRap_all->Integral(binPosLow,binPosUpp); // # of events with VM rapidity from 3.4 to 5.8
+    Float_t N4 = hRap_accFo->Integral(); // # of events with eta of both electrons from 3.4 to 5.8
+    Float_t lumi = fLumiRun4 * 1e6; // mb^(-1)
+    Float_t N_simulate = lumi * sigmaTotal * BR[opt] * N3 / N2;
+    Float_t N_yieldFoc = lumi * sigmaTotal * BR[opt] * N4 / N2;
+    ofstream of;
+    of.open("results/starlightRapDep/log" + sMC[opt] + ".txt");
+    of << Form("rapidity dependence of the %s cross section:", sLabel[opt].Data())
+       << "*\n"
+       << Form(" N1: # of gen ev: %.0f\n", N1)
+       << Form(" N2: # of gen ev containing two daugter electrons: %.0f\n", N2)
+       << Form(" N3: # of gen ev with J/psi rapidity from 3.4 to 5.8: %.0f\n", N3)
+       << Form(" N4: # of gen ev with eta of both ele within 3.4 to 5.8: %.0f\n", N4)
+       << "*\n"
+       << "cross section values for respective rapidity intervals:\n"
+       << Form(" |y| < 6.0: %.2e mb\n", sigmaTotal)
+       << Form(" 3.4 < |y| < 5.8: %.2e mb\n", sigmaForwd)
+       << Form(" 3.4 < y < 5.8: %.2e mb\n", sigmaFocal)
+       << "*\n"
+       << Form(" acceptance wrt |y| < 6.0 (N4 / N2): %.3f\n", N4 / N2)
+       << Form(" acceptance wrt 3.4 < y < 5.8 (N4 / N3): %.3f\n", N4 / N3)
+       << Form(" integrated lumi UPC Pb+Pb Run 4: %.2e mb^(-1)\n", lumi)
+       << Form(" FOCAL cross section: %.2e mb\n", sigmaTotal * BR[opt] * N4 / N2)
+       << " | meaning: photopr. VM decays into ee both electrons reach FOCAL (eta of both within 3.4 to 5.8)\n"
+       << " | equal to sigma(|y| < 6.0) * BR(VM -> ee) * Acc\n"
+       << "*\n"
+       << "expected yields:\n"
+       << Form(" # of VM with 3.4 < y < 5.8: %.2e\n", N_simulate)
+       << Form(" # of VM with both ele having 3.4 < eta < 5.8: %.2e\n", N_yieldFoc);
+    of.close();
+
+    // legends
+    TLegend *l1 = new TLegend(0.15,0.69,0.55,0.94);
     l1->AddEntry((TObject*)0,Form("#bf{STARlight: %s}",sLabel[opt].Data()),"");
     if(!isUpsilon) {
-        l1->AddEntry((TObject*)0,Form("#sigma(|#it{y}| < 6.0) = %.2f mb",sigmaTotal),"");
-        l1->AddEntry((TObject*)0,Form("#sigma(3.4 < |#it{y}| < 5.8) = %.2f mb",sigmaForwd),"");
-        l1->AddEntry((TObject*)0,Form("#sigma(3.4 < #it{y} < 5.8) = %.2f mb",sigmaFocal),"");
+        l1->AddEntry((TObject*)0,Form("#sigma(|#it{y}| < 6.0) = %.2f mb", sigmaTotal),"");
+        l1->AddEntry((TObject*)0,Form("#sigma(3.4 < |#it{y}| < 5.8) = %.2f mb", sigmaForwd),"");
+        l1->AddEntry((TObject*)0,Form("#sigma(3.4 < #it{y} < 5.8) = %.2f mb", sigmaFocal),"");
     } else {
-        l1->AddEntry((TObject*)0,Form("#sigma(|#it{y}| < 6.0) = %.2f #mub",sigmaTotal*1e3),"");
-        l1->AddEntry((TObject*)0,Form("#sigma(3.4 < |#it{y}| < 5.8) = %.2f #mub",sigmaForwd*1e3),"");
-        l1->AddEntry((TObject*)0,Form("#sigma(3.4 < #it{y} < 5.8) = %.2f #mub",sigmaFocal*1e3),"");
+        l1->AddEntry((TObject*)0,Form("#sigma(|#it{y}| < 6.0) = %.2f #mub", sigmaTotal*1e3),"");
+        l1->AddEntry((TObject*)0,Form("#sigma(3.4 < |#it{y}| < 5.8) = %.2f #mub", sigmaForwd*1e3),"");
+        l1->AddEntry((TObject*)0,Form("#sigma(3.4 < #it{y} < 5.8) = %.2f #mub", sigmaFocal*1e3),"");
     }
+    l1->AddEntry((TObject*)0,Form("Acceptance^{[1]}: %.2f %%", N4 / N3 * 1e2),"");
     l1->SetTextSize(0.036);
     l1->SetBorderSize(0);
     l1->SetFillStyle(0);
     l1->SetMargin(0.);
     l1->Draw();
-    // calculate expected yields of J/psi, psi' and Y in FoCal in Run 4
-    // convert lumi from nb^(-1) to mb^(-1)
-    Float_t nEvTot = hRap_all->Integral();
-    Float_t nEv2El = hRap_twoEl->Integral();
-    Float_t nEvAcc = hRap_accFo->Integral();
-    Float_t acc = nEvAcc / nEv2El;
-    Float_t lumi = fLumiRun4 * 1e6; // mb^(-1)
-    Float_t yield = lumi * sigmaTotal * BR[opt] * acc;
-    ofstream of;
-    of.open("results/starlightRapDep/log" + sMC[opt] + ".txt");
-    of << Form("generated events: %.0f\n", nEvTot);
-    of << Form("gen ev with 2 ele: %.0f\n", nEv2El);
-    of << Form("gen ev with 2 ele in Foc acc: %.0f\n", nEvAcc);
-    of << Form("acceptance: %.3f\n", acc);
-    of << Form("int lumi for UPC Pb+Pb in Run 4: %.2e mb^(-1)\n",lumi);
-    of << Form("total sigma for %s: %.2e mb\n",sLabel[opt].Data(),sigmaTotal);
-    of << Form("sigma for FoCal %s: %.2e mb\n",sLabel[opt].Data(),sigmaTotal * BR[opt] * acc * 1e3);
-    of << Form("rough expected yield with VM rapidity within 3.4 and 5.8: %.2e\n",yield);
-    of.close();
 
-    TLegend *l2 = new TLegend(0.15,0.72,0.55,0.94);
-    l2->AddEntry((TObject*)0,Form("gen. events: %.2e",nEv2El),"");
-    l2->AddEntry((TObject*)0,Form("e^{+}e^{#minus} in 3.4 < |#it{#eta}| < 5.8: %.2e",nEvAcc),"");
-    l2->AddEntry((TObject*)0,Form("Acc: %.2f %%",acc * 1e2),"");
-    l2->AddEntry((TObject*)0,Form("Expected yield (#it{L}_{int} = 10 nb^{#minus1}):"),"");
-    l2->AddEntry((TObject*)0,Form("#bf{%2.f}",yield),"");
+    TLegend *l2 = new TLegend(0.58,0.74,0.97,0.94);
+    l2->AddEntry((TObject*)0,Form("Run-4 expectations:"),"");
+    l2->AddEntry((TObject*)0,Form("#it{L}_{int} (UPC Pb#minusPb): %.1f nb^{#minus1}", fLumiRun4),"");
+    l2->AddEntry((TObject*)0,Form("N(3.4 < |#it{y}^{VM}| < 5.8) #approx %.0f", roundFloat(N_simulate)),"");
+    l2->AddEntry((TObject*)0,Form("N(3.4 < |#it{#eta}^{e^{#pm}}| < 5.8 #approx %.0f", roundFloat(N_yieldFoc)),"");
     l2->SetTextSize(0.036);
     l2->SetBorderSize(0);
     l2->SetFillStyle(0);
@@ -228,8 +257,8 @@ void CalculateRapDep(Int_t opt)
 
 void StarlightRapDep()
 {
-    for(Int_t i = 0; i < 6; i ++) {
-        ConvertStarlightAsciiToTree(5e6,"inputData/pureStarlightSim/" + sMC[i] + "/");
+    for(Int_t i = 0; i < 7; i ++) {
+        ConvertStarlightAsciiToTree(5e6,"inputData/starlight/" + sMC[i] + "/");
         CalculateRapDep(i);
     }
     return;

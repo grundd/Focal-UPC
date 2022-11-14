@@ -27,7 +27,7 @@ void FocalUpcGrid_RunAnalysis(Bool_t isLocal, TString sim = "")
         for(Int_t i = 0; i < nFiles; i++) 
         {
             // ending of input and output directories:
-            TString sIn = Form("%s%03i_1000ev/",inDir.Data(),i+1);
+            TString sIn = Form("%s%03i/",inDir.Data(),i+1);
             TString sOut = Form("%s%03i/",outDir.Data(),i+1);
             gSystem->Exec("mkdir -p " + sOut);
             // run the clusterizer:

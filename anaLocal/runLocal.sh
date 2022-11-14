@@ -5,7 +5,7 @@
 
 # version as of Nov 09, 2022
 
-sim="boxEle"
+sim="cohJpsi"
 
 # calculate rapidity dependence of Starlight cross sections
 # calculate expected yields of J/psi, psi' and Y(1S) in Run 4
@@ -14,12 +14,12 @@ if false; then
 fi
 
 # run primary analysis over all input data for a selected process
-if true; then 
+if false; then 
     aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$sim'")'
 fi
 
 # run secondary analysis over all input data for a selected process
-if false; then 
+if true; then 
     aliroot -q 'AnaMain.C("'$sim'")'
 fi
 

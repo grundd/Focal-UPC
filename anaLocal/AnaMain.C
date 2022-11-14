@@ -292,13 +292,13 @@ void AnaMain(TString sim)
     gSystem->Exec(Form("mkdir -p %smerged_%s",outDir.Data(),outSubDir.Data()));
 
     // merge all output files produced by FocalUpcGrid
-    //MergeOutputFiles();
+    MergeOutputFiles();
 
     // print all histograms from the merged output file
-    //PrintHistograms(Form("%smerged_%sanalysisResults.root",outDir.Data(),outSubDir.Data()));
+    PrintHistograms(Form("%smerged_%sanalysisResults.root",outDir.Data(),outSubDir.Data()));
 
     // open merged output file, go over clusters and create cluster pairs
     // store cluster pairs in a tree
     //AnalyzeClPairs(Form("%s001/%s",outDir.Data(),outSubDir.Data()),kTRUE);
-    AnalyzeClPairs(Form("%smerged_%s",outDir.Data(),outSubDir.Data()),kTRUE);
+    AnalyzeClPairs(Form("%smerged_%s",outDir.Data(),outSubDir.Data()));
 }

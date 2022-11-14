@@ -22,7 +22,7 @@ TString sParaFile = "";
 // number of available input files for each simulation version (1000 events each):
 const Int_t nBoxEle[2] = {16,16};
 const Int_t nBoxPho[2] = {6, 0};
-const Int_t nCohJpsi[2] = {11,11};
+const Int_t nCohJpsi[2] = {11,21};
 const Int_t nIncJpsi[2] = {0, 1};
 Int_t nFiles(0.);
 TString inDir = "";
@@ -34,27 +34,27 @@ void ConfigLocalAnalysis(TString sim)
     sParaFile = Form("parameters_%02i.txt",filePara);
 
     // set the input directory:
-    inDir = Form("inputData/sim%02i/",simFiles);
+    inDir = Form("inputData/aliDPG_v%02i/",simFiles);
 
     // box electrons
     if(sim == "boxEle") {
         nFiles = nBoxEle[simFiles-1];
-        inDir += "BoxElectrons_";
+        inDir += "BoxElectrons/";
     }
     // box photons
     else if(sim == "boxPho") {
         nFiles = nBoxPho[simFiles-1];
-        inDir += "BoxPhotons_";
+        inDir += "BoxPhotons/";
     }
     // kCohJpsiToElRad
     else if(sim == "cohJpsi") {
         nFiles = nCohJpsi[simFiles-1];
-        inDir += "kCohJpsiToElRad_";
+        inDir += "kCohJpsiToElRad/";
     }
     // kIncohJpsiToElRad
     else if(sim == "incJpsi") {
         nFiles = nIncJpsi[simFiles-1];
-        inDir += "kIncohJpsiToElRad_";
+        inDir += "kIncohJpsiToElRad/";
     }
     else {
         cout << " ERROR: Configuration not supported. Choose between \"boxEle\",\"boxPho\",\"cohJpsi\",\"incJpsi\". Terminating..." << endl;
