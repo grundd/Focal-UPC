@@ -1,0 +1,4 @@
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local3/MC/sim.C failed with exitcode 129, expecting 0
+Command '/Users/david/alice/sw/osx_arm64/AliDPG/master-local3/MC/dpgsim.sh --run 294925 --system Pb-Pb --energy 5500.0 --mode sim --detector FOCAL --uid 897116001 --nevents 1000 --generator Starlight --process kTwoGammaToElMedium --simulation NoDigitization --focalGeometryFile geometry_02.txt --ymin 3.4 --ymax 6.0' exited with error code 5
+/Users/david/alice/sw/osx_arm64/AliDPG/master-local3/MC/sim.C failed with exitcode 129, expecting 0
+Command '/Users/david/alice/sw/osx_arm64/AliDPG/master-local3/MC/dpgsim.sh --run 294925 --system Pb-Pb --energy 5500.0 --mode sim --detector FOCAL --uid 394786561 --nevents 1000 --generator Starlight --process kTwoGammaToElMedium --simulation NoDigitization --focalGeometryFile geometry_02.txt --ymin 3.4 --ymax 6.0' exited with error code 5

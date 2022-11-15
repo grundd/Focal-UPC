@@ -14,12 +14,12 @@ if false; then
 fi
 
 # run primary analysis over all input data for a selected process
-if false; then 
+if true; then 
     aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$sim'")'
 fi
 
 # run secondary analysis over all input data for a selected process
-if true; then 
+if false; then 
     aliroot -q 'AnaMain.C("'$sim'")'
 fi
 

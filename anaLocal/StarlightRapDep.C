@@ -11,52 +11,74 @@
 #include "TGraph.h"
 #include "TAxis.h"
 #include "TStyle.h"
+#include "TLatex.h"
 #include "TCanvas.h"
 #include "TLegend.h"
 // my headers
 #include "StarlightRapDep.h"
 
-Float_t fRapLow = -6.;
+Int_t nRapBins;
+Float_t fRapLow = -6.; // [-]
 Float_t fRapUpp = +6.;
-Float_t fRapStep = 0.2; // [-]
+Float_t fRapStep = 0.2; 
+Int_t binNegLow = 2;
+Int_t binNegUpp = 13;
+Int_t binPosLow = 48;
+Int_t binPosUpp = 59;
 Float_t fLumiRun4 = 6.9; // [nb^(-1)]
-Float_t fTotalCS[7] = {38.8, // [mb]
-                       17.8,
-                       7.5,
-                       3.1,
-                       0.094,
-                       0.041,
-                       3829
+// direct starlight
+Float_t fTotalCS[7] = {
+    38.8, // [mb]
+    17.8,
+    7.5,
+    3.1,
+    0.094,
+    0.041,
+    83.1
 }; 
-TString sLabel[7] = {"coherent J/#psi",
-                  "incoherent J/#psi",
-                  "coherent #psi'",
-                  "incoherent #psi'",
-                  "coherent #Upsilon(1S)",
-                  "incoherent #Upsilon(1S)",
-                  "low-mass continuum"
+TString SL_label[7] = {
+    "coherent J/#psi",
+    "incoherent J/#psi",
+    "coherent #psi'",
+    "incoherent #psi'",
+    "coherent #Upsilon(1S)",
+    "incoherent #Upsilon(1S)",
+    "medium-mass continuum (1.8 < #it{W} < 15 GeV)",
 };
-TString sMC[7] = {"CohJ",
-                  "IncJ",
-                  "CohP",
-                  "IncP",
-                  "CohU",
-                  "IncU",
-                  "BkgLow"
+TString SL_folder[7] = {
+    "CohJ",
+    "IncJ",
+    "CohP",
+    "IncP",
+    "CohU",
+    "IncU",
+    "Bkg"
 };
-Float_t BR[7] = {0.0594, // J/psi to e^(+)e^(-)
-                 0.0594, 
-                 0.00772, // psi' to e^(+)e^(-)
-                 0.00772, 
-                 0.0238, // Upsilon to e^(+)e^(-)
-                 0.0238,
-                 1.0
+Float_t fBR[7] = {
+    0.0594, // J/psi to e^(+)e^(-)
+    0.0594, 
+    0.00772, // psi' to e^(+)e^(-)
+    0.00772, 
+    0.0238, // Upsilon to e^(+)e^(-)
+    0.0238,
+    1.0, // gamma-gamma -> no BR
+};
+// feed-down:
+TString FD_label[2] = {
+    "FD from coherent psi'",
+    "FD from incoherent psi'"
+};
+TString FD_folder[2] = {
+    "CohFD",
+    "IncFD"
 };
 
 Float_t roundFloat(Float_t N)
 {
     Int_t divisor = 1;
-    if(N > 1e4) divisor = 1000;
+    if(N > 1e6) divisor = 100000;
+    else if(N > 1e5) divisor = 10000;
+    else if(N > 1e4) divisor = 1000;
     else if(N > 1e3) divisor = 100;
     else if(N > 1e2) divisor = 10;
     return (Int_t)N - ((Int_t)N % divisor);
@@ -64,20 +86,15 @@ Float_t roundFloat(Float_t N)
 
 void CalculateRapDep(Int_t opt)
 {
-    gSystem->Exec("mkdir -p results/starlightRapDep/");
-    Bool_t isUpsilon = kFALSE;
-    if(opt >= 4) isUpsilon = kTRUE;
-
-    Int_t nRapBins = (fRapUpp-fRapLow) / fRapStep;
-    Printf("%i rapidity bins will be used.", nRapBins);
+    Printf("\n*** Process: %s:", SL_label[opt].Data());
 
     TH1F* hRap_all = NULL;
     TH1F* hRap_twoEl = NULL;
     TH1F* hRap_accFo = NULL;
-    TFile* fOut = TFile::Open("results/starlightRapDep/h" + sMC[opt] + ".root","read");
+    TFile* fOut = TFile::Open("results/starlightRapDep/h" + SL_folder[opt] + ".root","read");
     if(fOut)
     {
-        Printf("Histogram hRap_all already created.");
+        Printf("Histograms already exist and will be loaded.");
         TList* l = (TList*) fOut->Get("HistList");
         if(l) Printf("%s loaded.", l->GetName()); 
         hRap_all = (TH1F*) l->FindObject("hRap_all");
@@ -89,9 +106,9 @@ void CalculateRapDep(Int_t opt)
     } 
     else 
     {
-        Printf("Histogram hRap_all will be created.");
+        Printf("Histograms will be created.");
 
-        TFile* fSL = TFile::Open("inputData/starlight/" + sMC[opt] + "/tSTARlight.root", "read");
+        TFile* fSL = TFile::Open("inputData/starlight/" + SL_folder[opt] + "/tSTARlight.root", "read");
         if(fSL) Printf("File %s loaded.", fSL->GetName());
 
         TTree* tSL = dynamic_cast<TTree*> (fSL->Get("starlightTree"));
@@ -103,9 +120,9 @@ void CalculateRapDep(Int_t opt)
 
         gROOT->cd();
         TList* l = new TList();
-        hRap_all = new TH1F("hRap_all","rap. distribution of generated events",nRapBins,fRapLow,fRapUpp);
-        hRap_twoEl = new TH1F("hRap_twoEl","rap. distribution of events with two electrons",nRapBins,fRapLow,fRapUpp);
-        hRap_accFo = new TH1F("hRap_accFo","rap. distribution of events with both electrons in FoCal acceptance",nRapBins,fRapLow,fRapUpp);
+        hRap_all = new TH1F("hRap_all","rap. dist.: gen. VM",nRapBins,fRapLow,fRapUpp);
+        hRap_twoEl = new TH1F("hRap_twoEl","rap. dist.: gen. VM with two electrons",nRapBins,fRapLow,fRapUpp);
+        hRap_accFo = new TH1F("hRap_accFo","rap. dist.: gen. VM with both electrons in FoCal acceptance",nRapBins,fRapLow,fRapUpp);
         l->Add(hRap_all);
         l->Add(hRap_twoEl);
         l->Add(hRap_accFo);
@@ -132,7 +149,7 @@ void CalculateRapDep(Int_t opt)
             }
             hRap_all->Fill(parent->Rapidity());
         }
-        fOut = new TFile("results/starlightRapDep/h" + sMC[opt] + ".root","RECREATE");
+        fOut = new TFile("results/starlightRapDep/h" + SL_folder[opt] + ".root","RECREATE");
         l->Write("HistList", TObject::kSingleKey);
         l->ls();
         fOut->ls();
@@ -170,16 +187,22 @@ void CalculateRapDep(Int_t opt)
     gStyle->SetOptTitle(0);
     TCanvas* c = new TCanvas("c","c",700,600);
     //c->SetLogy(); 
-    c->SetTopMargin(0.05);
+    c->SetTopMargin(0.07);
     c->SetBottomMargin(0.1);
     c->SetRightMargin(0.02);
     c->SetLeftMargin(0.12);
     gr->Draw("AC");
 
-    Int_t binNegLow = 2; Printf("Low edge of bin %i: %.1f", binNegLow, hRap_CS->GetBinLowEdge(binNegLow));
-    Int_t binNegUpp = 13; Printf("Upp edge of bin %i: %.1f", binNegUpp, hRap_CS->GetBinLowEdge(binNegUpp+1));
-    Int_t binPosLow = 48; Printf("Low edge of bin %i: %.1f", binPosLow, hRap_CS->GetBinLowEdge(binPosLow));
-    Int_t binPosUpp = 59; Printf("Upp edge of bin %i: %.1f", binPosUpp, hRap_CS->GetBinLowEdge(binPosUpp+1));
+    TLatex* latex = new TLatex();
+    latex->SetTextSize(0.036);
+    latex->SetTextAlign(21);
+    latex->SetNDC();
+    latex->DrawLatex(0.55,0.95,Form("STARlight: %s",SL_label[opt].Data()));
+
+    Printf("Low edge of bin %i: %.1f", binNegLow, hRap_CS->GetBinLowEdge(binNegLow));
+    Printf("Upp edge of bin %i: %.1f", binNegUpp, hRap_CS->GetBinLowEdge(binNegUpp+1));
+    Printf("Low edge of bin %i: %.1f", binPosLow, hRap_CS->GetBinLowEdge(binPosLow));
+    Printf("Upp edge of bin %i: %.1f", binPosUpp, hRap_CS->GetBinLowEdge(binPosUpp+1));
     Float_t sigmaTotal = hRap_CS->Integral("width");
     Float_t sigmaForwd = hRap_CS->Integral(binNegLow,binNegUpp,"width") + hRap_CS->Integral(binPosLow,binPosUpp,"width");
     Float_t sigmaFocal = hRap_CS->Integral(binPosLow,binPosUpp,"width");
@@ -191,11 +214,11 @@ void CalculateRapDep(Int_t opt)
     Float_t N3 = hRap_all->Integral(binPosLow,binPosUpp); // # of events with VM rapidity from 3.4 to 5.8
     Float_t N4 = hRap_accFo->Integral(); // # of events with eta of both electrons from 3.4 to 5.8
     Float_t lumi = fLumiRun4 * 1e6; // mb^(-1)
-    Float_t N_simulate = lumi * sigmaTotal * BR[opt] * N3 / N2;
-    Float_t N_yieldFoc = lumi * sigmaTotal * BR[opt] * N4 / N2;
+    Float_t N_simulate = lumi * sigmaTotal * fBR[opt] * N3 / N2;
+    Float_t N_yieldFoc = lumi * sigmaTotal * fBR[opt] * N4 / N2;
     ofstream of;
-    of.open("results/starlightRapDep/log" + sMC[opt] + ".txt");
-    of << Form("rapidity dependence of the %s cross section:", sLabel[opt].Data())
+    of.open("results/starlightRapDep/log" + SL_folder[opt] + ".txt");
+    of << Form("rapidity dependence of the %s cross section:", SL_label[opt].Data())
        << "*\n"
        << Form(" N1: # of gen ev: %.0f\n", N1)
        << Form(" N2: # of gen ev containing two daugter electrons: %.0f\n", N2)
@@ -210,7 +233,7 @@ void CalculateRapDep(Int_t opt)
        << Form(" acceptance wrt |y| < 6.0 (N4 / N2): %.3f\n", N4 / N2)
        << Form(" acceptance wrt 3.4 < y < 5.8 (N4 / N3): %.3f\n", N4 / N3)
        << Form(" integrated lumi UPC Pb+Pb Run 4: %.2e mb^(-1)\n", lumi)
-       << Form(" FOCAL cross section: %.2e mb\n", sigmaTotal * BR[opt] * N4 / N2)
+       << Form(" FOCAL cross section: %.2e mb\n", sigmaTotal * fBR[opt] * N4 / N2)
        << " | meaning: photopr. VM decays into ee both electrons reach FOCAL (eta of both within 3.4 to 5.8)\n"
        << " | equal to sigma(|y| < 6.0) * BR(VM -> ee) * Acc\n"
        << "*\n"
@@ -220,17 +243,10 @@ void CalculateRapDep(Int_t opt)
     of.close();
 
     // legends
-    TLegend *l1 = new TLegend(0.15,0.69,0.55,0.94);
-    l1->AddEntry((TObject*)0,Form("#bf{STARlight: %s}",sLabel[opt].Data()),"");
-    if(!isUpsilon) {
-        l1->AddEntry((TObject*)0,Form("#sigma(|#it{y}| < 6.0) = %.2f mb", sigmaTotal),"");
-        l1->AddEntry((TObject*)0,Form("#sigma(3.4 < |#it{y}| < 5.8) = %.2f mb", sigmaForwd),"");
-        l1->AddEntry((TObject*)0,Form("#sigma(3.4 < #it{y} < 5.8) = %.2f mb", sigmaFocal),"");
-    } else {
-        l1->AddEntry((TObject*)0,Form("#sigma(|#it{y}| < 6.0) = %.2f #mub", sigmaTotal*1e3),"");
-        l1->AddEntry((TObject*)0,Form("#sigma(3.4 < |#it{y}| < 5.8) = %.2f #mub", sigmaForwd*1e3),"");
-        l1->AddEntry((TObject*)0,Form("#sigma(3.4 < #it{y} < 5.8) = %.2f #mub", sigmaFocal*1e3),"");
-    }
+    TLegend *l1 = new TLegend(0.15,0.73,0.55,0.93);
+    l1->AddEntry((TObject*)0,Form("#sigma(|#it{y}| < 6.0) = %.3f mb", sigmaTotal),"");
+    l1->AddEntry((TObject*)0,Form("#sigma(3.4 < |#it{y}| < 5.8) = %.3f mb", sigmaForwd),"");
+    l1->AddEntry((TObject*)0,Form("#sigma(3.4 < #it{y} < 5.8) = %.3f mb", sigmaFocal),"");
     l1->AddEntry((TObject*)0,Form("Acceptance^{[1]}: %.2f %%", N4 / N3 * 1e2),"");
     l1->SetTextSize(0.036);
     l1->SetBorderSize(0);
@@ -238,7 +254,7 @@ void CalculateRapDep(Int_t opt)
     l1->SetMargin(0.);
     l1->Draw();
 
-    TLegend *l2 = new TLegend(0.58,0.74,0.97,0.94);
+    TLegend *l2 = new TLegend(0.58,0.73,0.97,0.93);
     l2->AddEntry((TObject*)0,Form("Run-4 expectations:"),"");
     l2->AddEntry((TObject*)0,Form("#it{L}_{int} (UPC Pb#minusPb): %.1f nb^{#minus1}", fLumiRun4),"");
     l2->AddEntry((TObject*)0,Form("N(3.4 < |#it{y}^{VM}| < 5.8) #approx %.0f", roundFloat(N_simulate)),"");
@@ -249,17 +265,133 @@ void CalculateRapDep(Int_t opt)
     l2->SetMargin(0.);
     l2->Draw();
     // save the canvas
-    c->Print("results/starlightRapDep/gr" + sMC[opt] + ".pdf");
+    c->Print("results/starlightRapDep/gr" + SL_folder[opt] + ".pdf");
     delete c;
     delete gr;
     return;
 }
 
+void AnalyzeFeedDown(Int_t opt)
+{
+    Printf("\n*** Process: %s:", FD_label[opt].Data());
+    Int_t nRapBins = (fRapUpp-fRapLow) / fRapStep;
+    Printf("%i rapidity bins will be used.", nRapBins);
+
+    TH1F* hRap_all = NULL;
+    TH1F* hRap_twoEl = NULL;
+    TH1F* hRap_accFo = NULL;
+    TFile* fOut = TFile::Open("results/starlightRapDep/h" + FD_folder[opt] + ".root","read");
+    if(fOut)
+    {
+        Printf("Histograms already exist and will be loaded.");
+        TList* l = (TList*) fOut->Get("HistList");
+        if(l) Printf("%s loaded.", l->GetName()); 
+        hRap_all = (TH1F*) l->FindObject("hRap_all");
+        if(hRap_all) Printf("%s loaded.", hRap_all->GetName());
+        hRap_twoEl = (TH1F*) l->FindObject("hRap_twoEl");
+        if(hRap_twoEl) Printf("%s loaded.", hRap_twoEl->GetName());
+        hRap_accFo = (TH1F*) l->FindObject("hRap_accFo");
+        if(hRap_accFo) Printf("%s loaded.", hRap_accFo->GetName());
+    } 
+    else 
+    {
+        Printf("Histograms will be created.");
+
+        gROOT->cd();
+        TList* l = new TList();
+        hRap_all = new TH1F("hRap_all","rap. dist.: psi'",nRapBins,fRapLow,fRapUpp);
+        hRap_twoEl = new TH1F("hRap_twoEl","rap. dist.: psi' with two electrons from J/psi decay",nRapBins,fRapLow,fRapUpp);
+        hRap_accFo = new TH1F("hRap_accFo","rap. dist.: psi' with both electrons from J/psi decay in FoCal acceptance",nRapBins,fRapLow,fRapUpp);
+        l->Add(hRap_all);
+        l->Add(hRap_twoEl);
+        l->Add(hRap_accFo);
+
+        // go over galice files and fill the histograms
+        for(Int_t iFile = 0; iFile < 6; iFile++)
+        {
+            TString galice = Form("inputData/starlight/%s/%03i/galice.root",FD_folder[opt].Data(),iFile+1);
+            AliRunLoader* runLoader = AliRunLoader::Open(galice);
+            runLoader->LoadKinematics();
+
+            Int_t nEv = runLoader->GetNumberOfEvents();
+            Printf("galice file %03i: %i entries.", iFile+1, nEv);
+
+            for(Int_t iEv = 0; iEv < nEv; iEv++)
+            {
+                // get tracks in this event
+                runLoader->GetEvent(iEv);	    
+                AliStack* stack = runLoader->Stack();
+                Int_t nTrks = stack->GetNtrack();
+                // loop over tracks
+                vector<Int_t> idxElTrk;
+                Int_t idxPsi2s;
+                for(Int_t iTrk = 0; iTrk < nTrks; iTrk++) 
+                {
+                    TParticle* part = stack->Particle(iTrk);
+                    // if psi'
+                    if(part->GetPdgCode() == 100443) idxPsi2s = iTrk;
+                    // if an electron
+                    if(TMath::Abs(part->GetPdgCode()) == 11) {
+                        // if physical primary
+                        if(stack->IsPhysicalPrimary(iTrk)) idxElTrk.push_back(iTrk);
+                    } 
+                }
+                TParticle *psi2s = stack->Particle(idxPsi2s);
+                if(idxElTrk.size() == 2)
+                {
+                    TParticle* el1 = stack->Particle(idxElTrk[0]);
+                    TParticle* el2 = stack->Particle(idxElTrk[1]);
+                    if(el1 && el2) {
+                        hRap_twoEl->Fill(psi2s->Y());
+                        Float_t EtaEl1 = el1->Eta();
+                        Float_t EtaEl2 = el2->Eta();
+                        if(3.4 < EtaEl1 && EtaEl1 < 5.8 && 3.4 < EtaEl2 && EtaEl2 < 5.8) hRap_accFo->Fill(psi2s->Y());
+                    }
+                }
+                hRap_all->Fill(psi2s->Y());
+            }
+            runLoader->Delete();
+        }
+        fOut = new TFile("results/starlightRapDep/h" + FD_folder[opt] + ".root","RECREATE");
+        l->Write("HistList", TObject::kSingleKey);
+        l->ls();
+        fOut->ls();
+    }
+    Printf("Low edge of bin %i: %.1f", binPosLow, hRap_all->GetBinLowEdge(binPosLow));
+    Printf("Upp edge of bin %i: %.1f", binPosUpp, hRap_all->GetBinLowEdge(binPosUpp+1));
+    // calculate the fraction of events with psi' with 3.4 < y < 5.8
+    // where both electrons are within FoCal acceptance (3.4 < eta < 5.8)
+    Float_t nTwoEl = hRap_twoEl->Integral(binPosLow,binPosUpp,"width");
+    Float_t nAccFo = hRap_accFo->Integral(binPosLow,binPosUpp,"width");
+    Float_t frac = nAccFo / nTwoEl;
+        ofstream of;
+    of.open("results/starlightRapDep/log" + FD_folder[opt] + ".txt");
+    of << Form("%s:\n", FD_label[opt].Data())
+       << "*\n"
+       << Form(" N1: # of events with 3.4 < y(psi') < 5.8: %.0f\n", nTwoEl)
+       << Form(" N2: # of (a & b) events where both J/psi electrons reached FoCal: %.0f\n", nAccFo)
+       << " | a -> have 3.4 < y(psi') < 5.8\n"
+       << " | b -> psi' decayed into J/psi + pi pi -> e e pi pi\n"
+       << Form(" fraction (N2 / N1): %.3f\n", frac);
+    of.close();
+    return;
+}
+
 void StarlightRapDep()
 {
-    for(Int_t i = 0; i < 7; i ++) {
-        ConvertStarlightAsciiToTree(5e6,"inputData/starlight/" + sMC[i] + "/");
+    gSystem->Exec("mkdir -p results/starlightRapDep/");
+
+    nRapBins = (fRapUpp-fRapLow) / fRapStep;
+    Printf("%i rapidity bins will be used.", nRapBins);
+
+    // direct SL samples
+    for(Int_t i = 0; i < 7; i++) {
+        ConvertStarlightAsciiToTree(5e6,"inputData/starlight/" + SL_folder[i] + "/");
         CalculateRapDep(i);
+    }
+    // feed-down samples (from AliDPG)
+    for(Int_t i = 0; i < 2; i++) {
+        AnalyzeFeedDown(i);
     }
     return;
 }
