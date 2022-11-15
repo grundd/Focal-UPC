@@ -3,7 +3,7 @@
 
 #include "ConfigParameters.h"
 #include "FocalUpcGrid.h"
-#include "FocalUpcGrid_CreateHistograms.h"
+#include "CreateHistograms.h"
 
 void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOut = "")
 {
@@ -44,27 +44,31 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
     if(!runLoader->TreeK()) runLoader->LoadKinematics();
 
     // arrays with output histograms
-    TObjArray* arrTH1F = NULL;
-    TObjArray* arrTH2F = NULL;
-    TObjArray* arrTPrf = NULL;
-    Int_t nTH1F(-1), nTH2F(-1), nTPrf(-1);
+    TObjArray* arrHistos = NULL;
+    Int_t kFirstTH1F(-1), kFirstTH2F(-1), kFirstTPrf(-1), kAll(-1);
     // if box simulations
     if(isBoxSim) 
     {
-        arrTH1F = new TObjArray(kB1_all); Bx_DefineTH1F(arrTH1F); nTH1F = kB1_all;
-        arrTH2F = new TObjArray(kB2_all); Bx_DefineTH2F(arrTH2F); nTH2F = kB2_all;
-        arrTPrf = new TObjArray(kBP_all); Bx_DefineTPrf(arrTPrf); nTPrf = kBP_all;
+        kFirstTH1F = kGridBox_firstTH1F; 
+        kFirstTH2F = kGridBox_firstTH2F; 
+        kFirstTPrf = kGridBox_firstTPrf; 
+        kAll = kGridBox_all;
+        arrHistos = new TObjArray(kAll);
+        CreateHistos_GridBox(arrHistos);
     } 
     // if starlight J/psi simulations
     else
     {
-        arrTH1F = new TObjArray(kJ1_all); Jp_DefineTH1F(arrTH1F); nTH1F = kJ1_all;
-        arrTH2F = new TObjArray(kJ2_all); Jp_DefineTH2F(arrTH2F); nTH2F = kJ2_all;
-        arrTPrf = new TObjArray(kJP_all); Jp_DefineTPrf(arrTPrf); nTPrf = kJP_all;
+        kFirstTH1F = kGridJpsi_firstTH1F; 
+        kFirstTH2F = kGridJpsi_firstTH2F;
+        kFirstTPrf = kGridJpsi_firstTPrf; 
+        kAll = kGridJpsi_all;
+        arrHistos = new TObjArray(kAll);
+        CreateHistos_GridJpsi(arrHistos);
     }
 
     // output file
-    TString sFile = Form("%s%sanalysisResults.root",sOut.Data(),outSubDir.Data());
+    TString sFile = Form("%s%sanalysisResultsGrid.root",sOut.Data(),outSubDir.Data());
     TFile* fOut = new TFile(sFile.Data(),"RECREATE");
     // output tree
     TTree* tOut = new TTree("tCls", "output tree containing prefiltered clusters");
@@ -304,15 +308,15 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
         if(isBoxSim)
         {
             // general histograms
-            ((TH1F*)arrTH1F->At(kB1_mcE))->Fill(stack->Particle(0)->Energy());
-            ((TH1F*)arrTH1F->At(kB1_mcPt))->Fill(stack->Particle(0)->Pt());
-            ((TH2F*)arrTH2F->At(kB2_mcE_nCls))->Fill(stack->Particle(0)->Energy(), nClsPref);
+            ((TH1F*)arrHistos->At(kB1_mcE))->Fill(stack->Particle(0)->Energy());
+            ((TH1F*)arrHistos->At(kB1_mcPt))->Fill(stack->Particle(0)->Pt());
+            ((TH2F*)arrHistos->At(kB2_mcE_nCls))->Fill(stack->Particle(0)->Energy(), nClsPref);
             // total energy vs MC energy
-            ((TH2F*)arrTH2F->At(kB2_totE_mcE))->Fill(ETot, stack->Particle(0)->Energy());
-            ((TProfile*)arrTPrf->At(kBP_totE_mcE))->Fill(ETot, stack->Particle(0)->Energy());
+            ((TH2F*)arrHistos->At(kB2_totE_mcE))->Fill(ETot, stack->Particle(0)->Energy());
+            ((TProfile*)arrHistos->At(kBP_totE_mcE))->Fill(ETot, stack->Particle(0)->Energy());
             // maximum cluster energy vs MC energy
-            ((TH2F*)arrTH2F->At(kB2_maxClE_mcE))->Fill(EClMax, stack->Particle(0)->Energy());
-            ((TProfile*)arrTPrf->At(kBP_maxClE_mcE))->Fill(EClMax, stack->Particle(0)->Energy());
+            ((TH2F*)arrHistos->At(kB2_maxClE_mcE))->Fill(EClMax, stack->Particle(0)->Energy());
+            ((TProfile*)arrHistos->At(kBP_maxClE_mcE))->Fill(EClMax, stack->Particle(0)->Energy());
             // X and Y of the cluster with the highest energy
             Float_t xClMaxE(-1.), yClMaxE(-1.);
             Bool_t isClWithMaxE = kFALSE;
@@ -334,22 +338,22 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
                 Float_t x(0.), y(0.);
                 TrackCoordinatesAtZ(part,zCl,x,y);
                 // correlation between MC energy and energies of prefiltered clusters
-                ((TH2F*)arrTH2F->At(kB2_clE_mcE))->Fill(clust->E(), part->Energy());
+                ((TH2F*)arrHistos->At(kB2_clE_mcE))->Fill(clust->E(), part->Energy());
                 // radial distance between the cluster and the MC track
                 Float_t DeltaX = xCl - x;
                 Float_t DeltaY = yCl - y;
                 Float_t DeltaR = TMath::Sqrt(TMath::Power(DeltaX,2) + TMath::Power(DeltaY,2));
-                ((TH2F*)arrTH2F->At(kB2_clMcDX_clMcDY))->Fill(DeltaX, DeltaY);
-                ((TH2F*)arrTH2F->At(kB2_mcE_clMcSep))->Fill(part->Energy(), DeltaR);
+                ((TH2F*)arrHistos->At(kB2_clMcDX_clMcDY))->Fill(DeltaX, DeltaY);
+                ((TH2F*)arrHistos->At(kB2_mcE_clMcSep))->Fill(part->Energy(), DeltaR);
                 // radial distance between the cluster and the cluster with maximum energy
                 if(isClWithMaxE && (iCl != iClMaxE)) {
                     Float_t DeltaX_maxE = xCl - xClMaxE;
                     Float_t DeltaY_maxE = yCl - yClMaxE;
                     Float_t DeltaR_maxE = TMath::Sqrt(TMath::Power(DeltaX_maxE,2) + TMath::Power(DeltaY_maxE,2));
-                    ((TH2F*)arrTH2F->At(kB2_clMaxClDX_clMaxClDY))->Fill(DeltaX_maxE, DeltaY_maxE);
-                    ((TH2F*)arrTH2F->At(kB2_mcE_clMaxClSep))->Fill(part->Energy(), DeltaR_maxE);
-                    ((TH2F*)arrTH2F->At(kB2_clX_clMaxClSep))->Fill((xCl + xClMaxE)/2., DeltaR_maxE);
-                    ((TH2F*)arrTH2F->At(kB2_clY_clMaxClSep))->Fill((yCl + yClMaxE)/2., DeltaR_maxE);
+                    ((TH2F*)arrHistos->At(kB2_clMaxClDX_clMaxClDY))->Fill(DeltaX_maxE, DeltaY_maxE);
+                    ((TH2F*)arrHistos->At(kB2_mcE_clMaxClSep))->Fill(part->Energy(), DeltaR_maxE);
+                    ((TH2F*)arrHistos->At(kB2_clX_clMaxClSep))->Fill((xCl + xClMaxE)/2., DeltaR_maxE);
+                    ((TH2F*)arrHistos->At(kB2_clY_clMaxClSep))->Fill((yCl + yClMaxE)/2., DeltaR_maxE);
                 }
             }
         }
@@ -365,17 +369,17 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
                 TParticle* part = stack->Particle(iTrk);
                 // if J/psi
                 if(part->GetPdgCode() == 443) {
-                    ((TH1F*)arrTH1F->At(kJ1_mcJEn))->Fill(part->Energy());
-                    ((TH1F*)arrTH1F->At(kJ1_mcJPt))->Fill(part->Pt());
-                    ((TH1F*)arrTH1F->At(kJ1_mcJRap))->Fill(part->Y());
-                    ((TH1F*)arrTH1F->At(kJ1_mcJM))->Fill(part->GetCalcMass());
-                    ((TH2F*)arrTH2F->At(kJ2_mcJRap_mcJPt))->Fill(part->Y(), part->Pt());
+                    ((TH1F*)arrHistos->At(kJ1_mcJEn))->Fill(part->Energy());
+                    ((TH1F*)arrHistos->At(kJ1_mcJPt))->Fill(part->Pt());
+                    ((TH1F*)arrHistos->At(kJ1_mcJRap))->Fill(part->Y());
+                    ((TH1F*)arrHistos->At(kJ1_mcJM))->Fill(part->GetCalcMass());
+                    ((TH2F*)arrHistos->At(kJ2_mcJRap_mcJPt))->Fill(part->Y(), part->Pt());
                 }
                 // if physical primary (pp) electron (i.e., J/psi direct decay product)
                 if(isEleOrPos(part) && stack->IsPhysicalPrimary(iTrk)) {
                     TParticle* mother = stack->Particle(part->GetMother(0));
                     if(mother->GetPdgCode() != 443) cout << " * MESSAGE: Unexpected mother of a pp electron." << endl;
-                    ((TH2F*)arrTH2F->At(kJ2_mcJElEta_mcJElPt))->Fill(part->Eta(), part->Pt());
+                    ((TH2F*)arrHistos->At(kJ2_mcJElEta_mcJElPt))->Fill(part->Eta(), part->Pt());
                     ppElectrons.AddLast(part);
                 }
             }
@@ -392,8 +396,8 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
                 // fill the histogram showing the correlation between energies and transverse momenta of the two pp electrons
                 ppEl1 = (TParticle*) ppElectrons[0];
                 ppEl2 = (TParticle*) ppElectrons[1];
-                ((TH2F*)arrTH2F->At(kJ2_mcJEl1En_mcJEl2En))->Fill(ppEl1->Energy(), ppEl2->Energy());
-                ((TH2F*)arrTH2F->At(kJ2_mcJEl1Pt_mcJEl2Pt))->Fill(ppEl1->Pt(), ppEl2->Pt());
+                ((TH2F*)arrHistos->At(kJ2_mcJEl1En_mcJEl2En))->Fill(ppEl1->Energy(), ppEl2->Energy());
+                ((TH2F*)arrHistos->At(kJ2_mcJEl1Pt_mcJEl2Pt))->Fill(ppEl1->Pt(), ppEl2->Pt());
                 // fill the histograms showing kinematics of J/psi reconstructed from the two pp electrons
                 TLorentzVector lvPPEl1;
                 lvPPEl1.SetPxPyPzE(ppEl1->Px(),ppEl1->Py(),ppEl1->Pz(),ppEl1->Energy());
@@ -401,10 +405,10 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
                 lvPPEl2.SetPxPyPzE(ppEl2->Px(),ppEl2->Py(),ppEl2->Pz(),ppEl2->Energy());
                 TLorentzVector Jpsi = lvPPEl1 + lvPPEl2;
                 lvJElPair->SetPxPyPzE(Jpsi.Px(),Jpsi.Py(),Jpsi.Pz(),Jpsi.Energy());
-                ((TH1F*)arrTH1F->At(kJ1_mcJElPairEn))->Fill(lvJElPair->Energy());
-                ((TH1F*)arrTH1F->At(kJ1_mcJElPairPt))->Fill(lvJElPair->Pt());
-                ((TH1F*)arrTH1F->At(kJ1_mcJElPairRap))->Fill(lvJElPair->Rapidity());
-                ((TH1F*)arrTH1F->At(kJ1_mcJElPairM))->Fill(lvJElPair->M());
+                ((TH1F*)arrHistos->At(kJ1_mcJElPairEn))->Fill(lvJElPair->Energy());
+                ((TH1F*)arrHistos->At(kJ1_mcJElPairPt))->Fill(lvJElPair->Pt());
+                ((TH1F*)arrHistos->At(kJ1_mcJElPairRap))->Fill(lvJElPair->Rapidity());
+                ((TH1F*)arrHistos->At(kJ1_mcJElPairM))->Fill(lvJElPair->M());
             }
 
             // match clusters to MC tracks
@@ -436,18 +440,18 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
                 fEtaJEl = -1e3;
                 fPhiJEl = -1e3;
 
-                ((TH1F*)arrTH1F->At(kJ1_clZ))->Fill(zCl);
+                ((TH1F*)arrHistos->At(kJ1_clZ))->Fill(zCl);
                 // fill some histograms with cluster kinematics
-                ((TH2F*)arrTH2F->At(kJ2_clEta_clPhi))->Fill(fEtaCl, fPhiCl);
-                ((TH2F*)arrTH2F->At(kJ2_clEta_clPt ))->Fill(fEtaCl, fPtCl);
+                ((TH2F*)arrHistos->At(kJ2_clEta_clPhi))->Fill(fEtaCl, fPhiCl);
+                ((TH2F*)arrHistos->At(kJ2_clEta_clPt ))->Fill(fEtaCl, fPtCl);
 
                 TParticle* mtchPhysPrimPart = (TParticle*)arrMtchPhysPrimParts[iCl];
                 // if matched to a ppp
                 if(mtchPhysPrimPart) 
                 {
-                    ((TH2F*)arrTH2F->At(kJ2_pppClEn_mtchEn))->Fill(fEnCl, mtchPhysPrimPart->Energy());
-                    ((TH2F*)arrTH2F->At(kJ2_pppClEta_mtchEta))->Fill(fEtaCl, mtchPhysPrimPart->Eta());
-                    ((TH2F*)arrTH2F->At(kJ2_pppClPt_mtchPt))->Fill(fPtCl, mtchPhysPrimPart->Pt());
+                    ((TH2F*)arrHistos->At(kJ2_pppClEn_mtchEn))->Fill(fEnCl, mtchPhysPrimPart->Energy());
+                    ((TH2F*)arrHistos->At(kJ2_pppClEta_mtchEta))->Fill(fEtaCl, mtchPhysPrimPart->Eta());
+                    ((TH2F*)arrHistos->At(kJ2_pppClPt_mtchPt))->Fill(fPtCl, mtchPhysPrimPart->Pt());
                     // if electron (ppe)
                     if(isEleOrPos(mtchPhysPrimPart)) {
                         fIdxJEl = idxMtchPhysPrimParts[iCl];
@@ -455,9 +459,9 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
                         fPtJEl = mtchPhysPrimPart->Pt();
                         fEtaJEl = mtchPhysPrimPart->Eta();
                         fPhiJEl = mtchPhysPrimPart->Phi();
-                        ((TH2F*)arrTH2F->At(kJ2_ppeClEn_mtchEn))->Fill(fEnCl, fEnJEl);
-                        ((TH2F*)arrTH2F->At(kJ2_ppeClEta_mtchEta))->Fill(fEtaCl, fEtaJEl);
-                        ((TH2F*)arrTH2F->At(kJ2_ppeClPt_mtchPt))->Fill(fPtCl, fPtJEl);
+                        ((TH2F*)arrHistos->At(kJ2_ppeClEn_mtchEn))->Fill(fEnCl, fEnJEl);
+                        ((TH2F*)arrHistos->At(kJ2_ppeClEta_mtchEta))->Fill(fEtaCl, fEtaJEl);
+                        ((TH2F*)arrHistos->At(kJ2_ppeClPt_mtchPt))->Fill(fPtCl, fPtJEl);
                     }
                 }
                 tOut->Fill();
@@ -473,10 +477,10 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
     TList* lOut1 = new TList(); // TH1F
     TList* lOut2 = new TList(); // TH2F
     TList* lOutP = new TList(); // TProfile
-    // add all histograms to this list
-    for(Int_t i = 0; i < nTH1F; i++) if((TH1F*)arrTH1F->At(i)) lOut1->Add((TH1F*)arrTH1F->At(i));
-    for(Int_t i = 0; i < nTH2F; i++) if((TH2F*)arrTH2F->At(i)) lOut2->Add((TH2F*)arrTH2F->At(i));
-    for(Int_t i = 0; i < nTPrf; i++) if((TProfile*)arrTPrf->At(i)) lOutP->Add((TProfile*)arrTPrf->At(i));
+    // add all histograms to the lists
+    for(Int_t i = kFirstTH1F+1; i < kFirstTH2F; i++) if((TH1F*)arrHistos->At(i)) lOut1->Add((TH1F*)arrHistos->At(i));
+    for(Int_t i = kFirstTH2F+1; i < kFirstTPrf; i++) if((TH2F*)arrHistos->At(i)) lOut2->Add((TH2F*)arrHistos->At(i));
+    for(Int_t i = kFirstTPrf+1; i < kAll; i++)   if((TProfile*)arrHistos->At(i)) lOutP->Add((TProfile*)arrHistos->At(i));
     lOut1->Write("lTH1F", TObject::kSingleKey);
     lOut2->Write("lTH2F", TObject::kSingleKey);
     lOutP->Write("lTPrf", TObject::kSingleKey);

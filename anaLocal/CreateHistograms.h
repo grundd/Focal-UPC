@@ -26,14 +26,15 @@ const Int_t nBinsSep = 50;
 const Float_t lowSep = 0.;
 const Float_t uppSep = 100.;
 
-enum kB1 {
-    kB1_mcE = 0,
+enum kGridBox {
+    //* TH1F histograms:
+    kGridBox_firstTH1F = 0,
+    kB1_mcE,
     kB1_mcPt,
-    kB1_all    
-};
-
-enum kB2 {
-    kB2_clMcDX_clMcDY = 0,
+    kB1_all,
+    //* TH2F histograms:
+    kGridBox_firstTH2F,
+    kB2_clMcDX_clMcDY,
     kB2_mcE_clMcSep,
     kB2_clMaxClDX_clMaxClDY,
     kB2_mcE_clMaxClSep,
@@ -43,17 +44,17 @@ enum kB2 {
     kB2_clE_mcE,
     kB2_totE_mcE,
     kB2_maxClE_mcE,
-    kB2_all
-};
-
-enum kBP {
-    kBP_totE_mcE = 0,
+    //* TProfile histograms:
+    kGridBox_firstTPrf,
+    kBP_totE_mcE,
     kBP_maxClE_mcE,
-    kBP_all
+    kGridBox_all
 };
 
-enum kJ1 {
-    kJ1_clZ = 0,
+enum kGridJpsi {
+    //* TH1F histograms:
+    kGridJpsi_firstTH1F = 0,
+    kJ1_clZ,
     // MC J/psi
     kJ1_mcJEn,
     kJ1_mcJPt,
@@ -64,12 +65,10 @@ enum kJ1 {
     kJ1_mcJElPairPt,
     kJ1_mcJElPairRap,
     kJ1_mcJElPairM,
-    kJ1_all
-};
-
-enum kJ2 {
+    //* TH2F histograms:
+    kGridJpsi_firstTH2F,
     // MC J/psi kinematics
-    kJ2_mcJRap_mcJPt = 0,
+    kJ2_mcJRap_mcJPt,
     // ppe kinematics
     kJ2_mcJElEta_mcJElPt,
     kJ2_mcJEl1En_mcJEl2En,
@@ -85,34 +84,53 @@ enum kJ2 {
     kJ2_ppeClEn_mtchEn,
     kJ2_ppeClEta_mtchEta,
     kJ2_ppeClPt_mtchPt,
-    kJ2_all
+    //* TProfile histograms:
+    kGridJpsi_firstTPrf,
+    kGridJpsi_all
 };
 
-enum kJP {
-    kJP_all = 0
+enum kMainJpsi {
+    //* TH1F histograms
+    kMainJpsi_firstTH1F = 0,
+    // cluster pairs
+    kJ1_clPairEn,
+    kJ1_clPairPt,
+    kJ1_clPairPt_massCut,
+    kJ1_clPairRap,
+    kJ1_clPairM,
+    kJ1_clPairSep,
+    // matched cl. pairs
+    kJ1_ppeClPairM,
+    kJ1_ppeClPairSep,
+    kJ1_sameppeClPairSep,
+    //* TH2F histograms:
+    kMainJpsi_firstTH2F,
+    // cluster pairs vs ppe pairs
+    kJ2_ppeClPairEn_mtchEn,
+    kJ2_ppeClPairRap_mtchRap,
+    kJ2_ppeClPairPt_mtchPt,
+    kJ2_ppeClPairM_mtchM,
+    kJ2_clPairSep_mcJElSep,
+    //* TProfile histograms:
+    kMainJpsi_firstTPrf,
+    kMainJpsi_all
 };
 
 // ******************************************************************************************************************
-// for analyses of box electron/photon: events:
+// GRID analysis -> box electron/photon events:
 // ******************************************************************************************************************
 
-void Bx_DefineTH1F(TObjArray* objArr)
+void CreateHistos_GridBox(TObjArray* objArr)
 {
     objArr->SetOwner();
-
+    //* TH1F histograms:
     TH1F* hB1_mcE = new TH1F("hB1_mcE","",nBinsEn,lowEn,uppEn);
                     hB1_mcE->SetTitle("#it{E} of generated electron;#it{E}_{MC} [GeV];counts");
                     objArr->AddAt(hB1_mcE, kB1_mcE);
     TH1F* hB1_mcPt = new TH1F("hB1_mcPt","",40,lowPt,uppPt);
                     hB1_mcPt->SetTitle("#it{p}_{T} of generated electron;#it{p}_{T} [GeV/#it{c}];counts");
                     objArr->AddAt(hB1_mcPt, kB1_mcPt);
-    return;
-}
-
-void Bx_DefineTH2F(TObjArray* objArr)
-{
-    objArr->SetOwner();
-
+    //* TH2F histograms:
     // cluster XY position vs that of ppe / cluster with maximum energy
     TH2F* hB2_clMcDX_clMcDY = new TH2F("hB2_clMcDX_clMcDY","",100,-20.,20.,100,-20.,20.);
                     hB2_clMcDX_clMcDY->SetTitle("Distance (in the XY plane) between the cluster and the MC track;#Delta#it{x} = #it{x}_{cl} - #it{x}_{MC} [cm];#Delta#it{y} = #it{y}_{cl} - #it{y}_{MC} [cm]");
@@ -145,13 +163,7 @@ void Bx_DefineTH2F(TObjArray* objArr)
     TH2F* hB2_maxClE_mcE = new TH2F("hB2_maxClE_mcE","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
                     hB2_maxClE_mcE->SetTitle("(#it{E}_{cl,max}, #it{E}_{MC});#it{E}_{cl,max} [GeV];#it{E}_{MC} [GeV]");
                     objArr->AddAt(hB2_maxClE_mcE, kB2_maxClE_mcE);
-    return;
-}
-
-void Bx_DefineTPrf(TObjArray* objArr)
-{
-    objArr->SetOwner();
-
+    //* TProfile histograms:
     TProfile* hBP_totE_mcE = new TProfile("hBP_totE_mcE","",nBinsEn,lowEn,uppEn,lowEn,uppEn);
                     hBP_totE_mcE->SetTitle("(#it{E}_{total}, #it{E}_{MC});#it{E}_{total} [GeV];#it{E}_{MC} [GeV]");
                     objArr->AddAt(hBP_totE_mcE, kBP_totE_mcE);
@@ -162,12 +174,13 @@ void Bx_DefineTPrf(TObjArray* objArr)
 }
 
 // ******************************************************************************************************************
-// for analyses of J/psi events:
+// GRID analysis -> STARlight J/psi simulations:
 // ******************************************************************************************************************
 
-void Jp_DefineTH1F(TObjArray* objArr)
+void CreateHistos_GridJpsi(TObjArray* objArr)
 {
     objArr->SetOwner();
+    //* TH1F histograms:
     TH1F* hJ1_clZ = new TH1F("hJ1_clZ","",60,700.,715.);
                     hJ1_clZ->SetTitle("#it{z} coordinate of FoCal clusters;#it{z}_{cl} [cm];counts");
                     objArr->AddAt(hJ1_clZ, kJ1_clZ);
@@ -198,12 +211,7 @@ void Jp_DefineTH1F(TObjArray* objArr)
     TH1F* hJ1_mcJElPairM = new TH1F("hJ1_mcJElPairM","",nBinsM,lowM,uppM);
                     hJ1_mcJElPairM->SetTitle("#it{m} of pairs of pp electrons;#it{m}_{ppe pair} [GeV/#it{c}^{2}];counts");
                     objArr->AddAt(hJ1_mcJElPairM, kJ1_mcJElPairM);
-    return;
-}
-
-void Jp_DefineTH2F(TObjArray* objArr)
-{
-    objArr->SetOwner();
+    //* TH2F histograms:
     // correlation of MC kinematics
     // J/psi
     TH2F* hJ2_mcJRap_mcJPt = new TH2F("hJ2_mcJRap_mcJPt","",nBinsYEta,lowYEta,uppYEta,nBinsPt,lowPt,uppPt);
@@ -247,12 +255,64 @@ void Jp_DefineTH2F(TObjArray* objArr)
     TH2F* hJ2_ppeClPt_mtchPt = new TH2F("hJ2_ppeClPt_mtchPt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
                     hJ2_ppeClPt_mtchPt->SetTitle("#it{p}_{T} of a cluster matched with a pp electron vs #it{p}_{T} of ppe;#it{p}_{T,cl} [GeV/#it{c}];#it{p}_{T,matched ppe^{#pm}} [GeV/#it{c}]");
                     objArr->AddAt(hJ2_ppeClPt_mtchPt, kJ2_ppeClPt_mtchPt);
+    //* TProfile histograms:
     return;
 }
 
-void Jp_DefineTPrf(TObjArray* objArr)
+// ******************************************************************************************************************
+// Main analysis -> STARlight J/psi simulations:
+// ******************************************************************************************************************
+
+void CreateHistos_MainJpsi(TObjArray* objArr)
 {
     objArr->SetOwner();
-
+    //* TH1F histograms:
+    // cluster pair kinematics
+    TH1F* hJ1_clPairEn = new TH1F("hJ1_clPairEn","",nBinsEn,lowEn,uppEn);
+                    hJ1_clPairEn->SetTitle("#it{E} of cluster pairs;#it{E}_{cl pair} [GeV];counts");
+                    objArr->AddAt(hJ1_clPairEn, kJ1_clPairEn);
+    TH1F* hJ1_clPairPt = new TH1F("hJ1_clPairPt","",nBinsPt,lowPt,uppPt);
+                    hJ1_clPairPt->SetTitle("#it{p}_{T} of cluster pairs;#it{p}_{T,cl pair} [GeV/#it{c}];counts");
+                    objArr->AddAt(hJ1_clPairPt, kJ1_clPairPt);
+    TH1F* hJ1_clPairPt_massCut = new TH1F("hJ1_clPairPt_massCut","",nBinsPt,lowPt,uppPt);
+                    hJ1_clPairPt_massCut->SetTitle("#it{p}_{T} of cluster pairs with #it{m} > 2.8 GeV/#it{c}^{2};#it{p}_{T,cl pair} [GeV/#it{c}];counts");
+                    objArr->AddAt(hJ1_clPairPt_massCut, kJ1_clPairPt_massCut);
+    TH1F* hJ1_clPairM = new TH1F("hJ1_clPairM","",nBinsM,lowM,uppM);
+                    hJ1_clPairM->SetTitle("#it{m} of cluster pairs;#it{m}_{cl pair} [GeV/#it{c}^{2}];counts");
+                    objArr->AddAt(hJ1_clPairM, kJ1_clPairM);
+    TH1F* hJ1_clPairRap = new TH1F("hJ1_clPairRap","",nBinsYEta,lowYEta,uppYEta);
+                    hJ1_clPairRap->SetTitle("rapidity of cluster pairs;#it{y}_{cl pair} [-];counts");
+                    objArr->AddAt(hJ1_clPairRap, kJ1_clPairRap);
+    TH1F* hJ1_clPairSep = new TH1F("hJ1_clPairSep","",nBinsSep,lowSep,uppSep);
+                    hJ1_clPairSep->SetTitle("Radial separation of cluster pairs;#Delta#it{R}_{cl pair} [cm];counts");
+                    objArr->AddAt(hJ1_clPairSep, kJ1_clPairSep);
+    // cluster pairs matched with ppe pairs
+    TH1F* hJ1_ppeClPairM = new TH1F("hJ1_ppeClPairM","",nBinsM,lowM,uppM);
+                    hJ1_ppeClPairM->SetTitle("#it{m} of cluster pairs matched with a pair of pp electrons;#it{m}_{matched cl pair} [GeV/#it{c}^{2}];counts");
+                    objArr->AddAt(hJ1_ppeClPairM, kJ1_ppeClPairM);
+    TH1F* hJ1_ppeClPairSep = new TH1F("hJ1_ppeClPairSep","",nBinsSep,lowSep,uppSep);
+                    hJ1_ppeClPairSep->SetTitle("Radial separation of cluster pairs matched with a pair of pp electrons;#Delta#it{R}_{matched cl pair} [cm];counts");
+                    objArr->AddAt(hJ1_ppeClPairSep, kJ1_ppeClPairSep);
+    TH1F* hJ1_sameppeClPairSep = new TH1F("hJ1_sameppeClPairSep","",nBinsSep,lowSep,uppSep);
+                    hJ1_sameppeClPairSep->SetTitle("Radial separation of cluster pairs matched with the same pp electron;#Delta#it{R}_{matched cl pair} [cm];counts");
+                    objArr->AddAt(hJ1_sameppeClPairSep, kJ1_sameppeClPairSep);
+    //* TH2F histograms:
+    // in the following, "cluster" denotes a prefiltered cluster
+    // cluster pair kinematics vs kinematics of matched ppe pair
+    TH2F* hJ2_ppeClPairEn_mtchEn = new TH2F("hJ2_ppeClPairEn_mtchEn","",nBinsEn,lowEn,uppEn,nBinsEn,lowEn,uppEn);
+                    hJ2_ppeClPairEn_mtchEn->SetTitle("energy of a cluster pair matched with a pair of pp electrons vs energy of ppe pair;#it{E}_{cl pair} [GeV];#it{E}_{matched ppe pair} [GeV]");
+                    objArr->AddAt(hJ2_ppeClPairEn_mtchEn, kJ2_ppeClPairEn_mtchEn);
+    TH2F* hJ2_ppeClPairRap_mtchRap = new TH2F("hJ2_ppeClPairRap_mtchRap","",nBinsYEta,lowYEta,uppYEta,nBinsYEta,lowYEta,uppYEta);
+                    hJ2_ppeClPairRap_mtchRap->SetTitle("#it{y} of a cluster pair matched with a pair of pp electrons vs #it{y} of ppe pair;#it{y}_{cl pair} [-];#it{y}_{matched ppe pair} [-]");
+                    objArr->AddAt(hJ2_ppeClPairRap_mtchRap, kJ2_ppeClPairRap_mtchRap);
+    TH2F* hJ2_ppeClPairPt_mtchPt = new TH2F("hJ2_ppeClPairPt_mtchPt","",nBinsPt,lowPt,uppPt,nBinsPt,lowPt,uppPt);
+                    hJ2_ppeClPairPt_mtchPt->SetTitle("#it{p}_{T} of a cluster pair matched with a pair of pp electrons vs #it{p}_{T} of ppe pair;#it{p}_{T,cl pair} [GeV/#it{c}];#it{p}_{T,matched ppe pair} [GeV/#it{c}]");
+                    objArr->AddAt(hJ2_ppeClPairPt_mtchPt, kJ2_ppeClPairPt_mtchPt);
+    TH2F* hJ2_ppeClPairM_mtchM = new TH2F("hJ2_ppeClPairM_mtchM","",nBinsM,lowM,uppM,nBinsM,lowM,uppM);
+                    hJ2_ppeClPairM_mtchM->SetTitle("#it{m} of a cluster pair matched with a pair of pp electrons vs #it{m} of ppe pair;#it{m}_{cl pair} [GeV/#it{c}];#it{m}_{matched ppe pair} [GeV/#it{c}]");
+                    objArr->AddAt(hJ2_ppeClPairM_mtchM, kJ2_ppeClPairM_mtchM);
+    TH2F* hJ2_clPairSep_mcJElSep = new TH2F("hJ2_clPairSep_mcJElSep","",nBinsSep,lowSep,uppSep,nBinsSep,lowSep,uppSep);
+                    hJ2_clPairSep_mcJElSep->SetTitle("Radial separation of cluster pairs vs radial separation of ppe pair;#Delta#it{R}_{cl pair} [cm];#Delta#it{R}_{ppe pair} [cm]");
+                    objArr->AddAt(hJ2_clPairSep_mcJElSep, kJ2_clPairSep_mcJElSep);
     return;
 }

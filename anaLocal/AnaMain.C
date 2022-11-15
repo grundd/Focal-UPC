@@ -11,16 +11,17 @@
 #include "ConfigAnalysis.h"
 #include "ConfigParameters.h"
 #include "AnaMain.h"
+#include "CreateHistograms.h"
 
 TString outSubDir = "";
 
 void MergeOutputFiles()
 {
     TFileMerger m;
-    m.OutputFile(Form("%smerged_%sanalysisResults.root",outDir.Data(),outSubDir.Data()));
+    m.OutputFile(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()));
     for(Int_t i = 0; i < nFiles; i++) 
     {
-        TString sFile = Form("%s%03i/%sanalysisResults.root",outDir.Data(),i+1,outSubDir.Data());
+        TString sFile = Form("%s%03i/%sanalysisResultsGrid.root",outDir.Data(),i+1,outSubDir.Data());
         cout << "Adding file: " << sFile << endl;
         m.AddFile(Form("%s",sFile.Data()));
     }
@@ -76,10 +77,10 @@ void PrintHistograms(TString sFile)
     return;
 }
 
-void AnalyzeClPairs(TString sDir, Bool_t debug = kFALSE)
+void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
 {
     // access input file
-    TFile* f = TFile::Open(sDir + "analysisResults.root", "read");
+    TFile* f = TFile::Open(sDir + "analysisResultsGrid.root", "read");
     if(f) Printf("File %s loaded.", f->GetName());
     TTree* tCls = dynamic_cast<TTree*>(f->Get("tCls"));
     if(tCls) Printf("Tree %s loaded.", tCls->GetName());
@@ -96,21 +97,26 @@ void AnalyzeClPairs(TString sDir, Bool_t debug = kFALSE)
         cout << "\n";
     }
 
+    // array with output histograms
+    TObjArray* arrHistos = NULL;
+    arrHistos = new TObjArray(kMainJpsi_all);
+    CreateHistos_MainJpsi(arrHistos);
+
     // create output file containing a tree of cl pairs
     Float_t fEnClPair, fPtClPair, fEtaClPair, fPhiClPair;
     Float_t fEnJElPair, fPtJElPair, fEtaJElPair, fPhiJElPair;
-    TFile* fClPairs = new TFile(sDir + "tClPairs.root","RECREATE");
-    TTree* tClPairs = new TTree("tClPairs", "output tree containing cluster pairs");
+    TFile* fOut = new TFile(sDir + "analysisResultsMain.root","RECREATE");
+    TTree* tOut = new TTree("tClPairs", "output tree containing cluster pairs");
     // pairs of summed clusters/superclusters
-    tClPairs->Branch("fEnClPair", &fEnClPair, "fEnClPair/F");
-    tClPairs->Branch("fPtClPair", &fPtClPair, "fPtClPair/F");
-    tClPairs->Branch("fEtaClPair", &fEtaClPair, "fEtaClPair/F");
-    tClPairs->Branch("fPhiClPair", &fPhiClPair, "fPhiClPair/F");
+    tOut->Branch("fEnClPair", &fEnClPair, "fEnClPair/F");
+    tOut->Branch("fPtClPair", &fPtClPair, "fPtClPair/F");
+    tOut->Branch("fEtaClPair", &fEtaClPair, "fEtaClPair/F");
+    tOut->Branch("fPhiClPair", &fPhiClPair, "fPhiClPair/F");
     // pairs of J/psi electrons (if cluster pairs was matched with it)
-    tClPairs->Branch("fEnJElPair", &fEnJElPair, "fEnJElPair/F");
-    tClPairs->Branch("fPtJElPair", &fPtJElPair, "fPtJElPair/F");
-    tClPairs->Branch("fEtaJElPair", &fEtaJElPair, "fEtaJElPair/F");
-    tClPairs->Branch("fPhiJElPair", &fPhiJElPair, "fPhiJElPair/F");
+    tOut->Branch("fEnJElPair", &fEnJElPair, "fEnJElPair/F");
+    tOut->Branch("fPtJElPair", &fPtJElPair, "fPtJElPair/F");
+    tOut->Branch("fEtaJElPair", &fEtaJElPair, "fEtaJElPair/F");
+    tOut->Branch("fPhiJElPair", &fPhiJElPair, "fPhiJElPair/F");
     gROOT->cd();
 
     // loop over entries in the tree
@@ -188,6 +194,7 @@ void AnalyzeClPairs(TString sDir, Bool_t debug = kFALSE)
                 fPtClPair = Cl12.Pt();
                 fEtaClPair = Cl12.Eta();
                 fPhiClPair = Cl12.Phi();
+                Float_t clPairM = Cl12.M();
                 // add the momentum vector of the two electrons
                 TLorentzVector El12 = *El1 + *El2;
                 // electron pair kinematics -> tree
@@ -195,93 +202,65 @@ void AnalyzeClPairs(TString sDir, Bool_t debug = kFALSE)
                 fPtJElPair = El12.Pt();
                 fEtaJElPair = El12.Eta();
                 fPhiJElPair = El12.Phi();
+                // fill some kinematic histograms
+                ((TH1F*)arrHistos->At(kJ1_clPairEn))->Fill(fEnClPair);
+                ((TH1F*)arrHistos->At(kJ1_clPairPt))->Fill(fPtClPair);
+                if(clPairM > 2.8) ((TH1F*)arrHistos->At(kJ1_clPairPt_massCut))->Fill(fPtClPair);
+                ((TH1F*)arrHistos->At(kJ1_clPairRap))->Fill(Cl12.Rapidity());
+                ((TH1F*)arrHistos->At(kJ1_clPairM))->Fill(clPairM);
+                // radial separation between the pairs of clusters
+                /*
+                Float_t sepCl = TMath::Sqrt(TMath::Power(xCl1-xCl2,2) + TMath::Power(yCl1-yCl2,2));
+                ((TH1F*)arrTH1F->At(kJ1_clPairSep))->Fill(sepCl);
+                // radial separation between cluster pair vs between the pair of ppe
+                Float_t x1(0.), y1(0.);
+                TrackCoordinatesAtZ(ppEl1,zCl1,x1,y1);
+                Float_t x2(0.), y2(0.);
+                TrackCoordinatesAtZ(ppEl2,zCl2,x2,y2);
+                Float_t sepMC = TMath::Sqrt(TMath::Power(x1-x2,2) + TMath::Power(y1-y2,2));
+                ((TH2F*)arrTH2F->At(kJ2_clPairSep_mcJElSep))->Fill(sepCl,sepMC);
+                */
                 // if both clusters are paired to a different physical primary electron
                 if(idxMtchJEl[iCl1] != idxMtchJEl[iCl2]) {
-
+                    ((TH1F*)arrHistos->At(kJ1_ppeClPairM))->Fill(clPairM);
+                    //((TH1F*)arrHistos->At(kJ1_ppeClPairSep))->Fill(sepCl); 
+                    ((TH2F*)arrHistos->At(kJ2_ppeClPairEn_mtchEn))->Fill(fEnClPair,fEnJElPair);
+                    ((TH2F*)arrHistos->At(kJ2_ppeClPairRap_mtchRap))->Fill(Cl12.Rapidity(),El12.Rapidity());
+                    ((TH2F*)arrHistos->At(kJ2_ppeClPairPt_mtchPt))->Fill(fPtClPair,fPtJElPair);
+                    ((TH2F*)arrHistos->At(kJ2_ppeClPairM_mtchM))->Fill(clPairM,El12.M());
+                } else {
+                    //((TH1F*)arrHistos->At(kJ1_sameppeClPairSep))->Fill(sepCl); 
                 }
-                tClPairs->Fill();
+                tOut->Fill();
             }
         }
         // increase the iterator for the next cluster that will be loaded
         iCl++;
     }
+
+    fOut->cd();
+    // output list with histograms
+    TList* lOut1 = new TList(); // TH1F
+    TList* lOut2 = new TList(); // TH2F
+    TList* lOutP = new TList(); // TProfile
+    // add all histograms to the lists
+    for(Int_t i = kMainJpsi_firstTH1F+1; i < kMainJpsi_firstTH2F; i++) if((TH1F*)arrHistos->At(i)) lOut1->Add((TH1F*)arrHistos->At(i));
+    for(Int_t i = kMainJpsi_firstTH2F+1; i < kMainJpsi_firstTH2F; i++) if((TH2F*)arrHistos->At(i)) lOut2->Add((TH2F*)arrHistos->At(i));
+    for(Int_t i = kMainJpsi_firstTPrf+1; i < kMainJpsi_all; i++)   if((TProfile*)arrHistos->At(i)) lOutP->Add((TProfile*)arrHistos->At(i));
+    lOut1->Write("lTH1F", TObject::kSingleKey);
+    lOut2->Write("lTH2F", TObject::kSingleKey);
+    lOutP->Write("lTPrf", TObject::kSingleKey);
+    // print file content and close it
+    fOut->ls();
     // save the file with the output tree
-    fClPairs->Write("",TObject::kWriteDelete);
-    delete fClPairs;
+    fOut->Write("",TObject::kWriteDelete);
+    delete fOut;
 
-    /*
-    // combine clusters into pairs
-    for(Int_t iCl1 = 0; iCl1 < nClsPref; iCl1++) 
-    {
-        AliFOCALCluster* clust1 = (AliFOCALCluster*) listClsPref->At(iCl1);
-        if(!clust1) continue;
-        // get energy and coordinates of this cluster
-        Float_t xCl1 = clust1->X();
-        Float_t yCl1 = clust1->Y();
-        Float_t zCl1 = clust1->Z();
-        Float_t ECl1 = clust1->E();
-        TLorentzVector cl1 = ConvertXYZEtoLorVec(xCl1,yCl1,zCl1,ECl1);
-        // go over all possible pairs of clusters
-        for(Int_t iCl2 = iCl1+1; iCl2 < nClsPref; iCl2++) 
-        {
-            AliFOCALCluster* clust2 = (AliFOCALCluster*) listClsPref->At(iCl2);
-            if(!clust2) continue;
-            // get energy and coordinates of this cluster
-            Float_t xCl2 = clust2->X();
-            Float_t yCl2 = clust2->Y();
-            Float_t zCl2 = clust2->Z();
-            Float_t ECl2 = clust2->E();
-            TLorentzVector cl2 = ConvertXYZEtoLorVec(xCl2,yCl2,zCl2,ECl2);
+    return;
+}
 
-            // add the momentum vectors of the two clusters to get the total momentum
-            TLorentzVector cl12 = cl1 + cl2;
-            // cluster pair kinematics -> tree
-            fEnClPair = cl12.Energy();
-            fPtClPair = cl12.Pt();
-            fEtaClPair = cl12.Eta();
-            fPhiClPair = cl12.Phi();
-            Float_t mass = cl12.M();
-            // pp electron pair kinematics -> tree
-            fEnJElPair = -1e3;
-            fPtJElPair = -1e3;
-            fEtaJElPair = -1e3;
-            fPhiJElPair = -1e3;
-            // fill some kinematic histograms
-            ((TH1F*)arrTH1F->At(kJ1_clPairEn))->Fill(fEnClPair);
-            ((TH1F*)arrTH1F->At(kJ1_clPairPt))->Fill(fPtClPair);
-            if(mass > 2.8) ((TH1F*)arrTH1F->At(kJ1_clPairPt_massCut))->Fill(fPtClPair);
-            ((TH1F*)arrTH1F->At(kJ1_clPairRap))->Fill(cl12.Rapidity());
-            ((TH1F*)arrTH1F->At(kJ1_clPairM))->Fill(mass);
-            // radial separation between the pairs of clusters
-            Float_t sepCl = TMath::Sqrt(TMath::Power(xCl1-xCl2,2) + TMath::Power(yCl1-yCl2,2));
-            ((TH1F*)arrTH1F->At(kJ1_clPairSep))->Fill(sepCl);
-            // radial separation between cluster pair vs between the pair of ppe
-            Float_t x1(0.), y1(0.);
-            TrackCoordinatesAtZ(ppEl1,zCl1,x1,y1);
-            Float_t x2(0.), y2(0.);
-            TrackCoordinatesAtZ(ppEl2,zCl2,x2,y2);
-            Float_t sepMC = TMath::Sqrt(TMath::Power(x1-x2,2) + TMath::Power(y1-y2,2));
-            ((TH2F*)arrTH2F->At(kJ2_clPairSep_mcJElSep))->Fill(sepCl,sepMC);
-            // if both paired to a different pp electron:
-            if((idxMtchPhysPrimParts[iCl1] != idxMtchPhysPrimParts[iCl2]) && idxMtchPhysPrimParts[iCl1] != -1 && idxMtchPhysPrimParts[iCl2] != -1)
-            {
-                fEnJElPair = lvJElPair->Energy();
-                fPtJElPair = lvJElPair->Pt();
-                fEtaJElPair = lvJElPair->Eta();
-                fPhiJElPair = lvJElPair->Phi();
-                ((TH1F*)arrTH1F->At(kJ1_ppeClPairM))->Fill(mass);
-                ((TH1F*)arrTH1F->At(kJ1_ppeClPairSep))->Fill(sepCl); 
-                ((TH2F*)arrTH2F->At(kJ2_ppeClPairEn_mtchEn))->Fill(fEnClPair,fEnJElPair);
-                ((TH2F*)arrTH2F->At(kJ2_ppeClPairRap_mtchRap))->Fill(cl12.Rapidity(),lvJElPair->Rapidity());
-                ((TH2F*)arrTH2F->At(kJ2_ppeClPairPt_mtchPt))->Fill(fPtClPair,fPtJElPair);
-                ((TH2F*)arrTH2F->At(kJ2_ppeClPairM_mtchM))->Fill(mass,lvJElPair->M());
-            } else {
-                ((TH1F*)arrTH1F->At(kJ1_sameppeClPairSep))->Fill(sepCl); 
-            }
-            tOutClPairs->Fill();
-        } // end of for over iCl2
-    } // end of for over iCl1
-    */
+void AnalyzeClPairs()
+{
     return;
 }
 
@@ -294,11 +273,14 @@ void AnaMain(TString sim)
     // merge all output files produced by FocalUpcGrid
     MergeOutputFiles();
 
-    // print all histograms from the merged output file
-    PrintHistograms(Form("%smerged_%sanalysisResults.root",outDir.Data(),outSubDir.Data()));
+    // print all histograms from the Grid analysis
+    PrintHistograms(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()));
 
     // open merged output file, go over clusters and create cluster pairs
     // store cluster pairs in a tree
-    //AnalyzeClPairs(Form("%s001/%s",outDir.Data(),outSubDir.Data()),kTRUE);
-    AnalyzeClPairs(Form("%smerged_%s",outDir.Data(),outSubDir.Data()));
+    //PrepareClPairs(Form("%s001/%s",outDir.Data(),outSubDir.Data()),kTRUE);
+    PrepareClPairs(Form("%smerged_%s",outDir.Data(),outSubDir.Data()));
+
+    // print all histograms from the main analysis
+    PrintHistograms(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()));
 }
