@@ -5,21 +5,20 @@
 
 # version as of Nov 09, 2022
 
-sim="cohJpsi"
+sim="bkg"
 
-# calculate rapidity dependence of Starlight cross sections
-# calculate expected yields of J/psi, psi' and Y(1S) in Run 4
+# calculate:
+# - rapidity dependence of Starlight cross sections
+# - expected yields of J/psi, psi' and Y(1S) in Run 4
+# - acceptance in feed-down processes
 if false; then 
     aliroot -q 'StarlightRapDep.C'
 fi
 
-# run primary analysis over all input data for a selected process
+# run primary (grid) and secondary (main) analysis
+# over all input data for a selected process
 if true; then 
     aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$sim'")'
-fi
-
-# run secondary analysis over all input data for a selected process
-if false; then 
     aliroot -q 'AnaMain.C("'$sim'")'
 fi
 

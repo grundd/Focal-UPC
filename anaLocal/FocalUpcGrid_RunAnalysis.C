@@ -7,7 +7,7 @@
 // my headers
 #include "ConfigAnalysis.h"
 
-void FocalUpcGrid_RunAnalysis(Bool_t isLocal, TString sim = "")
+void FocalUpcGrid_RunAnalysis(Bool_t isLocal, TString sim)
 {
     gSystem->Load("libpythia6_4_28.so");
 
@@ -17,9 +17,6 @@ void FocalUpcGrid_RunAnalysis(Bool_t isLocal, TString sim = "")
     if(isLocal)
     {
         ConfigLocalAnalysis(sim);
-        // is it box simulation?
-        Bool_t isBoxSim(kFALSE);
-        if(sim == "boxEle" || sim == "boxPho") isBoxSim = kTRUE;
         // compile the macros
         gROOT->ProcessLine(".L ClusterizeGrid.C");
         gROOT->ProcessLine(".L FocalUpcGrid.C");
@@ -34,13 +31,13 @@ void FocalUpcGrid_RunAnalysis(Bool_t isLocal, TString sim = "")
             TString sClFile = Form("%sfocalClusters.root",sOut.Data());
             if(gSystem->AccessPathName(sClFile.Data()))
             {
-                cout << " MESSAGE: cluster file not found! Runing the clusterizer now." << endl;
+                cout << " MESSAGE: cluster file not found! Running the clusterizer now." << endl;
                 TString sCmd = Form("ClusterizeGrid(kTRUE,\"%s\",\"%s\",\"%s\",\"%s\")",
                     sGeomFile.Data(),sParaFile.Data(),sIn.Data(),sOut.Data());
                 gROOT->ProcessLine(sCmd.Data());
             }
             // run the analysis:
-            TString sCmd = Form("FocalUpcGrid(%i,%i,\"%s\",\"%s\")",isLocal,isBoxSim,sIn.Data(),sOut.Data());
+            TString sCmd = Form("FocalUpcGrid(kTRUE,\"%s\",kFALSE,\"%s\",\"%s\")",sim.Data(),sIn.Data(),sOut.Data());
             gROOT->ProcessLine(sCmd.Data());
         }
         cout << endl << " FINISHED! " << endl;
@@ -55,7 +52,7 @@ void FocalUpcGrid_RunAnalysis(Bool_t isLocal, TString sim = "")
         // run the clusterizer:
         gROOT->ProcessLine(Form(".x ClusterizeGrid.C(kFALSE,\"%s\",\"%s\")",sGeomFile.Data(),sParaFile.Data()));
         // run the analysis:
-        gROOT->ProcessLine(".x FocalUpcGrid.C(kFALSE,kFALSE)");
+        gROOT->ProcessLine(Form(".x FocalUpcGrid.C(kFALSE,\"%s\")",sim.Data()));
         return;
     }
 }

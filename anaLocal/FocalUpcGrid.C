@@ -5,14 +5,32 @@
 #include "FocalUpcGrid.h"
 #include "CreateHistograms.h"
 
-void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOut = "")
+void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString sIn = "", TString sOut = "")
 {
-    TString outSubDir = "";
+    // PDG code of expected mother particle of physical primary electrons in the dataset
+    // (!) in AliDPG notation in feed-down files, the mother of electron pairs is psi', not J/psi
+    // not needed for box simulations
+    Int_t pdgMotherOfPhysPrimEl(-1);
+    if(sim == "cohJpsi" 
+    || sim == "incJpsi") pdgMotherOfPhysPrimEl = 443;
+    else if(sim == "cohFD"  
+         || sim == "incFD" 
+         || sim == "cohPsi2s" 
+         || sim == "incPsi2s") pdgMotherOfPhysPrimEl = 100443;
+
+    // is it box simulation?
+    Bool_t isBoxSim(kFALSE);
+    if(sim == "boxEle" || sim == "boxPho") isBoxSim = kTRUE;
+
     // mass filtering only for J/psi simulations
     if(cutM > 0 && isBoxSim) {
         cout << " ERROR: Cannot do mass cleang for box simulations of electrons/photons. Terminating... " << endl;
+        // terminate:
         return;
     }
+
+    // prepare subdirectory in output directory
+    TString outSubDir = "";
     if(isLocal) 
     {
         outSubDir = CreateOutputSubDir();
@@ -24,6 +42,7 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
     if(gSystem->AccessPathName(sClFile.Data()))
     {
         cout << " ERROR: cluster file not found! Terminating." << endl;
+        // terminate:
         return;
     } 
     // open the file with clusters
@@ -37,6 +56,7 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
     if(!runLoader) 
     {
         cout << " ERROR: AliRunLoader not good! Terminating." << endl;
+        // terminate:
         return;   
     }
     if(!runLoader->GetAliRun()) runLoader->LoadgAlice();
@@ -69,7 +89,23 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
 
     // output file
     TString sFile = Form("%s%sanalysisResultsGrid.root",sOut.Data(),outSubDir.Data());
-    TFile* fOut = new TFile(sFile.Data(),"RECREATE");
+    TFile* fOut = NULL;
+    // local analysis: if the output .root file has already been produced,
+    // this dataset won't be analyzed again if the option 'overwrite' is set to kFALSE
+    if(isLocal == kTRUE && overwrite == kFALSE) {
+        cout << sFile << ":" << endl;
+        // output file not found:
+        if(gSystem->AccessPathName(sFile.Data())) cout << " MESSAGE: output file not found! Runing the analysis now:" << endl;
+        // output file found:
+        else {
+            cout << " MESSAGE: output file found. Using previous results..." << endl;
+            // terminate:
+            runLoader->Delete();
+            return;
+        }
+    }
+    
+    fOut = new TFile(sFile.Data(),"RECREATE");
     // output tree
     TTree* tOut = new TTree("tCls", "output tree containing prefiltered clusters");
     // prefiltered clusters
@@ -377,8 +413,13 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
                 }
                 // if physical primary (pp) electron (i.e., J/psi direct decay product)
                 if(isEleOrPos(part) && stack->IsPhysicalPrimary(iTrk)) {
-                    TParticle* mother = stack->Particle(part->GetMother(0));
-                    if(mother->GetPdgCode() != 443) cout << " * MESSAGE: Unexpected mother of a pp electron." << endl;
+                    // if a mother particle exists:
+                    if(part->GetMother(0) >= 0) {
+                        TParticle* mother = stack->Particle(part->GetMother(0));
+                        // if it doesn't have the expected pdg code:
+                        if(mother->GetPdgCode() != pdgMotherOfPhysPrimEl) 
+                            cout << " * MESSAGE: Unexpected mother of a pp electron." << endl;
+                    }
                     ((TH2F*)arrHistos->At(kJ2_mcJElEta_mcJElPt))->Fill(part->Eta(), part->Pt());
                     ppElectrons.AddLast(part);
                 }
@@ -389,8 +430,10 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
             TLorentzVector* lvJElPair = new TLorentzVector();
             if(ppElectrons.GetEntries() != 2) {
                 cout << "  (!) ERROR: Unexpected number of phys. prim. electrons: " << ppElectrons.GetEntries() << ", terminating..." << endl;
+                // terminate:
                 runLoader->Delete();
                 fCls->Close();
+                delete fCls;
                 return;
             } else {
                 // fill the histogram showing the correlation between energies and transverse momenta of the two pp electrons
@@ -489,8 +532,9 @@ void FocalUpcGrid(Bool_t isLocal, Bool_t isBoxSim, TString sIn = "", TString sOu
     fOut->Write("",TObject::kWriteDelete);
     delete fOut;
 
+    // terminate:
     runLoader->Delete();
     fCls->Close();
-
+    delete fCls;
     return;
 }

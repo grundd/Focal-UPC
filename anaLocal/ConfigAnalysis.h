@@ -22,8 +22,13 @@ TString sParaFile = "";
 // number of available input files for each simulation version (1000 events each):
 const Int_t nBoxEle[2] = {16,16};
 const Int_t nBoxPho[2] = {6, 0};
-const Int_t nCohJpsi[2] = {11,27};
-const Int_t nIncJpsi[2] = {0, 1};
+const Int_t nCohJpsi[2] = {11,61};
+const Int_t nIncJpsi[2] = {0, 29};
+const Int_t nCohFD[2] = {0, 8};
+const Int_t nIncFD[2] = {0, 0};
+const Int_t nBkg[2]   = {0, 9};
+const Int_t nCohPsi2s[2] = {0, 0};
+const Int_t nIncPsi2s[2] = {0, 0};
 Int_t nFiles(0.);
 TString inDir = "";
 TString outDir = "";
@@ -56,8 +61,43 @@ void ConfigLocalAnalysis(TString sim)
         nFiles = nIncJpsi[simFiles-1];
         inDir += "kIncohJpsiToElRad/";
     }
+    // kCohPsi2sToElPi
+    else if(sim == "cohFD") {
+        nFiles = nCohFD[simFiles-1];
+        inDir += "kCohPsi2sToElPi/";
+    }
+    // kIncohPsi2sToElPi
+    else if(sim == "incFD") {
+        nFiles = nIncFD[simFiles-1];
+        inDir += "kIncohPsi2sToElPi/";
+    }
+    // kTwoGammaToElMedium
+    else if(sim == "bkg") {
+        nFiles = nBkg[simFiles-1];
+        inDir += "kTwoGammaToElMedium_etaCut/";
+    }
+    // kCohPsi2sToEl
+    else if(sim == "cohPsi2s") {
+        nFiles = nCohPsi2s[simFiles-1];
+        inDir += "kCohPsi2sToEl/";
+    }
+    // kIncohPsi2sToEl
+    else if(sim == "incPsi2s") {
+        nFiles = nIncPsi2s[simFiles-1];
+        inDir += "kIncohPsi2sToEl/";
+    }
     else {
-        cout << " ERROR: Configuration not supported. Choose between \"boxEle\",\"boxPho\",\"cohJpsi\",\"incJpsi\". Terminating..." << endl;
+        cout << " ERROR: Configuration not supported. Choose between:\n"
+             << "\t\"boxEle\",\n"
+             << "\t\"boxPho\",\n"
+             << "\t\"cohJpsi\",\n"
+             << "\t\"incJpsi\",\n"
+             << "\t\"cohFD\",\n"
+             << "\t\"incFD\",\n"
+             << "\t\"bkg\",\n"
+             << "\t\"cohPsi2s\",\n"
+             << "\t\"incPsi2s\".\n"
+             << "\tTerminating...\n";
         return;
     }
     // set the output folder

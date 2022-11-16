@@ -307,7 +307,7 @@ void AnalyzeFeedDown(Int_t opt)
         l->Add(hRap_accFo);
 
         // go over galice files and fill the histograms
-        for(Int_t iFile = 0; iFile < 6; iFile++)
+        for(Int_t iFile = 0; iFile < 100; iFile++)
         {
             TString galice = Form("inputData/starlight/%s/%03i/galice.root",FD_folder[opt].Data(),iFile+1);
             AliRunLoader* runLoader = AliRunLoader::Open(galice);

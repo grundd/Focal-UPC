@@ -15,7 +15,7 @@
 
 void PrintKinematics() 
 {
-    TString dir = "inputData/starlight/CohFD/"; // add subfolder, if needed
+    TString dir = "inputData/aliDPG_v02/kTwoGammaToElMedium_etaCut/001/"; // add subfolder, if needed
     // get the directory
     TString galiceFile = dir.Data();
     galiceFile += "galice.root";
