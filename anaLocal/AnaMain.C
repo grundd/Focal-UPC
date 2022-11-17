@@ -245,7 +245,7 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
     TList* lOutP = new TList(); // TProfile
     // add all histograms to the lists
     for(Int_t i = kMainJpsi_firstTH1F+1; i < kMainJpsi_firstTH2F; i++) if((TH1F*)arrHistos->At(i)) lOut1->Add((TH1F*)arrHistos->At(i));
-    for(Int_t i = kMainJpsi_firstTH2F+1; i < kMainJpsi_firstTH2F; i++) if((TH2F*)arrHistos->At(i)) lOut2->Add((TH2F*)arrHistos->At(i));
+    for(Int_t i = kMainJpsi_firstTH2F+1; i < kMainJpsi_firstTPrf; i++) if((TH2F*)arrHistos->At(i)) lOut2->Add((TH2F*)arrHistos->At(i));
     for(Int_t i = kMainJpsi_firstTPrf+1; i < kMainJpsi_all; i++)   if((TProfile*)arrHistos->At(i)) lOutP->Add((TProfile*)arrHistos->At(i));
     lOut1->Write("lTH1F", TObject::kSingleKey);
     lOut2->Write("lTH2F", TObject::kSingleKey);

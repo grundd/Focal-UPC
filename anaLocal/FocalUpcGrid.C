@@ -452,6 +452,8 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
                 ((TH1F*)arrHistos->At(kJ1_mcJElPairPt))->Fill(lvJElPair->Pt());
                 ((TH1F*)arrHistos->At(kJ1_mcJElPairRap))->Fill(lvJElPair->Rapidity());
                 ((TH1F*)arrHistos->At(kJ1_mcJElPairM))->Fill(lvJElPair->M());
+                if(3.4 < ppEl1->Eta() && ppEl1->Eta() < 5.8 && 3.4 < ppEl2->Eta() && ppEl2->Eta() < 5.8)
+                    ((TH1F*)arrHistos->At(kJ1_mcJElPairRap_acc))->Fill(lvJElPair->Rapidity());
             }
 
             // match clusters to MC tracks
@@ -486,7 +488,12 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
                 ((TH1F*)arrHistos->At(kJ1_clZ))->Fill(zCl);
                 // fill some histograms with cluster kinematics
                 ((TH2F*)arrHistos->At(kJ2_clEta_clPhi))->Fill(fEtaCl, fPhiCl);
-                ((TH2F*)arrHistos->At(kJ2_clEta_clPt ))->Fill(fEtaCl, fPtCl);
+                ((TH2F*)arrHistos->At(kJ2_clEta_clPt))->Fill(fEtaCl, fPtCl);
+                ((TH2F*)arrHistos->At(kJ2_clX_clY))->Fill(xCl, yCl);
+                ((TH2F*)arrHistos->At(kJ2_clX_clEn))->Fill(xCl, ECl);
+                ((TH2F*)arrHistos->At(kJ2_clY_clEn))->Fill(yCl, ECl);
+                ((TProfile*)arrHistos->At(kJP_clX_clEn))->Fill(xCl, ECl);
+                ((TProfile*)arrHistos->At(kJP_clY_clEn))->Fill(yCl, ECl);
 
                 TParticle* mtchPhysPrimPart = (TParticle*)arrMtchPhysPrimParts[iCl];
                 // if matched to a ppp

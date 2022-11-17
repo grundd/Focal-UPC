@@ -65,8 +65,12 @@ enum kGridJpsi {
     kJ1_mcJElPairPt,
     kJ1_mcJElPairRap,
     kJ1_mcJElPairM,
+    kJ1_mcJElPairRap_acc,
     //* TH2F histograms:
     kGridJpsi_firstTH2F,
+    kJ2_clX_clY,
+    kJ2_clX_clEn,
+    kJ2_clY_clEn,
     // MC J/psi kinematics
     kJ2_mcJRap_mcJPt,
     // ppe kinematics
@@ -86,6 +90,8 @@ enum kGridJpsi {
     kJ2_ppeClPt_mtchPt,
     //* TProfile histograms:
     kGridJpsi_firstTPrf,
+    kJP_clX_clEn,
+    kJP_clY_clEn,
     kGridJpsi_all
 };
 
@@ -211,7 +217,20 @@ void CreateHistos_GridJpsi(TObjArray* objArr)
     TH1F* hJ1_mcJElPairM = new TH1F("hJ1_mcJElPairM","",nBinsM,lowM,uppM);
                     hJ1_mcJElPairM->SetTitle("#it{m} of pairs of pp electrons;#it{m}_{ppe pair} [GeV/#it{c}^{2}];counts");
                     objArr->AddAt(hJ1_mcJElPairM, kJ1_mcJElPairM);
+    // acceptance
+    TH1F* hJ1_mcJElPairRap_acc = new TH1F("hJ1_mcJElPairRap_acc","",30,3.0,6.0);
+                    hJ1_mcJElPairRap_acc->SetTitle("#it{y} of pairs of pp electrons with 3.4 < #eta^{e^{#pm}}< 5.8;#it{y}_{ppe pair} [-];counts");
+                    objArr->AddAt(hJ1_mcJElPairRap_acc, kJ1_mcJElPairRap_acc);
     //* TH2F histograms:
+    TH2F* hJ2_clX_clY = new TH2F("hJ2_clX_clY","",100,-50.,+50.,100,-50.,+50.);
+                    hJ2_clX_clY->SetTitle("(#it{x}, #it{y}) of prefiltered clusters;#it{x}_{cl} [cm];#it{y}_{cl} [cm]");
+                    objArr->AddAt(hJ2_clX_clY, kJ2_clX_clY);
+    TH2F* hJ2_clX_clEn = new TH2F("hJ2_clX_clEn","",100,-50.,+50.,nBinsEn,lowEn,uppEn);
+                    hJ2_clX_clEn->SetTitle("(#it{x}_{cl}, #it{E}_{cl});#it{x}_{cl} [cm];#it{E}_{cl} [GeV]");
+                    objArr->AddAt(hJ2_clX_clEn, kJ2_clX_clEn);
+    TH2F* hJ2_clY_clEn = new TH2F("hJ2_clY_clEn","",100,-50.,+50.,nBinsEn,lowEn,uppEn);
+                    hJ2_clY_clEn->SetTitle("(#it{y}_{cl}, #it{E}_{cl});#it{y}_{cl} [cm];#it{E}_{cl} [GeV]");
+                    objArr->AddAt(hJ2_clY_clEn, kJ2_clY_clEn);
     // correlation of MC kinematics
     // J/psi
     TH2F* hJ2_mcJRap_mcJPt = new TH2F("hJ2_mcJRap_mcJPt","",nBinsYEta,lowYEta,uppYEta,nBinsPt,lowPt,uppPt);
@@ -256,6 +275,12 @@ void CreateHistos_GridJpsi(TObjArray* objArr)
                     hJ2_ppeClPt_mtchPt->SetTitle("#it{p}_{T} of a cluster matched with a pp electron vs #it{p}_{T} of ppe;#it{p}_{T,cl} [GeV/#it{c}];#it{p}_{T,matched ppe^{#pm}} [GeV/#it{c}]");
                     objArr->AddAt(hJ2_ppeClPt_mtchPt, kJ2_ppeClPt_mtchPt);
     //* TProfile histograms:
+    TProfile* hJP_clX_clEn = new TProfile("hJP_clX_clEn","",100,-50.,+50.,lowEn,uppEn);
+                    hJP_clX_clEn->SetTitle("(#it{x}_{cl}, #it{E}_{cl});#it{x}_{cl} [cm];#it{E}_{cl} [GeV]");
+                    objArr->AddAt(hJP_clX_clEn, kJP_clX_clEn);
+    TProfile* hJP_clY_clEn = new TProfile("hJP_clY_clEn","",100,-50.,+50.,lowEn,uppEn);
+                    hJP_clY_clEn->SetTitle("(#it{y}_{cl}, #it{E}_{cl});#it{y}_{cl} [cm];#it{E}_{cl} [GeV]");
+                    objArr->AddAt(hJP_clY_clEn, kJP_clY_clEn);
     return;
 }
 

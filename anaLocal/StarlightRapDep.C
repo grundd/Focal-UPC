@@ -37,13 +37,13 @@ Float_t fTotalCS[7] = {
     83.1
 }; 
 TString SL_label[7] = {
-    "coherent J/#psi",
-    "incoherent J/#psi",
-    "coherent #psi'",
-    "incoherent #psi'",
-    "coherent #Upsilon(1S)",
-    "incoherent #Upsilon(1S)",
-    "medium-mass continuum (1.8 < #it{W} < 15 GeV)",
+    "coh J/#psi #rightarrow e^{+}e^{-}",
+    "inc J/#psi #rightarrow e^{+}e^{-}",
+    "coh #psi' #rightarrow e^{+}e^{-}",
+    "inc #psi' #rightarrow e^{+}e^{-}",
+    "coh #Upsilon(1S) #rightarrow e^{+}e^{-}",
+    "inc #Upsilon(1S) #rightarrow e^{+}e^{-}",
+    "medium-mass continuum (1.8 < #it{W} < 15 GeV): #gamma#gamma #rightarrow e^{+}e^{-}",
 };
 TString SL_folder[7] = {
     "CohJ",
@@ -65,8 +65,8 @@ Float_t fBR[7] = {
 };
 // feed-down:
 TString FD_label[2] = {
-    "FD from coherent psi'",
-    "FD from incoherent psi'"
+    "coh #psi' #rightarrow J/#psi + #pi^{+}#pi^{-} #rightarrow e^{+}e^{-} + #pi^{+}#pi^{-}",
+    "inc #psi' #rightarrow J/#psi + #pi^{+}#pi^{-} #rightarrow e^{+}e^{-} + #pi^{+}#pi^{-}"
 };
 TString FD_folder[2] = {
     "CohFD",
@@ -82,6 +82,16 @@ Float_t roundFloat(Float_t N)
     else if(N > 1e3) divisor = 100;
     else if(N > 1e2) divisor = 10;
     return (Int_t)N - ((Int_t)N % divisor);
+}
+
+TCanvas* CreateCanvas()
+{
+    TCanvas* c = new TCanvas("c","c",700,600);
+    c->SetTopMargin(0.07);
+    c->SetBottomMargin(0.1);
+    c->SetRightMargin(0.02);
+    c->SetLeftMargin(0.12);
+    return c;
 }
 
 void CalculateRapDep(Int_t opt)
@@ -161,7 +171,7 @@ void CalculateRapDep(Int_t opt)
     hRap_CS->Scale(fTotalCS[opt]/hRap_all->Integral(),"width");
     // create the graph
     TGraph* gr = new TGraph(nRapBins);
-    gr->SetTitle(";|#it{y}| [-]; d#sigma/d#it{y} [mb]");
+    gr->SetTitle(";#it{y} [-]; d#sigma/d#it{y} [mb]");
     // graph properties
     gr->SetLineStyle(9);
     gr->SetLineColor(kBlue);
@@ -185,12 +195,7 @@ void CalculateRapDep(Int_t opt)
     // plot it
     gStyle->SetOptStat(0);
     gStyle->SetOptTitle(0);
-    TCanvas* c = new TCanvas("c","c",700,600);
-    //c->SetLogy(); 
-    c->SetTopMargin(0.07);
-    c->SetBottomMargin(0.1);
-    c->SetRightMargin(0.02);
-    c->SetLeftMargin(0.12);
+    TCanvas* c = CreateCanvas();
     gr->Draw("AC");
 
     TLatex* latex = new TLatex();
@@ -247,7 +252,7 @@ void CalculateRapDep(Int_t opt)
     l1->AddEntry((TObject*)0,Form("#sigma(|#it{y}| < 6.0) = %.3f mb", sigmaTotal),"");
     l1->AddEntry((TObject*)0,Form("#sigma(3.4 < |#it{y}| < 5.8) = %.3f mb", sigmaForwd),"");
     l1->AddEntry((TObject*)0,Form("#sigma(3.4 < #it{y} < 5.8) = %.3f mb", sigmaFocal),"");
-    l1->AddEntry((TObject*)0,Form("Acceptance^{[1]}: %.2f %%", N4 / N3 * 1e2),"");
+    l1->AddEntry((TObject*)0,Form("Acc^{[1]}: %.2f %%", N4 / N3 * 1e2),"");
     l1->SetTextSize(0.036);
     l1->SetBorderSize(0);
     l1->SetFillStyle(0);
@@ -257,8 +262,8 @@ void CalculateRapDep(Int_t opt)
     TLegend *l2 = new TLegend(0.58,0.73,0.97,0.93);
     l2->AddEntry((TObject*)0,Form("Run-4 expectations:"),"");
     l2->AddEntry((TObject*)0,Form("#it{L}_{int} (UPC Pb#minusPb): %.1f nb^{#minus1}", fLumiRun4),"");
-    l2->AddEntry((TObject*)0,Form("N(3.4 < |#it{y}^{VM}| < 5.8) #approx %.0f", roundFloat(N_simulate)),"");
-    l2->AddEntry((TObject*)0,Form("N(3.4 < |#it{#eta}^{e^{#pm}}| < 5.8 #approx %.0f", roundFloat(N_yieldFoc)),"");
+    l2->AddEntry((TObject*)0,Form("N(3.4 < #it{y} < 5.8) #approx %.0f", roundFloat(N_simulate)),"");
+    l2->AddEntry((TObject*)0,Form("N(3.4 < #it{#eta}^{e^{#pm}} < 5.8 #approx %.0f", roundFloat(N_yieldFoc)),"");
     l2->SetTextSize(0.036);
     l2->SetBorderSize(0);
     l2->SetFillStyle(0);
@@ -274,8 +279,6 @@ void CalculateRapDep(Int_t opt)
 void AnalyzeFeedDown(Int_t opt)
 {
     Printf("\n*** Process: %s:", FD_label[opt].Data());
-    Int_t nRapBins = (fRapUpp-fRapLow) / fRapStep;
-    Printf("%i rapidity bins will be used.", nRapBins);
 
     TH1F* hRap_all = NULL;
     TH1F* hRap_twoEl = NULL;
@@ -374,6 +377,43 @@ void AnalyzeFeedDown(Int_t opt)
        << " | b -> psi' decayed into J/psi + pi pi -> e e pi pi\n"
        << Form(" fraction (N2 / N1): %.3f\n", frac);
     of.close();
+
+    // draw the histograms
+    TCanvas* c = CreateCanvas();
+    hRap_twoEl->SetTitle(";#it{y}(#psi') [-]; #it{N} [counts]");
+    hRap_twoEl->SetLineColor(kBlue);
+    hRap_twoEl->SetLineWidth(2);
+    hRap_twoEl->GetXaxis()->SetRangeUser(3.0,6.0);
+    hRap_twoEl->GetXaxis()->SetTitleSize(0.042);
+    hRap_twoEl->GetXaxis()->SetLabelSize(0.042);
+    hRap_twoEl->GetYaxis()->SetTitleSize(0.042);
+    hRap_twoEl->GetYaxis()->SetLabelSize(0.042);
+    hRap_twoEl->GetYaxis()->SetDecimals(1);
+    hRap_twoEl->GetYaxis()->SetMaxDigits(3);
+    hRap_twoEl->Draw("HIST");
+    hRap_accFo->SetLineColor(kRed);
+    hRap_accFo->SetLineWidth(2);
+    hRap_accFo->Draw("HIST SAME");
+
+    TLatex* latex = new TLatex();
+    latex->SetTextSize(0.036);
+    latex->SetTextAlign(21);
+    latex->SetNDC();
+    latex->DrawLatex(0.55,0.95,Form("STARlight: %s",FD_label[opt].Data()));
+
+    // legends
+    TLegend *l1 = new TLegend(0.50,0.75,0.90,0.90);
+    l1->AddEntry(hRap_twoEl,"#it{y}(#psi') of generated events","L");
+    l1->AddEntry(hRap_accFo,"#it{y}(#psi') of events with 3.4 < #it{#eta}^{e^{#pm}} < 5.8","L");
+    l1->AddEntry((TObject*)0,Form("Acc^{[1]}: %.2f %%", frac * 1e2),"");
+    l1->SetTextSize(0.036);
+    l1->SetBorderSize(0);
+    l1->SetFillStyle(0);
+    l1->SetMargin(0.);
+    l1->Draw();
+
+    c->Print("results/starlightRapDep/h" + FD_folder[opt] + ".pdf");
+    delete c;
     return;
 }
 

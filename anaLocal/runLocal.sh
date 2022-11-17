@@ -5,7 +5,7 @@
 
 # version as of Nov 09, 2022
 
-sim="bkg"
+sim="cohJpsi"
 
 # calculate:
 # - rapidity dependence of Starlight cross sections
