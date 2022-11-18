@@ -92,6 +92,8 @@ enum kGridJpsi {
     kGridJpsi_firstTPrf,
     kJP_clX_clEn,
     kJP_clY_clEn,
+    kJP_ppeClX_mtchEn,
+    kJP_ppeClY_mtchEn,
     kGridJpsi_all
 };
 
@@ -281,6 +283,12 @@ void CreateHistos_GridJpsi(TObjArray* objArr)
     TProfile* hJP_clY_clEn = new TProfile("hJP_clY_clEn","",100,-50.,+50.,lowEn,uppEn);
                     hJP_clY_clEn->SetTitle("(#it{y}_{cl}, #it{E}_{cl});#it{y}_{cl} [cm];#it{E}_{cl} [GeV]");
                     objArr->AddAt(hJP_clY_clEn, kJP_clY_clEn);
+    TProfile* hJP_ppeClX_mtchEn = new TProfile("hJP_ppeClX_mtchEn","",100,-50.,+50.,lowEn,uppEn);
+                    hJP_ppeClX_mtchEn->SetTitle("(#it{x}_{cl}, #it{E}_{matched ppe^{#pm}});#it{x}_{cl} [cm];#it{E}_{matched ppe^{#pm}} [GeV]");
+                    objArr->AddAt(hJP_ppeClX_mtchEn, kJP_ppeClX_mtchEn);
+    TProfile* hJP_ppeClY_mtchEn = new TProfile("hJP_ppeClY_mtchEn","",100,-50.,+50.,lowEn,uppEn);
+                    hJP_ppeClY_mtchEn->SetTitle("(#it{y}_{cl}, #it{E}_{matched ppe^{#pm}});#it{y}_{cl} [cm];#it{E}_{matched ppe^{#pm}} [GeV]");
+                    objArr->AddAt(hJP_ppeClY_mtchEn, kJP_ppeClY_mtchEn);
     return;
 }
 

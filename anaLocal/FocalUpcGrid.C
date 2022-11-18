@@ -12,6 +12,7 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
     // not needed for box simulations
     Int_t pdgMotherOfPhysPrimEl(-1);
     if(sim == "cohJpsi" 
+    || sim == "cohJpsiNoFIT"
     || sim == "incJpsi") pdgMotherOfPhysPrimEl = 443;
     else if(sim == "cohFD"  
          || sim == "incFD" 
@@ -512,6 +513,8 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
                         ((TH2F*)arrHistos->At(kJ2_ppeClEn_mtchEn))->Fill(fEnCl, fEnJEl);
                         ((TH2F*)arrHistos->At(kJ2_ppeClEta_mtchEta))->Fill(fEtaCl, fEtaJEl);
                         ((TH2F*)arrHistos->At(kJ2_ppeClPt_mtchPt))->Fill(fPtCl, fPtJEl);
+                        ((TProfile*)arrHistos->At(kJP_ppeClX_mtchEn))->Fill(xCl, fEnJEl);
+                        ((TProfile*)arrHistos->At(kJP_ppeClY_mtchEn))->Fill(yCl, fEnJEl);
                     }
                 }
                 tOut->Fill();

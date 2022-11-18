@@ -4,7 +4,7 @@
 // configuration of the FoCal UPC analysis:
 
 // superclusterizer
-Bool_t doSupercls = kTRUE;
+Bool_t doSupercls = kFALSE;
 // if true, create superclusters using:
 const Float_t minSeedE = 5; // [GeV]
 const Float_t radius = 15; // [cm]

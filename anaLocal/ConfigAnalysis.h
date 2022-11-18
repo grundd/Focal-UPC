@@ -23,6 +23,7 @@ TString sParaFile = "";
 const Int_t nBoxEle[2] = {16,16};
 const Int_t nBoxPho[2] = {6, 0};
 const Int_t nCohJpsi[2] = {11,61};
+const Int_t nCohJpsiNoFIT[2] = {0, 3};
 const Int_t nIncJpsi[2] = {0, 29};
 const Int_t nCohFD[2] = {0, 8};
 const Int_t nIncFD[2] = {0, 0};
@@ -55,6 +56,11 @@ void ConfigLocalAnalysis(TString sim)
     else if(sim == "cohJpsi") {
         nFiles = nCohJpsi[simFiles-1];
         inDir += "kCohJpsiToElRad/";
+    }
+    // kCohJpsiToElRad without FIT
+    else if(sim == "cohJpsiNoFIT") {
+        nFiles = nCohJpsiNoFIT[simFiles-1];
+        inDir += "kCohJpsiToElRadNoFIT/";
     }
     // kIncohJpsiToElRad
     else if(sim == "incJpsi") {

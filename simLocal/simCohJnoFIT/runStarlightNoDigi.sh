@@ -4,7 +4,7 @@
 # ./runStarlightNoDigi.sh
 
 # options to set:
-first=81
+first=1
 simulations=10
 last=$(($first+$simulations-1))
 evPerSim=1000
@@ -35,7 +35,7 @@ do
     echo "******************************************"
     echo ""
     # run the simulation:
-    $ALIDPG_ROOT/bin/aliroot_dpgsim.sh --run 294925 --system Pb-Pb --energy 5500.0 --mode sim --detector FOCAL --uid $ranSeed \
+    $ALIDPG_ROOT/bin/aliroot_dpgsim.sh --run 294925 --system Pb-Pb --energy 5500.0 --mode sim --detector FOCALnoFIT --uid $ranSeed \
     --nevents $evPerSim --generator Starlight --process $process --simulation NoDigitization --focalGeometryFile geometry_02.txt \
     --ymin 3.4 --ymax 6.0
     # create a folder to store the results:
