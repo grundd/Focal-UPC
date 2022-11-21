@@ -39,7 +39,7 @@ double IDtoMass(int particleCode)
     else if (particleCode == 5 || particleCode==6) {mass = 0.105658389;} // muon
     else if (particleCode == 8 || particleCode==9)  {mass = 0.13956995;} // charged pion
     else if (particleCode == 7) {mass = 0.1345766;} // neutral pion
-    else if (particleCode == 11|| particleCode==12) {mass = 0.493677;} // charged kaon
+    else if (particleCode == 11 || particleCode==12) {mass = 0.493677;} // charged kaon
     else if (particleCode == 10 || particleCode == 16)  {mass = 0.497614;} // neutral kaon
     else if (particleCode == 14)	{mass = 0.93827231;} // proton
     else {

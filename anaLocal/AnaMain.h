@@ -17,6 +17,7 @@ void DrawHisto1D(TH* h, TString sDir, TH* h2 = NULL)
 {
     TCanvas c("c","c",700,600);
     // canvas settings
+    c.SetLeftMargin(0.11);
     c.SetRightMargin(0.03);
     // x-axis
     h->GetXaxis()->SetDecimals(1);
@@ -34,12 +35,10 @@ void DrawHisto1D(TH* h, TString sDir, TH* h2 = NULL)
     Float_t hMax = h->GetMaximum();
     h->GetYaxis()->SetRangeUser(0.,hMax*1.05);
     // print the histogram
-    TString sName = sDir + h->GetName() + ".pdf";
+    if(h2) h->SetBit(TH1::kNoStats);
     c.cd();
     h->Draw();
     if(h2) {
-        h->SetBit(TH1::kNoTitle);
-        h->SetBit(TH1::kNoStats);
         h2->SetLineColor(kRed+1);
         h2->SetLineWidth(2);
         h2->SetFillColor(kRed);
@@ -47,6 +46,7 @@ void DrawHisto1D(TH* h, TString sDir, TH* h2 = NULL)
         h2->SetFillColorAlpha(kRed,0.3);
         h2->Draw("SAME");
     }
+    TString sName = sDir + h->GetName() + ".pdf";
     c.Print(sName.Data());
     return;
 }
@@ -58,6 +58,7 @@ void DrawHisto2D(TH* h, TString sDir)
     // canvas settings
     c.SetGrid();
     c.SetLogz();
+    c.SetLeftMargin(0.11);
     c.SetRightMargin(0.12);
     // x-axis
     h->GetXaxis()->SetDecimals(1);
@@ -69,9 +70,9 @@ void DrawHisto2D(TH* h, TString sDir)
     Float_t hMax = h->GetMaximum();
     h->GetZaxis()->SetRangeUser(1.,hMax);
     // print the histogram
-    TString sName = sDir + h->GetName() + ".pdf";
     c.cd();
     h->Draw("COLZ");
+    TString sName = sDir + h->GetName() + ".pdf";
     c.Print(sName.Data());
     return;
 }
@@ -82,8 +83,8 @@ void DrawHisto3D(TH* h, TString sDir)
     TCanvas c("c","c",700,600);
     // canvas settings
     c.SetGrid();
-    c.SetRightMargin(0.04);
     c.SetLeftMargin(0.13);
+    c.SetRightMargin(0.04);
     // x-axis
     h->GetXaxis()->SetTitleOffset(1.8);
     // y-axis
@@ -97,9 +98,9 @@ void DrawHisto3D(TH* h, TString sDir)
     Float_t hMax = h->GetMaximum();
     h->GetZaxis()->SetRangeUser(0.,hMax);
     // print the histogram
-    TString sName = sDir + h->GetName() + ".pdf";
     c.cd();
     h->Draw("SURF1");
+    TString sName = sDir + h->GetName() + ".pdf";
     c.Print(sName.Data());
     return;
 }

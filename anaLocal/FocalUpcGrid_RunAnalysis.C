@@ -37,7 +37,7 @@ void FocalUpcGrid_RunAnalysis(Bool_t isLocal, TString sim)
                 gROOT->ProcessLine(sCmd.Data());
             }
             // run the analysis:
-            TString sCmd = Form("FocalUpcGrid(kTRUE,\"%s\",kTRUE,\"%s\",\"%s\")",sim.Data(),sIn.Data(),sOut.Data());
+            TString sCmd = Form("FocalUpcGrid(kTRUE,\"%s\",kFALSE,\"%s\",\"%s\")",sim.Data(),sIn.Data(),sOut.Data());
             gROOT->ProcessLine(sCmd.Data());
         }
         cout << endl << " FINISHED! " << endl;

@@ -25,7 +25,7 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
 
     // mass filtering only for J/psi simulations
     if(cutM > 0 && isBoxSim) {
-        cout << " ERROR: Cannot do mass cleang for box simulations of electrons/photons. Terminating... " << endl;
+        cout << " ERROR: Cannot do mass cleaning for box simulations of electrons/photons. Terminating... " << endl;
         // terminate:
         return;
     }

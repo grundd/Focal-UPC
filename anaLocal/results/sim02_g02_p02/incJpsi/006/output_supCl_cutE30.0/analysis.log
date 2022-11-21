@@ -89,8 +89,8 @@ Ev 20:
   after energy cut: 1
 Ev 21:
   summed cls: 3
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 22:
   summed cls: 3
   identified supercls: 1
@@ -293,8 +293,8 @@ Ev 71:
   after energy cut: 1
 Ev 72:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 73:
   summed cls: 1
   identified supercls: 0
@@ -325,8 +325,8 @@ Ev 79:
   after energy cut: 1
 Ev 80:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 81:
   summed cls: 4
   identified supercls: 1
@@ -537,8 +537,8 @@ Ev 132:
   after energy cut: 1
 Ev 133:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 134:
   summed cls: 1
   identified supercls: 1
@@ -649,8 +649,8 @@ Ev 160:
   after energy cut: 1
 Ev 161:
   summed cls: 2
-  identified supercls: 2
-  after energy cut: 2
+  identified supercls: 1
+  after energy cut: 1
 Ev 162:
   summed cls: 0
   identified supercls: 0
@@ -697,8 +697,8 @@ Ev 172:
   after energy cut: 1
 Ev 173:
   summed cls: 1
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 174:
   summed cls: 5
   identified supercls: 2
@@ -949,8 +949,8 @@ Ev 235:
   after energy cut: 2
 Ev 236:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 237:
   summed cls: 5
   identified supercls: 1
@@ -1149,8 +1149,8 @@ Ev 285:
   after energy cut: 0
 Ev 286:
   summed cls: 2
-  identified supercls: 2
-  after energy cut: 2
+  identified supercls: 1
+  after energy cut: 1
 Ev 287:
   summed cls: 2
   identified supercls: 0
@@ -1197,8 +1197,8 @@ Ev 297:
   after energy cut: 0
 Ev 298:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 299:
   summed cls: 1
   identified supercls: 0
@@ -1881,8 +1881,8 @@ Ev 468:
   after energy cut: 1
 Ev 469:
   summed cls: 2
-  identified supercls: 2
-  after energy cut: 2
+  identified supercls: 1
+  after energy cut: 1
 Ev 470:
   summed cls: 3
   identified supercls: 1
@@ -1937,8 +1937,8 @@ Ev 482:
   after energy cut: 1
 Ev 483:
   summed cls: 5
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 484:
   summed cls: 2
   identified supercls: 2
@@ -2041,8 +2041,8 @@ Ev 508:
   after energy cut: 1
 Ev 509:
   summed cls: 3
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 510:
   summed cls: 4
   identified supercls: 1
@@ -2541,8 +2541,8 @@ Ev 633:
   after energy cut: 0
 Ev 634:
   summed cls: 3
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 635:
   summed cls: 3
   identified supercls: 1
@@ -2785,8 +2785,8 @@ Ev 694:
   after energy cut: 0
 Ev 695:
   summed cls: 1
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 696:
   summed cls: 2
   identified supercls: 1
@@ -2893,8 +2893,8 @@ Ev 721:
   after energy cut: 0
 Ev 722:
   summed cls: 1
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 723:
   summed cls: 3
   identified supercls: 2
@@ -2993,8 +2993,8 @@ Ev 746:
   after energy cut: 1
 Ev 747:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 748:
   summed cls: 1
   identified supercls: 1
@@ -3313,8 +3313,8 @@ Ev 826:
   after energy cut: 1
 Ev 827:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 828:
   summed cls: 2
   identified supercls: 2
@@ -3713,8 +3713,8 @@ Ev 926:
   after energy cut: 1
 Ev 927:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 928:
   summed cls: 2
   identified supercls: 1

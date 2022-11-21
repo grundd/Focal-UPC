@@ -307,7 +307,7 @@ void CreateHistos_GridJpsi(TObjArray* objArr)
                     hJP2_clX_clY_clEn->GetZaxis()->SetTitle("#it{E}_{cl} [GeV]");
                     objArr->AddAt(hJP2_clX_clY_clEn, kJP2_clX_clY_clEn);
     TProfile2D* hJP2_ppeClX_ppeClY_mtchEn = new TProfile2D("hJP2_ppeClX_ppeClY_mtchEn","",nBinsXY,lowXY,uppXY,nBinsXY,lowXY,uppXY);
-                    hJP2_ppeClX_ppeClY_mtchEn->SetTitle("Energy of pp electrons matched with clusters vs (#it{x}_{cl}, #it{y}_{cl});#it{x}_{cl} [cm];#it{y}_{cl} [cm]");
+                    hJP2_ppeClX_ppeClY_mtchEn->SetTitle("Energy of physical primary electrons matched with clusters vs (#it{x}_{cl}, #it{y}_{cl});#it{x}_{cl} [cm];#it{y}_{cl} [cm]");
                     hJP2_ppeClX_ppeClY_mtchEn->GetZaxis()->SetTitle("#it{E}_{matched ppe^{#pm}} [GeV]");
                     objArr->AddAt(hJP2_ppeClX_ppeClY_mtchEn, kJP2_ppeClX_ppeClY_mtchEn);
     return;

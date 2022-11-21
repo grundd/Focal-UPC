@@ -6,6 +6,8 @@
 #include "TFileMerger.h"
 #include "TFile.h"
 #include "TList.h"
+#include "TCollection.h"
+#include "TObject.h"
 #include "TLorentzVector.h"
 // my headers
 #include "ConfigAnalysis.h"
@@ -93,10 +95,12 @@ void DrawHistograms(TString sFile)
     // draw XY energy distribution: clusters vs MC
     if(hJP_ppeClX_mtchEn) {
         hJP_ppeClX_mtchEn->SetName("h_XEnDist_ClvsMC");
+        hJP_ppeClX_mtchEn->SetTitle("X-profile of energy distributions: matched MC tracks (blue) vs clusters (red);#it{x}_{cl};#it{E} [GeV]");
         DrawHisto1D(hJP_ppeClX_mtchEn,sOut,hJP_clX_clEn);
     }
     if(hJP_ppeClY_mtchEn) {
         hJP_ppeClY_mtchEn->SetName("h_YEnDist_ClvsMC");
+        hJP_ppeClY_mtchEn->SetTitle("Y-profile of energy distributions: matched MC tracks (blue) vs clusters (red);#it{y}_{cl};#it{E} [GeV]");
         DrawHisto1D(hJP_ppeClY_mtchEn,sOut,hJP_clY_clEn);
     }
 
@@ -218,14 +222,14 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
             TLorentzVector* El1 = (TLorentzVector*)lEls.At(iCl1);
             if(!El1) continue;     
             // go over all possible pairs of clusters
-            for(Int_t iClTH2F = iCl1+1; iClTH2F < nClThisEvent; iClTH2F++) 
+            for(Int_t iCl2 = iCl1+1; iCl2 < nClThisEvent; iCl2++) 
             {
-                TLorentzVector* ClTH2F = (TLorentzVector*)lCls.At(iClTH2F);
-                if(!ClTH2F) continue;
-                TLorentzVector* ElTH2F = (TLorentzVector*)lEls.At(iClTH2F);
-                if(!ElTH2F) continue;
+                TLorentzVector* Cl2 = (TLorentzVector*)lCls.At(iCl2);
+                if(!Cl2) continue;
+                TLorentzVector* El2 = (TLorentzVector*)lEls.At(iCl2);
+                if(!El2) continue;
                 // add the momentum vectors of the two clusters
-                TLorentzVector Cl12 = *Cl1 + *ClTH2F;
+                TLorentzVector Cl12 = *Cl1 + *Cl2;
                 // cluster pair kinematics -> tree
                 fEnClPair = Cl12.Energy();
                 fPtClPair = Cl12.Pt();
@@ -233,7 +237,7 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
                 fPhiClPair = Cl12.Phi();
                 Float_t clPairM = Cl12.M();
                 // add the momentum vector of the two electrons
-                TLorentzVector El12 = *El1 + *ElTH2F;
+                TLorentzVector El12 = *El1 + *El2;
                 // electron pair kinematics -> tree
                 fEnJElPair = El12.Energy();
                 fPtJElPair = El12.Pt();
@@ -248,18 +252,18 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
                 ((TH1F*)arrHistos->At(kJ1_clPairM))->Fill(clPairM);
                 // radial separation between the pairs of clusters
                 /*
-                Float_t sepCl = TMath::Sqrt(TMath::Power(xCl1-xClTH2F,2) + TMath::Power(yCl1-yClTH2F,2));
+                Float_t sepCl = TMath::Sqrt(TMath::Power(xCl1-xCl2,2) + TMath::Power(yCl1-yCl2,2));
                 ((TH1F*)arrTH1F->At(kJ1_clPairSep))->Fill(sepCl);
                 // radial separation between cluster pair vs between the pair of ppe
                 Float_t x1(0.), y1(0.);
                 TrackCoordinatesAtZ(ppEl1,zCl1,x1,y1);
                 Float_t x2(0.), y2(0.);
-                TrackCoordinatesAtZ(ppElTH2F,zClTH2F,x2,y2);
+                TrackCoordinatesAtZ(ppEl2,zCl2,x2,y2);
                 Float_t sepMC = TMath::Sqrt(TMath::Power(x1-x2,2) + TMath::Power(y1-y2,2));
                 ((TH2F*)arrTH2F->At(kJ2_clPairSep_mcJElSep))->Fill(sepCl,sepMC);
                 */
                 // if both clusters are paired to a different physical primary electron
-                if(idxMtchJEl[iCl1] != idxMtchJEl[iClTH2F]) {
+                if(idxMtchJEl[iCl1] != idxMtchJEl[iCl2]) {
                     ((TH1F*)arrHistos->At(kJ1_ppeClPairM))->Fill(clPairM);
                     //((TH1F*)arrHistos->At(kJ1_ppeClPairSep))->Fill(sepCl); 
                     ((TH2F*)arrHistos->At(kJ2_ppeClPairEn_mtchEn))->Fill(fEnClPair,fEnJElPair);
@@ -300,8 +304,52 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
     return;
 }
 
-void AnalyzeClPairs()
+template <typename TH> // for TH2F and TProfile2D
+TH* GetHistoFromList(TString filePath, TString listName, TString histoName, Bool_t debug = kFALSE)
 {
+    Printf("Accessing the histogram %s:", histoName.Data());
+    // open the file
+    TFile* f = TFile::Open(filePath.Data(), "read");
+    if(f) Printf("File %s loaded.", f->GetName());
+    // load the list
+    TList *l = (TList*) f->Get(listName.Data());
+    if(l) Printf("List %s loaded.", l->GetName());
+    if(debug) l->ls();
+    // go over the list and look for the histogram
+    TIter next(l);
+	TObject* object = NULL;
+    TH* h = NULL;
+	while ((object = next()))
+	{
+		if(debug) cout << "Found object " << object->GetName() << ". ";
+        if((TString)object->GetName() == histoName) {
+            h = (TH*)(((TH*)object)->Clone(histoName.Data()));
+            cout << "Histogram found!" << endl;
+            return h;
+        } else if(debug) cout << "Going on..." << endl;
+	}
+    cout << "Requested histogram not found!" << endl;
+    return NULL;
+} 
+
+void AxE()
+{
+    // rapidity distribution of AxE:
+    // load histogram with all JEl pairs generated within FOCAL acceptance
+    TH1F *hGen = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()),
+        "lTH1F","hJ1_mcJElPairRap_acc",kFALSE);
+    hGen->SetName("hGen");
+    // load histogram with reconstructed cluster pairs
+    TH1F* hRec = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()),
+        "lTH1F","hJ1_clPairRap_acc",kFALSE);
+    hRec->SetName("hRec");
+    // calculate and draw AxE in given rapidity bins
+    TH1F* hAxE = (TH1F*)(hRec->Clone("hAxE"));
+    hAxE->SetTitle("hAxE;#it{y} [-];#it{N}_{rec cl pairs} / #it{N}_{gen events}");
+    hAxE->Sumw2();
+    hAxE->Divide(hGen);
+    DrawHisto1D(hAxE,Form("%smerged_%s",outDir.Data(),outSubDir.Data()));
+
     return;
 }
 
@@ -319,9 +367,13 @@ void AnaMain(TString sim)
 
     // open merged output file, go over clusters and create cluster pairs
     // store cluster pairs in a tree
-    //PrepareClPairs(Form("%s001/%s",outDir.Data(),outSubDir.Data()),kTRUE);
     PrepareClPairs(Form("%smerged_%s",outDir.Data(),outSubDir.Data()));
 
     // print all histograms from the main analysis
     DrawHistograms(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()));
+
+    // calculate rapidity dependence of AxE
+    AxE();
+
+    return;
 }

@@ -123,8 +123,9 @@ void MatchClsToPhysPrimP(AliStack* stack, TList* listClsPref, vector<Int_t>& idx
         for(Int_t iTrk = 0; iTrk < stack->GetNtrack(); iTrk++)
         {
             TParticle *part = stack->Particle(iTrk);
-            // if J/psi, continue (is also a physical primary and could cause problems during matching)
+            // if J/psi or psi', continue (is also a physical primary and could cause problems during matching)
             if(part->GetPdgCode() == 443) continue;
+            if(part->GetPdgCode() == 100443) continue;
             // during matching, skip photons with very low energy (< 0.2 MeV)
             // trajectories of these often overlap with those of pp electron (when projected as straight lines)
             // and clusters could very likely be matched with them instead of pp electrons
