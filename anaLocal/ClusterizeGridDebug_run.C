@@ -11,9 +11,12 @@ Int_t nFiles = 25;
 void PlotHistogram1D(TH1F* h)
 {
     TCanvas c("c","c",700,600);
-    c.SetLeftMargin(0.13);
-    c.SetRightMargin(0.05);
+    c.SetLeftMargin(0.12);
+    c.SetRightMargin(0.03);
     //c.SetLogz();
+    h->SetBit(TH1::kNoStats);
+    h->SetLineColor(kBlue);
+    h->SetLineWidth(2);
     h->Draw("");
     c.Print(Form("results/sim02_g02_p02/clusterizeGridDebug/%s.pdf",h->GetName()));
     return;
@@ -22,9 +25,41 @@ void PlotHistogram1D(TH1F* h)
 void PlotHistogram2D(TH2F* h)
 {
     TCanvas c("c","c",700,600);
+    c.SetLeftMargin(0.12);
+    c.SetRightMargin(0.11);
     //c.SetLogz();
+    h->SetBit(TH2::kNoStats);
     h->Draw("COLZ");
     c.Print(Form("results/sim02_g02_p02/clusterizeGridDebug/%s.pdf",h->GetName()));
+    return;
+}
+
+void CompareBeforeAfterCalib(TString sBefore, TString sAfter, TString sEntries, Bool_t isX)
+{
+    TFile* f = TFile::Open("results/sim02_g02_p02/clusterizeGridDebug/mergedClusterizerHistograms.root", "read");
+    if(f) Printf("File %s loaded.", f->GetName());
+    TH2F* hBefore = (TH2F*) f->Get(sBefore.Data());
+    TH2F* hAfter = (TH2F*) f->Get(sAfter.Data());
+    TH1F* hNEntries = new TH1F(sEntries.Data(),"",100,-50.,+50.);
+    if(isX) {
+        hBefore->SetTitle("Energy distribution of cls per segment vs #it{x} before calibration;#it{x}_{cl per seg} [cm];#it{E}_{cl per seg} [GeV]");
+        hAfter->SetTitle("Energy distribution of cls per segment vs #it{x} after calibration;#it{x}_{cl per seg} [cm];#it{E}_{cl per seg} [GeV]");
+        hNEntries->SetTitle("Number of cls per segment vs #it{x};#it{x}_{cl per seg} [cm];#it{N}_{cl per seg}");
+    } else {
+        hBefore->SetTitle("Energy distribution of cls per segment vs #it{y} before calibration;#it{y}_{cl per seg} [cm];#it{E}_{cl per seg} [GeV]");
+        hAfter->SetTitle("Energy distribution of cls per segment vs #it{y} after calibration;#it{y}_{cl per seg} [cm];#it{E}_{cl per seg} [GeV]");
+        hNEntries->SetTitle("Number of cls per segment vs #it{y};#it{y}_{cl per seg} [cm];#it{N}_{cl per seg}");
+    }   
+    for(Int_t iRow = 1; iRow <= 100; iRow++) {
+        Int_t nPerCol = 0;
+        for(Int_t iCol = 1; iCol <= 100; iCol++) nPerCol += hBefore->GetBinContent(iRow,iCol);
+        hNEntries->SetBinContent(iRow,nPerCol);
+    }
+    PlotHistogram2D(hBefore);
+    PlotHistogram2D(hAfter);
+    PlotHistogram1D(hNEntries);
+    delete hNEntries;
+    f->Close();
     return;
 }
 
@@ -66,57 +101,13 @@ void ClusterizeGridDebug_run()
     TFile* f = TFile::Open("results/sim02_g02_p02/clusterizeGridDebug/mergedClusterizerHistograms.root", "read");
     if(f) Printf("File %s loaded.", f->GetName());
     TH2F *hCalibratedCls = (TH2F*) f->Get("hCalibratedCls");
-    TH2F *hXCl_EnCl_CoarseBefore = (TH2F*) f->Get("hXCl_EnCl_CoarseBefore");
-    TH2F *hXCl_EnCl_CoarseAfter = (TH2F*) f->Get("hXCl_EnCl_CoarseAfter");
-    TH1F *hXCl_NEntries_Coarse = new TH1F("hXCl_NEntries_Coarse","",100,-50.,+50.);
-    hXCl_NEntries_Coarse->SetTitle("Number of cls per segment at given #it{x};#it{x}_{cl};#it{N}_{cl per segment}");
-    for(Int_t iRow = 1; iRow <= 100; iRow++) {
-        Int_t nPerCol = 0;
-        for(Int_t iCol = 1; iCol <= 100; iCol++) nPerCol += hXCl_EnCl_CoarseBefore->GetBinContent(iRow,iCol);
-        hXCl_NEntries_Coarse->SetBinContent(iRow,nPerCol);
-    }
-    TH2F *hXCl_EnCl_FineBefore = (TH2F*) f->Get("hXCl_EnCl_FineBefore");
-    TH2F *hXCl_EnCl_FineAfter = (TH2F*) f->Get("hXCl_EnCl_FineAfter");
-    TH1F *hXCl_NEntries_Fine = new TH1F("hXCl_NEntries_Fine","",100,-50.,+50.);
-    hXCl_NEntries_Fine->SetTitle("Number of cls per segment at given #it{x};#it{x}_{cl};#it{N}_{cl per segment}");
-    for(Int_t iRow = 1; iRow <= 100; iRow++) {
-        Int_t nPerCol = 0;
-        for(Int_t iCol = 1; iCol <= 100; iCol++) nPerCol += hXCl_EnCl_FineBefore->GetBinContent(iRow,iCol);
-        hXCl_NEntries_Fine->SetBinContent(iRow,nPerCol);
-    }
-    TH2F *hYCl_EnCl_CoarseBefore = (TH2F*) f->Get("hYCl_EnCl_CoarseBefore");
-    TH2F *hYCl_EnCl_CoarseAfter = (TH2F*) f->Get("hYCl_EnCl_CoarseAfter");
-    TH1F *hYCl_NEntries_Coarse = new TH1F("hYCl_NEntries_Coarse","",100,-50.,+50.);
-    hYCl_NEntries_Coarse->SetTitle("Number of cls per segment at given #it{y};#it{y}_{cl};#it{N}_{cl per segment}");
-    for(Int_t iRow = 1; iRow <= 100; iRow++) {
-        Int_t nPerCol = 0;
-        for(Int_t iCol = 1; iCol <= 100; iCol++) nPerCol += hYCl_EnCl_CoarseBefore->GetBinContent(iRow,iCol);
-        hYCl_NEntries_Coarse->SetBinContent(iRow,nPerCol);
-    }
-    TH2F *hYCl_EnCl_FineBefore = (TH2F*) f->Get("hYCl_EnCl_FineBefore");
-    TH2F *hYCl_EnCl_FineAfter = (TH2F*) f->Get("hYCl_EnCl_FineAfter");
-    TH1F *hYCl_NEntries_Fine = new TH1F("hYCl_NEntries_Fine","",100,-50.,+50.);
-    hYCl_NEntries_Fine->SetTitle("Number of cls per segment at given #it{y};#it{y}_{cl};#it{N}_{cl per segment}");
-    for(Int_t iRow = 1; iRow <= 100; iRow++) {
-        Int_t nPerCol = 0;
-        for(Int_t iCol = 1; iCol <= 100; iCol++) nPerCol += hYCl_EnCl_FineBefore->GetBinContent(iRow,iCol);
-        hYCl_NEntries_Fine->SetBinContent(iRow,nPerCol);
-    }
-
-    // plot all histograms
+    hCalibratedCls->SetTitle(";#it{x}_{cl per seg} [cm];#it{y}_{cl per seg} [cm]");
     PlotHistogram2D(hCalibratedCls);
-    PlotHistogram2D(hXCl_EnCl_CoarseBefore);
-    PlotHistogram2D(hXCl_EnCl_CoarseAfter);
-    PlotHistogram1D(hXCl_NEntries_Coarse);
-    PlotHistogram2D(hXCl_EnCl_FineBefore);
-    PlotHistogram2D(hXCl_EnCl_FineAfter);
-    PlotHistogram1D(hXCl_NEntries_Fine);
-    PlotHistogram2D(hYCl_EnCl_CoarseBefore);
-    PlotHistogram2D(hYCl_EnCl_CoarseAfter);
-    PlotHistogram1D(hYCl_NEntries_Coarse);
-    PlotHistogram2D(hYCl_EnCl_FineBefore);
-    PlotHistogram2D(hYCl_EnCl_FineAfter);
-    PlotHistogram1D(hYCl_NEntries_Fine);
+    
+    CompareBeforeAfterCalib("hXCl_EnCl_CoarseBefore","hXCl_EnCl_CoarseAfter","hXCl_NEntries_Coarse",kTRUE);
+    CompareBeforeAfterCalib("hYCl_EnCl_CoarseBefore","hYCl_EnCl_CoarseAfter","hYCl_NEntries_Coarse",kFALSE);
+    CompareBeforeAfterCalib("hXCl_EnCl_FineBefore","hXCl_EnCl_FineAfter","hXCl_NEntries_Fine",kTRUE);
+    CompareBeforeAfterCalib("hYCl_EnCl_FineBefore","hYCl_EnCl_FineAfter","hYCl_NEntries_Fine",kFALSE);
 
     return;
 }
