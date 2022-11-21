@@ -111,7 +111,7 @@ Ev 34:
   identified supercls: 2
 Ev 35:
   summed cls: 1
-  identified supercls: 1
+  identified supercls: 0
 Ev 36:
   summed cls: 2
   identified supercls: 1
@@ -774,7 +774,7 @@ Ev 255:
   identified supercls: 1
 Ev 256:
   summed cls: 1
-  identified supercls: 1
+  identified supercls: 0
 Ev 257:
   summed cls: 4
   identified supercls: 1
@@ -1467,7 +1467,7 @@ Ev 486:
   identified supercls: 2
 Ev 487:
   summed cls: 2
-  identified supercls: 1
+  identified supercls: 0
 Ev 488:
   summed cls: 2
   identified supercls: 1

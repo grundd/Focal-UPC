@@ -1733,7 +1733,7 @@ Ev 431:
   after energy cut: 1
 Ev 432:
   summed cls: 3
-  identified supercls: 1
+  identified supercls: 0
   after energy cut: 0
 Ev 433:
   summed cls: 1
@@ -2629,8 +2629,8 @@ Ev 655:
   after energy cut: 0
 Ev 656:
   summed cls: 4
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 657:
   summed cls: 2
   identified supercls: 1
@@ -3957,8 +3957,8 @@ Ev 987:
   after energy cut: 1
 Ev 988:
   summed cls: 3
-  identified supercls: 2
-  after energy cut: 1
+  identified supercls: 1
+  after energy cut: 0
 Ev 989:
   summed cls: 8
   identified supercls: 2

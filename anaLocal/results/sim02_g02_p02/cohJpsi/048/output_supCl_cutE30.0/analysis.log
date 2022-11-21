@@ -109,8 +109,8 @@ Ev 25:
   after energy cut: 0
 Ev 26:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 27:
   summed cls: 3
   identified supercls: 1
@@ -621,7 +621,7 @@ Ev 153:
   after energy cut: 1
 Ev 154:
   summed cls: 4
-  identified supercls: 1
+  identified supercls: 0
   after energy cut: 0
 Ev 155:
   summed cls: 0
@@ -865,7 +865,7 @@ Ev 214:
   after energy cut: 0
 Ev 215:
   summed cls: 4
-  identified supercls: 1
+  identified supercls: 0
   after energy cut: 0
 Ev 216:
   summed cls: 2
@@ -1461,7 +1461,7 @@ Ev 363:
   after energy cut: 1
 Ev 364:
   summed cls: 1
-  identified supercls: 1
+  identified supercls: 0
   after energy cut: 0
 Ev 365:
   summed cls: 1
@@ -2045,8 +2045,8 @@ Ev 509:
   after energy cut: 1
 Ev 510:
   summed cls: 5
-  identified supercls: 2
-  after energy cut: 2
+  identified supercls: 1
+  after energy cut: 1
 Ev 511:
   summed cls: 1
   identified supercls: 1
@@ -2109,8 +2109,8 @@ Ev 525:
   after energy cut: 1
 Ev 526:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 527:
   summed cls: 4
   identified supercls: 1
@@ -2353,8 +2353,8 @@ Ev 586:
   after energy cut: 0
 Ev 587:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 588:
   summed cls: 1
   identified supercls: 1
@@ -2533,8 +2533,8 @@ Ev 631:
   after energy cut: 0
 Ev 632:
   summed cls: 3
-  identified supercls: 2
-  after energy cut: 1
+  identified supercls: 1
+  after energy cut: 0
 Ev 633:
   summed cls: 0
   identified supercls: 0
@@ -2761,7 +2761,7 @@ Ev 688:
   after energy cut: 2
 Ev 689:
   summed cls: 1
-  identified supercls: 1
+  identified supercls: 0
   after energy cut: 0
 Ev 690:
   summed cls: 1
@@ -3757,8 +3757,8 @@ Ev 937:
   after energy cut: 1
 Ev 938:
   summed cls: 4
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 939:
   summed cls: 2
   identified supercls: 2

@@ -66,13 +66,14 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
 
     // arrays with output histograms
     TObjArray* arrHistos = NULL;
-    Int_t kFirstTH1F(-1), kFirstTH2F(-1), kFirstTPrf(-1), kAll(-1);
+    Int_t kFirstTH1F(-1), kFirstTH2F(-1), kFirstTPrf(-1), kFirstTP2D(-1), kAll(-1);
     // if box simulations
     if(isBoxSim) 
     {
         kFirstTH1F = kGridBox_firstTH1F; 
         kFirstTH2F = kGridBox_firstTH2F; 
         kFirstTPrf = kGridBox_firstTPrf; 
+        kFirstTP2D = 
         kAll = kGridBox_all;
         arrHistos = new TObjArray(kAll);
         CreateHistos_GridBox(arrHistos);
@@ -83,6 +84,7 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
         kFirstTH1F = kGridJpsi_firstTH1F; 
         kFirstTH2F = kGridJpsi_firstTH2F;
         kFirstTPrf = kGridJpsi_firstTPrf; 
+        kFirstTP2D = kGridJpsi_firstTP2D;
         kAll = kGridJpsi_all;
         arrHistos = new TObjArray(kAll);
         CreateHistos_GridJpsi(arrHistos);
@@ -252,7 +254,7 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
                     Float_t yCl = clust->Y();
                     Float_t zCl = clust->Z();
                     Float_t ECl = clust->E();
-                    Float_t distXY = TMath::Sqrt(TMath::Power(xSeed-xCl,2) + TMath::Power(ySeed-yCl,2)); 
+                    Float_t distXY = TMath::Sqrt(TMath::Power(xSeed-xCl,2) + TMath::Power(ySeed-yCl,2));
                     // if this cluster is close enough to the supercluster seed, add it to the supercluster
                     if(distXY < radius) {
                         xSupCl += xCl * ECl;
@@ -267,9 +269,9 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
                     EClTop = clustTop->E();
                 } 
                 else EClTop = 0;
-                // add the new supercluster to listClsPref
+                // add the new supercluster to listClsPref if abs(x_cl) > 5 cm and abs(y_cl) > 5 cm
                 AliFOCALCluster* supClNew = new AliFOCALCluster(xSupCl/ESupCl,ySupCl/ESupCl,zSupCl/ESupCl,ESupCl,-1);
-                listClsPref->Add(supClNew);
+                if(TMath::Abs(xSupCl/ESupCl) > 5 || TMath::Abs(ySupCl/ESupCl) > 5) listClsPref->Add(supClNew);
             }
             nClsPref = listClsPref->GetEntries();
             of << "  identified supercls: " << nClsPref << endl;
@@ -495,6 +497,7 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
                 ((TH2F*)arrHistos->At(kJ2_clY_clEn))->Fill(yCl, ECl);
                 ((TProfile*)arrHistos->At(kJP_clX_clEn))->Fill(xCl, ECl);
                 ((TProfile*)arrHistos->At(kJP_clY_clEn))->Fill(yCl, ECl);
+                ((TProfile2D*)arrHistos->At(kJP2_clX_clY_clEn))->Fill(xCl, yCl, ECl);
 
                 TParticle* mtchPhysPrimPart = (TParticle*)arrMtchPhysPrimParts[iCl];
                 // if matched to a ppp
@@ -515,6 +518,7 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
                         ((TH2F*)arrHistos->At(kJ2_ppeClPt_mtchPt))->Fill(fPtCl, fPtJEl);
                         ((TProfile*)arrHistos->At(kJP_ppeClX_mtchEn))->Fill(xCl, fEnJEl);
                         ((TProfile*)arrHistos->At(kJP_ppeClY_mtchEn))->Fill(yCl, fEnJEl);
+                        ((TProfile2D*)arrHistos->At(kJP2_ppeClX_ppeClY_mtchEn))->Fill(xCl, yCl, fEnJEl);
                     }
                 }
                 tOut->Fill();
@@ -527,16 +531,19 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
 
     fOut->cd();
     // output list with histograms
-    TList* lOut1 = new TList(); // TH1F
-    TList* lOut2 = new TList(); // TH2F
-    TList* lOutP = new TList(); // TProfile
+    TList* lTH1F = new TList(); // TH1F
+    TList* lTH2F = new TList(); // TH2F
+    TList* lTPrf = new TList(); // TProfile
+    TList* lTP2D = new TList(); // TProfile2D
     // add all histograms to the lists
-    for(Int_t i = kFirstTH1F+1; i < kFirstTH2F; i++) if((TH1F*)arrHistos->At(i)) lOut1->Add((TH1F*)arrHistos->At(i));
-    for(Int_t i = kFirstTH2F+1; i < kFirstTPrf; i++) if((TH2F*)arrHistos->At(i)) lOut2->Add((TH2F*)arrHistos->At(i));
-    for(Int_t i = kFirstTPrf+1; i < kAll; i++)   if((TProfile*)arrHistos->At(i)) lOutP->Add((TProfile*)arrHistos->At(i));
-    lOut1->Write("lTH1F", TObject::kSingleKey);
-    lOut2->Write("lTH2F", TObject::kSingleKey);
-    lOutP->Write("lTPrf", TObject::kSingleKey);
+    for(Int_t i = kFirstTH1F+1; i < kFirstTH2F; i++) if((TH1F*)arrHistos->At(i)) lTH1F->Add((TH1F*)arrHistos->At(i));
+    for(Int_t i = kFirstTH2F+1; i < kFirstTPrf; i++) if((TH2F*)arrHistos->At(i)) lTH2F->Add((TH2F*)arrHistos->At(i));
+    for(Int_t i = kFirstTPrf+1; i < kFirstTP2D; i++) if((TProfile*)arrHistos->At(i)) lTPrf->Add((TProfile*)arrHistos->At(i));
+    for(Int_t i = kFirstTP2D+1; i < kAll; i++)     if((TProfile2D*)arrHistos->At(i)) lTP2D->Add((TProfile2D*)arrHistos->At(i));
+    lTH1F->Write("lTH1F", TObject::kSingleKey);
+    lTH2F->Write("lTH2F", TObject::kSingleKey);
+    lTPrf->Write("lTPrf", TObject::kSingleKey);
+    lTP2D->Write("lTP2D", TObject::kSingleKey);
     // print file content and close it
     fOut->ls();
     fOut->Write("",TObject::kWriteDelete);

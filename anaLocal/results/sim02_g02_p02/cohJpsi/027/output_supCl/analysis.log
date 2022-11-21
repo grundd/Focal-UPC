@@ -708,7 +708,7 @@ Ev 233:
   identified supercls: 1
 Ev 234:
   summed cls: 1
-  identified supercls: 1
+  identified supercls: 0
 Ev 235:
   summed cls: 2
   identified supercls: 1
@@ -723,7 +723,7 @@ Ev 238:
   identified supercls: 2
 Ev 239:
   summed cls: 3
-  identified supercls: 1
+  identified supercls: 0
 Ev 240:
   summed cls: 3
   identified supercls: 2
@@ -1158,7 +1158,7 @@ Ev 383:
   identified supercls: 2
 Ev 384:
   summed cls: 3
-  identified supercls: 1
+  identified supercls: 0
 Ev 385:
   summed cls: 1
   identified supercls: 1
@@ -1248,7 +1248,7 @@ Ev 413:
   identified supercls: 1
 Ev 414:
   summed cls: 1
-  identified supercls: 1
+  identified supercls: 0
 Ev 415:
   summed cls: 2
   identified supercls: 2
@@ -1446,7 +1446,7 @@ Ev 479:
   identified supercls: 2
 Ev 480:
   summed cls: 5
-  identified supercls: 1
+  identified supercls: 0
 Ev 481:
   summed cls: 6
   identified supercls: 2
@@ -1500,7 +1500,7 @@ Ev 497:
   identified supercls: 1
 Ev 498:
   summed cls: 1
-  identified supercls: 1
+  identified supercls: 0
 Ev 499:
   summed cls: 5
   identified supercls: 0
@@ -2325,7 +2325,7 @@ Ev 772:
   identified supercls: 2
 Ev 773:
   summed cls: 5
-  identified supercls: 2
+  identified supercls: 1
 Ev 774:
   summed cls: 2
   identified supercls: 1
@@ -2604,7 +2604,7 @@ Ev 865:
   identified supercls: 1
 Ev 866:
   summed cls: 4
-  identified supercls: 2
+  identified supercls: 1
 Ev 867:
   summed cls: 2
   identified supercls: 1
@@ -2778,13 +2778,13 @@ Ev 923:
   identified supercls: 1
 Ev 924:
   summed cls: 2
-  identified supercls: 1
+  identified supercls: 0
 Ev 925:
   summed cls: 0
   identified supercls: 0
 Ev 926:
   summed cls: 5
-  identified supercls: 2
+  identified supercls: 1
 Ev 927:
   summed cls: 0
   identified supercls: 0
@@ -2847,7 +2847,7 @@ Ev 946:
   identified supercls: 1
 Ev 947:
   summed cls: 2
-  identified supercls: 1
+  identified supercls: 0
 Ev 948:
   summed cls: 3
   identified supercls: 1
@@ -2895,7 +2895,7 @@ Ev 962:
   identified supercls: 0
 Ev 963:
   summed cls: 4
-  identified supercls: 2
+  identified supercls: 1
 Ev 964:
   summed cls: 1
   identified supercls: 1

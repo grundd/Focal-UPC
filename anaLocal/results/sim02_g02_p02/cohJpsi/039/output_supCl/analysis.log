@@ -465,7 +465,7 @@ Ev 152:
   identified supercls: 1
 Ev 153:
   summed cls: 2
-  identified supercls: 2
+  identified supercls: 1
 Ev 154:
   summed cls: 1
   identified supercls: 1
@@ -1302,7 +1302,7 @@ Ev 431:
   identified supercls: 1
 Ev 432:
   summed cls: 3
-  identified supercls: 1
+  identified supercls: 0
 Ev 433:
   summed cls: 9
   identified supercls: 1
@@ -2241,7 +2241,7 @@ Ev 744:
   identified supercls: 2
 Ev 745:
   summed cls: 2
-  identified supercls: 1
+  identified supercls: 0
 Ev 746:
   summed cls: 4
   identified supercls: 2

@@ -165,8 +165,8 @@ Ev 39:
   after energy cut: 1
 Ev 40:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 41:
   summed cls: 0
   identified supercls: 0
@@ -1329,8 +1329,8 @@ Ev 330:
   after energy cut: 1
 Ev 331:
   summed cls: 1
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 332:
   summed cls: 1
   identified supercls: 1
@@ -1381,8 +1381,8 @@ Ev 343:
   after energy cut: 1
 Ev 344:
   summed cls: 1
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 345:
   summed cls: 1
   identified supercls: 1
@@ -1573,8 +1573,8 @@ Ev 391:
   after energy cut: 2
 Ev 392:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 393:
   summed cls: 0
   identified supercls: 0
@@ -1697,8 +1697,8 @@ Ev 422:
   after energy cut: 2
 Ev 423:
   summed cls: 3
-  identified supercls: 2
-  after energy cut: 2
+  identified supercls: 1
+  after energy cut: 1
 Ev 424:
   summed cls: 0
   identified supercls: 0
@@ -1889,8 +1889,8 @@ Ev 470:
   after energy cut: 1
 Ev 471:
   summed cls: 1
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 472:
   summed cls: 1
   identified supercls: 1
@@ -1993,8 +1993,8 @@ Ev 496:
   after energy cut: 1
 Ev 497:
   summed cls: 1
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 498:
   summed cls: 1
   identified supercls: 1
@@ -2113,8 +2113,8 @@ Ev 526:
   after energy cut: 2
 Ev 527:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 528:
   summed cls: 4
   identified supercls: 2
@@ -3613,8 +3613,8 @@ Ev 901:
   after energy cut: 1
 Ev 902:
   summed cls: 1
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 903:
   summed cls: 7
   identified supercls: 2

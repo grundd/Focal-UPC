@@ -489,7 +489,7 @@ Ev 160:
   identified supercls: 3
 Ev 161:
   summed cls: 1
-  identified supercls: 1
+  identified supercls: 0
 Ev 162:
   summed cls: 4
   identified supercls: 2
@@ -1095,7 +1095,7 @@ Ev 362:
   identified supercls: 0
 Ev 363:
   summed cls: 1
-  identified supercls: 1
+  identified supercls: 0
 Ev 364:
   summed cls: 0
   identified supercls: 0
@@ -1296,7 +1296,7 @@ Ev 429:
   identified supercls: 1
 Ev 430:
   summed cls: 2
-  identified supercls: 1
+  identified supercls: 0
 Ev 431:
   summed cls: 1
   identified supercls: 1
@@ -1497,7 +1497,7 @@ Ev 496:
   identified supercls: 0
 Ev 497:
   summed cls: 3
-  identified supercls: 1
+  identified supercls: 0
 Ev 498:
   summed cls: 8
   identified supercls: 1
@@ -1533,7 +1533,7 @@ Ev 508:
   identified supercls: 1
 Ev 509:
   summed cls: 3
-  identified supercls: 2
+  identified supercls: 1
 Ev 510:
   summed cls: 2
   identified supercls: 1
@@ -1764,7 +1764,7 @@ Ev 585:
   identified supercls: 1
 Ev 586:
   summed cls: 1
-  identified supercls: 1
+  identified supercls: 0
 Ev 587:
   summed cls: 3
   identified supercls: 2
@@ -1935,7 +1935,7 @@ Ev 642:
   identified supercls: 1
 Ev 643:
   summed cls: 5
-  identified supercls: 1
+  identified supercls: 0
 Ev 644:
   summed cls: 10
   identified supercls: 2
@@ -2811,7 +2811,7 @@ Ev 934:
   identified supercls: 2
 Ev 935:
   summed cls: 1
-  identified supercls: 1
+  identified supercls: 0
 Ev 936:
   summed cls: 9
   identified supercls: 2

@@ -17,13 +17,13 @@ fi
 
 # run primary (grid) and secondary (main) analysis
 # over all input data for a selected process
-if false; then 
+if true; then 
     aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$sim'")'
     aliroot -q 'AnaMain.C("'$sim'")'
 fi
 
 # run clusterizer over a specific HITS file
-if true; then
+if false; then
     aliroot -q 'ClusterizeGrid.C(kTRUE,"geometry_02.txt","parameters_02.txt","inputData/aliDPG_v02/kCohJpsiToElRad/062/")'
 fi
 

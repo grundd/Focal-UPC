@@ -756,7 +756,7 @@ Ev 249:
   identified supercls: 1
 Ev 250:
   summed cls: 2
-  identified supercls: 2
+  identified supercls: 1
 Ev 251:
   summed cls: 9
   identified supercls: 1
@@ -2721,7 +2721,7 @@ Ev 904:
   identified supercls: 2
 Ev 905:
   summed cls: 1
-  identified supercls: 1
+  identified supercls: 0
 Ev 906:
   summed cls: 1
   identified supercls: 1

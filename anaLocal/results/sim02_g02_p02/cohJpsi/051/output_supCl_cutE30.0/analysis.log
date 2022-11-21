@@ -785,8 +785,8 @@ Ev 194:
   after energy cut: 1
 Ev 195:
   summed cls: 4
-  identified supercls: 2
-  after energy cut: 1
+  identified supercls: 1
+  after energy cut: 0
 Ev 196:
   summed cls: 7
   identified supercls: 2
@@ -1089,8 +1089,8 @@ Ev 270:
   after energy cut: 1
 Ev 271:
   summed cls: 1
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 272:
   summed cls: 1
   identified supercls: 1
@@ -1497,8 +1497,8 @@ Ev 372:
   after energy cut: 1
 Ev 373:
   summed cls: 1
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 374:
   summed cls: 2
   identified supercls: 2
@@ -1893,8 +1893,8 @@ Ev 471:
   after energy cut: 0
 Ev 472:
   summed cls: 2
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 473:
   summed cls: 2
   identified supercls: 2
@@ -2013,8 +2013,8 @@ Ev 501:
   after energy cut: 0
 Ev 502:
   summed cls: 1
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 503:
   summed cls: 1
   identified supercls: 1
@@ -3137,8 +3137,8 @@ Ev 782:
   after energy cut: 1
 Ev 783:
   summed cls: 5
-  identified supercls: 1
-  after energy cut: 1
+  identified supercls: 0
+  after energy cut: 0
 Ev 784:
   summed cls: 1
   identified supercls: 1

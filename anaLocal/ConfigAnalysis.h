@@ -22,14 +22,14 @@ TString sParaFile = "";
 // number of available input files for each simulation version (1000 events each):
 const Int_t nBoxEle[2] = {16,16};
 const Int_t nBoxPho[2] = {6, 0};
-const Int_t nCohJpsi[2] = {11,61};
-const Int_t nCohJpsiNoFIT[2] = {0, 3};
-const Int_t nIncJpsi[2] = {0, 29};
-const Int_t nCohFD[2] = {0, 8};
-const Int_t nIncFD[2] = {0, 0};
-const Int_t nBkg[2]   = {0, 9};
-const Int_t nCohPsi2s[2] = {0, 0};
-const Int_t nIncPsi2s[2] = {0, 0};
+const Int_t nCohJpsi[2] = {11,97};
+const Int_t nIncJpsi[2] = {0, 70};
+const Int_t nCohFD[2] = {0,10};
+const Int_t nIncFD[2] = {0,10};
+const Int_t nBkg[2]   = {0,13};
+const Int_t nCohPsi2s[2] = {0, 4};
+const Int_t nIncPsi2s[2] = {0, 1};
+const Int_t nCohJpsiNoFIT[2] = {0, 10};
 Int_t nFiles(0.);
 TString inDir = "";
 TString outDir = "";
@@ -57,11 +57,6 @@ void ConfigLocalAnalysis(TString sim)
         nFiles = nCohJpsi[simFiles-1];
         inDir += "kCohJpsiToElRad/";
     }
-    // kCohJpsiToElRad without FIT
-    else if(sim == "cohJpsiNoFIT") {
-        nFiles = nCohJpsiNoFIT[simFiles-1];
-        inDir += "kCohJpsiToElRadNoFIT/";
-    }
     // kIncohJpsiToElRad
     else if(sim == "incJpsi") {
         nFiles = nIncJpsi[simFiles-1];
@@ -80,7 +75,7 @@ void ConfigLocalAnalysis(TString sim)
     // kTwoGammaToElMedium
     else if(sim == "bkg") {
         nFiles = nBkg[simFiles-1];
-        inDir += "kTwoGammaToElMedium_etaCut/";
+        inDir += "kTwoGammaToElMedium_noEtaCut/";
     }
     // kCohPsi2sToEl
     else if(sim == "cohPsi2s") {
@@ -91,6 +86,11 @@ void ConfigLocalAnalysis(TString sim)
     else if(sim == "incPsi2s") {
         nFiles = nIncPsi2s[simFiles-1];
         inDir += "kIncohPsi2sToEl/";
+    }
+    // kCohJpsiToElRad without FIT
+    else if(sim == "cohJpsiNoFIT") {
+        nFiles = nCohJpsiNoFIT[simFiles-1];
+        inDir += "kCohJpsiToElRadNoFIT/";
     }
     else {
         cout << " ERROR: Configuration not supported. Choose between:\n"
@@ -103,6 +103,7 @@ void ConfigLocalAnalysis(TString sim)
              << "\t\"bkg\",\n"
              << "\t\"cohPsi2s\",\n"
              << "\t\"incPsi2s\".\n"
+             << "\t\"cohJpsiNoFIT\",\n"
              << "\tTerminating...\n";
         return;
     }

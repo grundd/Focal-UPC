@@ -31,47 +31,84 @@ void MergeOutputFiles()
     return;
 }
 
-void PrintHistograms(TString sFile)
+void DrawHistograms(TString sFile)
 {
     TFile* f = TFile::Open(sFile.Data(), "read");
     if(f) Printf("File %s loaded.", f->GetName());
     // get list with TH1F histograms
-    TList *l1 = (TList*) f->Get("lTH1F");
-    if(l1) Printf("List %s loaded.", l1->GetName()); 
+    TList *lTH1F = (TList*) f->Get("lTH1F");
+    if(lTH1F) Printf("List %s loaded.", lTH1F->GetName()); 
     // get list with TH2F histograms
-    TList *l2 = (TList*) f->Get("lTH2F");
-    if(l2) Printf("List %s loaded.", l2->GetName()); 
+    TList *lTH2F = (TList*) f->Get("lTH2F");
+    if(lTH2F) Printf("List %s loaded.", lTH2F->GetName()); 
     // get list with TProfile histograms
-    TList *lP = (TList*) f->Get("lTPrf");
-    if(lP) Printf("List %s loaded.", lP->GetName()); 
+    TList *lTPrf = (TList*) f->Get("lTPrf");
+    if(lTPrf) Printf("List %s loaded.", lTPrf->GetName()); 
+    // get list with TProfile2D histograms
+    TList *lTP2D = (TList*) f->Get("lTP2D");
+    if(lTP2D) Printf("List %s loaded.", lTP2D->GetName()); 
     // go over the lists and print all histograms
     TString sOut = Form("%smerged_%s",outDir.Data(),outSubDir.Data());
+
     // TH1F
-    l1->ls();
-	TIter next1(l1);
+    Printf("\n***");
+    lTH1F->ls();
+	TIter nextTH1F(lTH1F);
 	TObject* object = NULL;
-	while ((object = next1()))
+	while ((object = nextTH1F()))
 	{
 		cout << "Got an object " << object->GetName() << ":" << endl;
-        DrawHisto(((TH1F*)object),sOut);
+        DrawHisto1D(((TH1F*)object),sOut);
 	}
+
     // TH2F
-    l2->ls();
-	TIter next2(l2);
+    Printf("\n***");
+    lTH2F->ls();
+	TIter nextTH2F(lTH2F);
 	object = NULL;
-	while ((object = next2()))
+	while ((object = nextTH2F()))
 	{
 		cout << "Got an object " << object->GetName() << ":" << endl;
-        DrawHistoCOLZ(((TH2F*)object),sOut);
+        DrawHisto2D(((TH2F*)object),sOut);
 	}
-    // TH1F
-    lP->ls();
-	TIter nextP(lP);
+
+    // TProfile
+    TProfile* hJP_ppeClX_mtchEn = NULL;
+    TProfile* hJP_clX_clEn = NULL;
+    TProfile* hJP_ppeClY_mtchEn = NULL;
+    TProfile* hJP_clY_clEn = NULL;
+    Printf("\n***");
+    lTPrf->ls();
+	TIter nextTPrf(lTPrf);
 	object = NULL;
-	while ((object = nextP()))
+	while ((object = nextTPrf()))
 	{
 		cout << "Got an object " << object->GetName() << ":" << endl;
-        DrawHisto(((TProfile*)object),sOut);
+        DrawHisto1D(((TProfile*)object),sOut);
+        if((TString)object->GetName() == "hJP_ppeClX_mtchEn") hJP_ppeClX_mtchEn = (TProfile*)object;
+        if((TString)object->GetName() == "hJP_clX_clEn") hJP_clX_clEn = (TProfile*)object;
+        if((TString)object->GetName() == "hJP_ppeClY_mtchEn") hJP_ppeClY_mtchEn = (TProfile*)object;
+        if((TString)object->GetName() == "hJP_clY_clEn") hJP_clY_clEn = (TProfile*)object;
+	}
+    // draw XY energy distribution: clusters vs MC
+    if(hJP_ppeClX_mtchEn) {
+        hJP_ppeClX_mtchEn->SetName("h_XEnDist_ClvsMC");
+        DrawHisto1D(hJP_ppeClX_mtchEn,sOut,hJP_clX_clEn);
+    }
+    if(hJP_ppeClY_mtchEn) {
+        hJP_ppeClY_mtchEn->SetName("h_YEnDist_ClvsMC");
+        DrawHisto1D(hJP_ppeClY_mtchEn,sOut,hJP_clY_clEn);
+    }
+
+    // TProfile2D
+    Printf("\n***");
+    lTP2D->ls();
+    TIter nextTP2D(lTP2D);
+    object = NULL;
+	while ((object = nextTP2D()))
+	{
+		cout << "Got an object " << object->GetName() << ":" << endl;
+        DrawHisto3D(((TProfile2D*)object),sOut);
 	}
 
     return;
@@ -181,14 +218,14 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
             TLorentzVector* El1 = (TLorentzVector*)lEls.At(iCl1);
             if(!El1) continue;     
             // go over all possible pairs of clusters
-            for(Int_t iCl2 = iCl1+1; iCl2 < nClThisEvent; iCl2++) 
+            for(Int_t iClTH2F = iCl1+1; iClTH2F < nClThisEvent; iClTH2F++) 
             {
-                TLorentzVector* Cl2 = (TLorentzVector*)lCls.At(iCl2);
-                if(!Cl2) continue;
-                TLorentzVector* El2 = (TLorentzVector*)lEls.At(iCl2);
-                if(!El2) continue;
+                TLorentzVector* ClTH2F = (TLorentzVector*)lCls.At(iClTH2F);
+                if(!ClTH2F) continue;
+                TLorentzVector* ElTH2F = (TLorentzVector*)lEls.At(iClTH2F);
+                if(!ElTH2F) continue;
                 // add the momentum vectors of the two clusters
-                TLorentzVector Cl12 = *Cl1 + *Cl2;
+                TLorentzVector Cl12 = *Cl1 + *ClTH2F;
                 // cluster pair kinematics -> tree
                 fEnClPair = Cl12.Energy();
                 fPtClPair = Cl12.Pt();
@@ -196,7 +233,7 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
                 fPhiClPair = Cl12.Phi();
                 Float_t clPairM = Cl12.M();
                 // add the momentum vector of the two electrons
-                TLorentzVector El12 = *El1 + *El2;
+                TLorentzVector El12 = *El1 + *ElTH2F;
                 // electron pair kinematics -> tree
                 fEnJElPair = El12.Energy();
                 fPtJElPair = El12.Pt();
@@ -207,21 +244,22 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
                 ((TH1F*)arrHistos->At(kJ1_clPairPt))->Fill(fPtClPair);
                 if(clPairM > 2.8) ((TH1F*)arrHistos->At(kJ1_clPairPt_massCut))->Fill(fPtClPair);
                 ((TH1F*)arrHistos->At(kJ1_clPairRap))->Fill(Cl12.Rapidity());
+                ((TH1F*)arrHistos->At(kJ1_clPairRap_acc))->Fill(Cl12.Rapidity());
                 ((TH1F*)arrHistos->At(kJ1_clPairM))->Fill(clPairM);
                 // radial separation between the pairs of clusters
                 /*
-                Float_t sepCl = TMath::Sqrt(TMath::Power(xCl1-xCl2,2) + TMath::Power(yCl1-yCl2,2));
+                Float_t sepCl = TMath::Sqrt(TMath::Power(xCl1-xClTH2F,2) + TMath::Power(yCl1-yClTH2F,2));
                 ((TH1F*)arrTH1F->At(kJ1_clPairSep))->Fill(sepCl);
                 // radial separation between cluster pair vs between the pair of ppe
                 Float_t x1(0.), y1(0.);
                 TrackCoordinatesAtZ(ppEl1,zCl1,x1,y1);
                 Float_t x2(0.), y2(0.);
-                TrackCoordinatesAtZ(ppEl2,zCl2,x2,y2);
+                TrackCoordinatesAtZ(ppElTH2F,zClTH2F,x2,y2);
                 Float_t sepMC = TMath::Sqrt(TMath::Power(x1-x2,2) + TMath::Power(y1-y2,2));
                 ((TH2F*)arrTH2F->At(kJ2_clPairSep_mcJElSep))->Fill(sepCl,sepMC);
                 */
                 // if both clusters are paired to a different physical primary electron
-                if(idxMtchJEl[iCl1] != idxMtchJEl[iCl2]) {
+                if(idxMtchJEl[iCl1] != idxMtchJEl[iClTH2F]) {
                     ((TH1F*)arrHistos->At(kJ1_ppeClPairM))->Fill(clPairM);
                     //((TH1F*)arrHistos->At(kJ1_ppeClPairSep))->Fill(sepCl); 
                     ((TH2F*)arrHistos->At(kJ2_ppeClPairEn_mtchEn))->Fill(fEnClPair,fEnJElPair);
@@ -240,16 +278,19 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
 
     fOut->cd();
     // output list with histograms
-    TList* lOut1 = new TList(); // TH1F
-    TList* lOut2 = new TList(); // TH2F
-    TList* lOutP = new TList(); // TProfile
+    TList* lTH1F = new TList(); // TH1F
+    TList* lTH2F = new TList(); // TH2F
+    TList* lTPrf = new TList(); // TProfile
+    TList* lTP2D = new TList(); // TProfile2D
     // add all histograms to the lists
-    for(Int_t i = kMainJpsi_firstTH1F+1; i < kMainJpsi_firstTH2F; i++) if((TH1F*)arrHistos->At(i)) lOut1->Add((TH1F*)arrHistos->At(i));
-    for(Int_t i = kMainJpsi_firstTH2F+1; i < kMainJpsi_firstTPrf; i++) if((TH2F*)arrHistos->At(i)) lOut2->Add((TH2F*)arrHistos->At(i));
-    for(Int_t i = kMainJpsi_firstTPrf+1; i < kMainJpsi_all; i++)   if((TProfile*)arrHistos->At(i)) lOutP->Add((TProfile*)arrHistos->At(i));
-    lOut1->Write("lTH1F", TObject::kSingleKey);
-    lOut2->Write("lTH2F", TObject::kSingleKey);
-    lOutP->Write("lTPrf", TObject::kSingleKey);
+    for(Int_t i = kMainJpsi_firstTH1F+1; i < kMainJpsi_firstTH2F; i++) if((TH1F*)arrHistos->At(i)) lTH1F->Add((TH1F*)arrHistos->At(i));
+    for(Int_t i = kMainJpsi_firstTH2F+1; i < kMainJpsi_firstTPrf; i++) if((TH2F*)arrHistos->At(i)) lTH2F->Add((TH2F*)arrHistos->At(i));
+    for(Int_t i = kMainJpsi_firstTPrf+1; i < kMainJpsi_firstTP2D; i++) if((TProfile*)arrHistos->At(i)) lTPrf->Add((TProfile*)arrHistos->At(i));
+    for(Int_t i = kMainJpsi_firstTP2D+1; i < kMainJpsi_all; i++)     if((TProfile2D*)arrHistos->At(i)) lTP2D->Add((TProfile2D*)arrHistos->At(i));
+    lTH1F->Write("lTH1F", TObject::kSingleKey);
+    lTH2F->Write("lTH2F", TObject::kSingleKey);
+    lTPrf->Write("lTPrf", TObject::kSingleKey);
+    lTP2D->Write("lTP2D", TObject::kSingleKey);
     // print file content and close it
     fOut->ls();
     // save the file with the output tree
@@ -274,7 +315,7 @@ void AnaMain(TString sim)
     MergeOutputFiles();
 
     // print all histograms from the Grid analysis
-    PrintHistograms(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()));
+    DrawHistograms(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()));
 
     // open merged output file, go over clusters and create cluster pairs
     // store cluster pairs in a tree
@@ -282,5 +323,5 @@ void AnaMain(TString sim)
     PrepareClPairs(Form("%smerged_%s",outDir.Data(),outSubDir.Data()));
 
     // print all histograms from the main analysis
-    PrintHistograms(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()));
+    DrawHistograms(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()));
 }

@@ -4,8 +4,8 @@
 # ./runStarlightNoDigi.sh
 
 # options to set:
-first=30
-simulations=11
+first=61
+simulations=10
 last=$(($first+$simulations-1))
 evPerSim=1000
 process="kIncohJpsiToElRad"
