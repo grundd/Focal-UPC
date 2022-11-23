@@ -22,7 +22,7 @@ TString sParaFile = "";
 // number of available input files for each simulation version (1000 events each):
 const Int_t nBoxEle[2] = {16,16};
 const Int_t nBoxPho[2] = {6, 0};
-const Int_t nCohJpsi[2] = {11,97};
+const Int_t nCohJpsi[3] = {11,97,5};
 const Int_t nIncJpsi[2] = {0, 72};
 const Int_t nCohFD[2] = {0,10};
 const Int_t nIncFD[2] = {0,10};

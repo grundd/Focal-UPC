@@ -455,6 +455,8 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
                 ((TH1F*)arrHistos->At(kJ1_mcJElPairPt))->Fill(lvJElPair->Pt());
                 ((TH1F*)arrHistos->At(kJ1_mcJElPairRap))->Fill(lvJElPair->Rapidity());
                 ((TH1F*)arrHistos->At(kJ1_mcJElPairM))->Fill(lvJElPair->M());
+                // acceptance
+                ((TH1F*)arrHistos->At(kJ1_mcJElPairRap_gen))->Fill(lvJElPair->Rapidity());
                 if(3.4 < ppEl1->Eta() && ppEl1->Eta() < 5.8 && 3.4 < ppEl2->Eta() && ppEl2->Eta() < 5.8)
                     ((TH1F*)arrHistos->At(kJ1_mcJElPairRap_acc))->Fill(lvJElPair->Rapidity());
             }

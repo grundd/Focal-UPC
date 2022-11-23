@@ -7,7 +7,7 @@
 // my headers
 #include "ConfigAnalysis.h"
 
-void FocalUpcGrid_RunAnalysis(Bool_t isLocal, TString sim)
+void FocalUpcGrid_RunAnalysis(Bool_t isLocal, TString sim, Bool_t overwrite = kFALSE)
 {
     gSystem->Load("libpythia6_4_28.so");
 
@@ -37,7 +37,7 @@ void FocalUpcGrid_RunAnalysis(Bool_t isLocal, TString sim)
                 gROOT->ProcessLine(sCmd.Data());
             }
             // run the analysis:
-            TString sCmd = Form("FocalUpcGrid(kTRUE,\"%s\",kFALSE,\"%s\",\"%s\")",sim.Data(),sIn.Data(),sOut.Data());
+            TString sCmd = Form("FocalUpcGrid(kTRUE,\"%s\",%d,\"%s\",\"%s\")",sim.Data(),overwrite,sIn.Data(),sOut.Data());
             gROOT->ProcessLine(sCmd.Data());
         }
         cout << endl << " FINISHED! " << endl;

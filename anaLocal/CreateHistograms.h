@@ -71,6 +71,8 @@ enum kGridJpsi {
     kJ1_mcJElPairPt,
     kJ1_mcJElPairRap,
     kJ1_mcJElPairM,
+    // acceptance and efficiency
+    kJ1_mcJElPairRap_gen,
     kJ1_mcJElPairRap_acc,
     //* TH2F histograms:
     kGridJpsi_firstTH2F,
@@ -115,9 +117,11 @@ enum kMainJpsi {
     kJ1_clPairPt,
     kJ1_clPairPt_massCut,
     kJ1_clPairRap,
-    kJ1_clPairRap_acc,
     kJ1_clPairM,
     kJ1_clPairSep,
+    // acceptance and efficiency
+    kJ1_mcJElPairRap_rec,
+    kJ1_clPairRap_rec,
     // matched cl. pairs
     kJ1_ppeClPairM,
     kJ1_ppeClPairSep,
@@ -231,9 +235,12 @@ void CreateHistos_GridJpsi(TObjArray* objArr)
     TH1F* hJ1_mcJElPairM = new TH1F("hJ1_mcJElPairM","",nBinsM,lowM,uppM);
                     hJ1_mcJElPairM->SetTitle("#it{m} of pairs of pp electrons;#it{m}_{ppe pair} [GeV/#it{c}^{2}];counts");
                     objArr->AddAt(hJ1_mcJElPairM, kJ1_mcJElPairM);
-    // acceptance
+    // acceptance and efficiency
+    TH1F* hJ1_mcJElPairRap_gen = new TH1F("hJ1_mcJElPairRap_gen","",30,3.0,6.0);
+                    hJ1_mcJElPairRap_gen->SetTitle("#it{y} of pp electrons pairs generated in 3.4 < #it{y} < 5.8;#it{y}_{ppe pair} [-];counts");
+                    objArr->AddAt(hJ1_mcJElPairRap_gen, kJ1_mcJElPairRap_gen);
     TH1F* hJ1_mcJElPairRap_acc = new TH1F("hJ1_mcJElPairRap_acc","",30,3.0,6.0);
-                    hJ1_mcJElPairRap_acc->SetTitle("#it{y} of pairs of pp electrons with 3.4 < #eta^{e^{#pm}}< 5.8;#it{y}_{ppe pair} [-];counts");
+                    hJ1_mcJElPairRap_acc->SetTitle("#it{y} of pp electron pairs with 3.4 < #eta^{e^{#pm}}< 5.8;#it{y}_{ppe pair} [-];counts");
                     objArr->AddAt(hJ1_mcJElPairRap_acc, kJ1_mcJElPairRap_acc);
     //* TH2F histograms:
     TH2F* hJ2_clX_clY = new TH2F("hJ2_clX_clY","",2*nBinsXY,lowXY,uppXY,2*nBinsXY,lowXY,uppXY);
@@ -337,12 +344,16 @@ void CreateHistos_MainJpsi(TObjArray* objArr)
     TH1F* hJ1_clPairRap = new TH1F("hJ1_clPairRap","",nBinsRapEta,lowRapEta,uppRapEta);
                     hJ1_clPairRap->SetTitle("rapidity of cluster pairs;#it{y}_{cl pair} [-];counts");
                     objArr->AddAt(hJ1_clPairRap, kJ1_clPairRap);
-    TH1F* hJ1_clPairRap_acc = new TH1F("hJ1_clPairRap_acc","",30,3.0,6.0);
-                    hJ1_clPairRap_acc->SetTitle("rapidity of reconstructed cluster pairs;#it{y}_{cl pair} [-];counts");
-                    objArr->AddAt(hJ1_clPairRap_acc, kJ1_clPairRap_acc);
     TH1F* hJ1_clPairSep = new TH1F("hJ1_clPairSep","",nBinsSep,lowSep,uppSep);
                     hJ1_clPairSep->SetTitle("Radial separation of cluster pairs;#Delta#it{R}_{cl pair} [cm];counts");
                     objArr->AddAt(hJ1_clPairSep, kJ1_clPairSep);
+    // acceptance and efficiency
+    TH1F* hJ1_mcJElPairRap_rec = new TH1F("hJ1_mcJElPairRap_rec","",30,3.0,6.0);
+                    hJ1_mcJElPairRap_rec->SetTitle("#it{y} of pp electron pairs matched with reconstructed clusters;#it{y}_{cl pair} [-];counts");
+                    objArr->AddAt(hJ1_mcJElPairRap_rec, kJ1_mcJElPairRap_rec);
+    TH1F* hJ1_clPairRap_rec = new TH1F("hJ1_clPairRap_rec","",30,3.0,6.0);
+                    hJ1_clPairRap_rec->SetTitle("#it{y} of reconstructed cluster pairs;#it{y}_{cl pair} [-];counts");
+                    objArr->AddAt(hJ1_clPairRap_rec, kJ1_clPairRap_rec);
     // cluster pairs matched with ppe pairs
     TH1F* hJ1_ppeClPairM = new TH1F("hJ1_ppeClPairM","",nBinsM,lowM,uppM);
                     hJ1_ppeClPairM->SetTitle("#it{m} of cluster pairs matched with a pair of pp electrons;#it{m}_{matched cl pair} [GeV/#it{c}^{2}];counts");

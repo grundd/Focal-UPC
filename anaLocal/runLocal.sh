@@ -5,7 +5,8 @@
 
 # version as of Nov 09, 2022
 
-sim="cohJpsiNoFIT"
+sim="cohJpsi"
+overwrite=kFALSE
 
 # calculate:
 # - rapidity dependence of Starlight cross sections
@@ -18,7 +19,7 @@ fi
 # run primary (grid) and secondary (main) analysis
 # over all input data for a selected process
 if true; then 
-    aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$sim'")'
+    aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$sim'",'$overwrite')'
     aliroot -q 'AnaMain.C("'$sim'")'
 fi
 

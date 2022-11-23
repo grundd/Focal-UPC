@@ -9,6 +9,7 @@
 #include "TCollection.h"
 #include "TObject.h"
 #include "TLorentzVector.h"
+#include "TLegend.h"
 // my headers
 #include "ConfigAnalysis.h"
 #include "ConfigParameters.h"
@@ -248,8 +249,10 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
                 ((TH1F*)arrHistos->At(kJ1_clPairPt))->Fill(fPtClPair);
                 if(clPairM > 2.8) ((TH1F*)arrHistos->At(kJ1_clPairPt_massCut))->Fill(fPtClPair);
                 ((TH1F*)arrHistos->At(kJ1_clPairRap))->Fill(Cl12.Rapidity());
-                ((TH1F*)arrHistos->At(kJ1_clPairRap_acc))->Fill(Cl12.Rapidity());
                 ((TH1F*)arrHistos->At(kJ1_clPairM))->Fill(clPairM);
+                // acceptance and efficiency
+                ((TH1F*)arrHistos->At(kJ1_mcJElPairRap_rec))->Fill(El12.Rapidity());
+                ((TH1F*)arrHistos->At(kJ1_clPairRap_rec))->Fill(Cl12.Rapidity());
                 // radial separation between the pairs of clusters
                 /*
                 Float_t sepCl = TMath::Sqrt(TMath::Power(xCl1-xCl2,2) + TMath::Power(yCl1-yCl2,2));
@@ -335,20 +338,99 @@ TH* GetHistoFromList(TString filePath, TString listName, TString histoName, Bool
 void AxE()
 {
     // rapidity distribution of AxE:
-    // load histogram with all JEl pairs generated within FOCAL acceptance
-    TH1F *hGen = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()),
-        "lTH1F","hJ1_mcJElPairRap_acc",kFALSE);
-    hGen->SetName("hGen");
-    // load histogram with reconstructed cluster pairs
-    TH1F* hRec = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()),
-        "lTH1F","hJ1_clPairRap_acc",kFALSE);
-    hRec->SetName("hRec");
+    // histogram with all JEl pairs generated in FOCAL rapidity coverage
+    TH1F *hJElPairGen = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()),
+        "lTH1F","hJ1_mcJElPairRap_gen");
+    hJElPairGen->SetName("hJElPairGen");
+    // histogram with all JEl pairs with both electrons reaching FOCAL
+    TH1F *hJElPairAcc = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()),
+        "lTH1F","hJ1_mcJElPairRap_acc");
+    hJElPairAcc->SetName("hJElPairAcc");
+    // histogram with rapidity dist of pp ele pairs matched with reconstructed cl pairs
+    TH1F *hJElPairRec = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()),
+        "lTH1F","hJ1_mcJElPairRap_rec");
+    hJElPairRec->SetName("hJElPairRec");
+    // histogram with rapidity dist of reconstructed cl pairs
+    TH1F* hClPairRec = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()),
+        "lTH1F","hJ1_clPairRap_rec");
+    hClPairRec->SetName("hClPairRec");
     // calculate and draw AxE in given rapidity bins
-    TH1F* hAxE = (TH1F*)(hRec->Clone("hAxE"));
-    hAxE->SetTitle("hAxE;#it{y} [-];#it{N}_{rec cl pairs} / #it{N}_{gen events}");
+    TH1F* hAxE = (TH1F*)(hJElPairRec->Clone("hAxE"));
+    hAxE->SetTitle("Rapidity dependence of (Acc#times#varepsilon);#it{y} [-];#it{N}_{rec cl pairs} / #it{N}_{gen events}");
+    hAxE->SetBit(TH1::kNoStats);
     hAxE->Sumw2();
-    hAxE->Divide(hGen);
-    DrawHisto1D(hAxE,Form("%smerged_%s",outDir.Data(),outSubDir.Data()));
+    hAxE->Divide(hJElPairGen);
+    // calculate integrated efficiency
+    Float_t NGen(0.), NRec(0.);
+    for(Int_t iBin = 1; iBin <= 30; iBin++) {
+        NGen += hJElPairGen->GetBinContent(iBin);
+        NRec += hClPairRec->GetBinContent(iBin);
+    }
+    Float_t totalAxE = NRec / NGen;
+    // plot rapidity dist of all four histograms
+    TCanvas c1("c1","c1",700,600);
+    // canvas settings
+    //c1.SetLogy();
+    c1.SetLeftMargin(0.11);
+    c1.SetRightMargin(0.03);
+    // x-axis
+    hJElPairGen->GetXaxis()->SetTitle("#it{y} [-]");
+    hJElPairGen->GetXaxis()->SetDecimals(1);
+    hJElPairGen->GetXaxis()->SetTitleOffset(1.2);
+    // y-axis
+    hJElPairGen->GetYaxis()->SetDecimals(1);
+    hJElPairGen->GetYaxis()->SetMaxDigits(3);
+    // ranges of axes
+    hJElPairGen->GetYaxis()->SetRangeUser(1.,hJElPairGen->GetMaximum()*1.05);
+    // print the histograms
+    SetHistoLineFill(hJElPairGen,kBlue);
+    hJElPairGen->SetBit(TH1::kNoStats);
+    hJElPairGen->Draw("HIST");
+    SetHistoLineFill(hJElPairAcc,kRed);
+    hJElPairAcc->Draw("HIST SAME");
+    SetHistoLineFill(hJElPairRec,kGreen);
+    hJElPairRec->Draw("HIST SAME");
+    SetHistoLineFill(hClPairRec,kViolet);
+    hClPairRec->Draw("HIST SAME");
+    // legend
+    TLegend l1(0.50,0.70,0.95,0.90);
+    l1.AddEntry(hJElPairGen,"generated e^{-}e^{+} pairs","L");
+    l1.AddEntry(hJElPairAcc,"FOCAL acceptance: 3.4 < #eta^{e^{#pm}} < 5.8","L");
+    l1.AddEntry(hJElPairRec,"e^{-}e^{+} pairs matched with rec cl pairs","L");
+    l1.AddEntry(hClPairRec,"rec cl pairs","L");
+    l1.SetTextSize(0.032);
+    l1.SetBorderSize(0);
+    l1.SetFillStyle(0);
+    l1.SetMargin(0.15);
+    l1.Draw();
+    // print the canvas
+    c1.Print(Form("%smerged_%shAxE_rapDists.pdf",outDir.Data(),outSubDir.Data()));
+    // plot AxE
+    TCanvas c2("c2","c2",700,600);
+    // canvas settings
+    c2.SetLeftMargin(0.11);
+    c2.SetRightMargin(0.03);
+    // x-axis
+    hAxE->GetXaxis()->SetDecimals(1);
+    hAxE->GetXaxis()->SetTitleOffset(1.2);
+    // y-axis
+    hAxE->GetYaxis()->SetDecimals(1);
+    hAxE->GetYaxis()->SetMaxDigits(3);
+    // ranges of axes
+    hAxE->GetYaxis()->SetRangeUser(0.,hAxE->GetMaximum()*1.05);
+    // print the histogram
+    SetHistoLineFill(hAxE,kBlue);
+    hAxE->SetBit(TH1::kNoStats);
+    hAxE->Draw("");
+    // legend
+    TLegend l2(0.73,0.85,0.95,0.90);
+    l2.AddEntry((TObject*)0,Form("total (Acc#times#varepsilon): %.2f%%",totalAxE*100.),"");
+    l2.SetTextSize(0.032);
+    l2.SetBorderSize(0);
+    l2.SetFillStyle(0);
+    l2.SetMargin(0.);
+    l2.Draw();
+    c2.Print(Form("%smerged_%shAxE.pdf",outDir.Data(),outSubDir.Data()));
 
     return;
 }
