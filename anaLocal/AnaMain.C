@@ -1,6 +1,8 @@
 // AnaMain.C
 // David Grund, Nov 06, 2022
 
+// cpp headers
+#include <fstream>
 // root headers
 #include "TSystem.h"
 #include "TFileMerger.h"
@@ -145,8 +147,6 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
     CreateHistos_MainJpsi(arrHistos);
 
     // create output file containing a tree of cl pairs
-    Float_t fEnClPair, fPtClPair, fEtaClPair, fPhiClPair;
-    Float_t fEnJElPair, fPtJElPair, fEtaJElPair, fPhiJElPair;
     TFile* fOut = new TFile(sDir + "analysisResultsMain.root","RECREATE");
     TTree* tOut = new TTree("tClPairs", "output tree containing cluster pairs");
     // pairs of summed clusters/superclusters
@@ -360,13 +360,17 @@ void AxE()
     hAxE->SetBit(TH1::kNoStats);
     hAxE->Sumw2();
     hAxE->Divide(hJElPairGen);
-    // calculate integrated efficiency
+    // calculate the integrated efficiency
     Float_t NGen(0.), NRec(0.);
     for(Int_t iBin = 1; iBin <= 30; iBin++) {
         NGen += hJElPairGen->GetBinContent(iBin);
         NRec += hClPairRec->GetBinContent(iBin);
     }
     Float_t totalAxE = NRec / NGen;
+    // print the value
+    ofstream of(Form("%smerged_%stotalAxE.txt",outDir.Data(),outSubDir.Data()));
+    of << totalAxE;
+    of.close();
     // plot rapidity dist of all four histograms
     TCanvas c1("c1","c1",700,600);
     // canvas settings
@@ -381,7 +385,7 @@ void AxE()
     hJElPairGen->GetYaxis()->SetDecimals(1);
     hJElPairGen->GetYaxis()->SetMaxDigits(3);
     // ranges of axes
-    hJElPairGen->GetYaxis()->SetRangeUser(1.,hJElPairGen->GetMaximum()*1.05);
+    hJElPairGen->GetYaxis()->SetRangeUser(0.,hJElPairGen->GetMaximum()*1.05);
     // print the histograms
     SetHistoLineFill(hJElPairGen,kBlue);
     hJElPairGen->SetBit(TH1::kNoStats);

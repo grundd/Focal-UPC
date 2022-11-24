@@ -132,3 +132,20 @@ void SetBranchAddresses_tCls(TTree* t)
     Printf("Branch addresses of %s set.", t->GetName());
     return;
 }
+
+Float_t fEnClPair, fPtClPair, fEtaClPair, fPhiClPair;
+Float_t fEnJElPair, fPtJElPair, fEtaJElPair, fPhiJElPair;
+
+void SetBranchAddresses_tClPairs(TTree* t)
+{
+    t->SetBranchAddress("fEnClPair", &fEnClPair);
+    t->SetBranchAddress("fPtClPair", &fPtClPair);
+    t->SetBranchAddress("fEtaClPair", &fEtaClPair);
+    t->SetBranchAddress("fPhiClPair", &fPhiClPair);
+    t->SetBranchAddress("fEnJElPair", &fEnJElPair);
+    t->SetBranchAddress("fPtJElPair", &fPtJElPair);
+    t->SetBranchAddress("fEtaJElPair", &fEtaJElPair);
+    t->SetBranchAddress("fPhiJElPair", &fPhiJElPair);
+    Printf("Branch addresses of %s set.", t->GetName());
+    return;
+}

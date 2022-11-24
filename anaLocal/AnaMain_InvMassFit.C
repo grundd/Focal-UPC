@@ -12,15 +12,123 @@
 #include "RooAddPdf.h"
 #include "RooExtendPdf.h"
 // my headers
-#include "FocalUpc_Utilities.h"
-#include "FocalUpc_ConfigAnalysis.h"
+#include "ConfigAnalysis.h"
+#include "ConfigParameters.h"
+#include "AnaMain.h"
 
 using namespace RooFit;
+
+// names of the processes
+TString processes[6] = {
+    "cohJpsi",
+    "incJpsi",
+    "cohFD",
+    "incFD",
+    "cohPsi2s",
+    "incPsi2s"
+};
+// expected number of photoproduced VMs in FOCAL rapidity converage:
+// 3.4 < y < 5.8
+Float_t expNFocRap[6] = {
+    965000, // coh J/psi
+    715000, // inc J/psi
+    95000,  // coh FD
+    74000,  // inc FD
+    20000,  // coh psi'
+    16000   // inc psi'
+};
+
+TString outSubDir = "";
+TString sOut = "";
+
+Int_t nBinsM(50);
+Float_t lowM(0.), uppM(5.);
 
 Float_t fM,fPt,fRap;
 Bool_t fixNParameters = kFALSE;
 Bool_t fitWithDSCB = kTRUE;
 
+void PrintHistogram(TH1F *h, TString path)
+{
+    TCanvas c("c","c",700,600);
+    // canvas settings
+    c.SetLeftMargin(0.11);
+    c.SetRightMargin(0.03);
+    // x-axis
+    h->GetXaxis()->SetDecimals(1);
+    h->GetXaxis()->SetTitleOffset(1.2);
+    // y-axis
+    h->GetYaxis()->SetDecimals(1);
+    h->GetYaxis()->SetMaxDigits(3);
+    // ranges of axes
+    h->GetYaxis()->SetRangeUser(0.,h->GetMaximum()*1.05);
+    // print the histogram
+    SetHistoLineFill(h,kBlue);
+    h->SetBit(TH1::kNoStats);
+    h->Draw("HIST");
+    // legend
+    TLegend l(0.18,0.83,0.40,0.88);
+    l.AddEntry((TObject*)0,Form("integral: %.0f",h->Integral()),"");
+    l.SetTextSize(0.032);
+    l.SetBorderSize(0);
+    l.SetFillStyle(0);
+    l.SetMargin(0.);
+    l.Draw();
+    c.Print(Form("%s",path.Data()));
+    return;
+}
+
+TH1F* PrepareHist(Int_t process)
+{
+    ConfigLocalAnalysis(processes[process]);
+    // get the file with the tree
+    TFile* f = TFile::Open(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()),"read");
+    if(f) Printf("File %s loaded.", f->GetName());
+    TTree* t = dynamic_cast<TTree*>(f->Get("tClPairs"));
+    if(t) Printf("Tree %s loaded.", t->GetName());
+    SetBranchAddresses_tClPairs(t);
+    // define a histogram with invariant masses
+    TH1F* hInvMass = new TH1F(Form("h%s",processes[process].Data()),"",nBinsM,lowM,uppM);
+    hInvMass->SetTitle(";#it{m}_{cl pairs} [GeV/#it{c}^{2}]; counts [-]");
+    // go over tree entries and fill a histogram with masses
+    Int_t nClPairs = t->GetEntries();
+    for(Int_t iClPair = 0; iClPair < nClPairs; iClPair++)
+    {
+        t->GetEntry(iClPair);
+        TLorentzVector clPair;
+        clPair.SetPtEtaPhiE(fPtClPair,fEtaClPair,fEtaClPair,fEnClPair);
+        hInvMass->Fill(clPair.M());
+    }
+    // get the total AxE
+    Float_t totalAxE;
+    ifstream ifs(Form("%smerged_%stotalAxE.txt",outDir.Data(),outSubDir.Data()));
+    ifs >> totalAxE;
+    ifs.close();
+    // scale the histogram to the expected yields
+    Float_t currIntegral = hInvMass->Integral();
+    Float_t currNFocRap = currIntegral / totalAxE;
+    Float_t scale = expNFocRap[process] / currNFocRap;
+    hInvMass->Scale(scale);
+    Float_t newIntegral = hInvMass->Integral();
+    Float_t newAxE = newIntegral / expNFocRap[process];
+    // print the info
+    cout << "\n**********************************"
+         << " process: " << processes[process] << "\n"
+         << " before scaling: \n"
+         << "  - integral: " << currIntegral << "\n"
+         << "  - total AxE: " << totalAxE << "\n"
+         << "  - N in FOC rap: " << currNFocRap << "\n"
+         << " scale: " << scale << "\n"
+         << " after scaling: \n"
+         << "  - integral: " << newIntegral << "\n"
+         << "  - total AxE: " << newAxE << "\n"
+         << "  - N in FOC rap: " << newIntegral / newAxE << "\n";
+    // print the histogram
+    PrintHistogram(hInvMass,Form("%sh_%s.pdf",sOut.Data(),processes[process].Data()));
+    return hInvMass;
+}
+
+/*
 void PrepareTree(TString sIn)
 {
     TFile* f = TFile::Open(sIn.Data(),"read");
@@ -70,6 +178,7 @@ void PrepareTree(TString sIn)
         return;
     }
 }
+*/
 
 void DrawCM(TCanvas* cCM, RooFitResult* fResFit)
 {
@@ -106,7 +215,7 @@ void SetCanvas(TCanvas* c, Bool_t logScale)
     return;
 }
 
-void DoFit(TString sSim)
+void DoFit(TString sim)
 {
     // fit the invariant mass distribution of the signal using Double-sided CB function
 
@@ -116,14 +225,14 @@ void DoFit(TString sSim)
     Float_t fMCutUpp  = 4.;
     Float_t fPtCutLow = -1e3;
     Float_t fPtCutUpp = -1e3;
-    Float_t fRapCutLow = fEtaFOClow;
-    Float_t fRapCutUpp = fEtaFOCupp;
+    Float_t fRapCutLow = 3.4;
+    Float_t fRapCutUpp = 5.8;
 
-    if(sSim == "cohJpsi") {
+    if(sim == "cohJpsi") {
         fPtCutLow = 0.0;
         fPtCutUpp = 1.0;
     }
-    else if(sSim == "incJpsi") {
+    else if(sim == "incJpsi") {
         fPtCutLow = 0.2;
         fPtCutUpp = 1.0;    
     }
@@ -273,20 +382,27 @@ void DoFit(TString sSim)
     return;
 }
 
-void FocalUpc_InvMassFit(TString sSim)
+void AnaMain_InvMassFit()
 {
-    if(!ConfigAnalysis(sSim)) {
-        cout << "Wrong configuration. Terminating..." << endl;
-        return;
-    }
-    gSystem->Exec("mkdir -p " + sOut + "invMassFit/");
+    outSubDir = CreateOutputSubDir();
+    sOut = Form("results/sim%02i_g%02i_p%02i/invMassFit/",simFiles,fileGeom,filePara);
+    gSystem->Exec("mkdir -p " + sOut);
 
+    TH1F* hProcesses[6] = { NULL };
+    TH1F* hAll = new TH1F("hAll","",nBinsM,lowM,uppM);
+    hAll->SetTitle(";#it{m}_{cl pairs} [GeV/#it{c}^{2}]; counts [-]");
+    for(Int_t i = 0; i < 6; i++) {
+        hProcesses[i] = PrepareHist(i);
+        hAll->Add(hProcesses[i]);
+    }
+    PrintHistogram(hAll,Form("%sh_all.pdf",sOut.Data()));
+    /*
     // prepare the data tree that will be used for fitting
     TString sIn = sOut + "invMassFit/tInvMassFit.root";
     PrepareTree(sIn);
 
     // do the invariant mass fit
-    DoFit(sSim);
-
+    DoFit(sim);
+    */
     return;
 }

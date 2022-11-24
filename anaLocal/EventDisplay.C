@@ -35,20 +35,20 @@ void PlotEventDisplays(TString, TString, TString, Bool_t);
 void EventDisplay(TString sim)
 {
     // set the input folder:
-    TString inDir = Form("inputData/sim%02i/",simFiles);
+    TString inDir = Form("inputData/aliDPG_v%02i/",simFiles);
     // box electrons
-    if(sim == "boxEle") inDir += "BoxElectrons_";
+    if(sim == "boxEle") inDir += "BoxElectrons/";
     // box photons
-    else if(sim == "boxPho") inDir += "BoxPhotons_";
+    else if(sim == "boxPho") inDir += "BoxPhotons/";
     // kCohJpsiToElRad
-    else if(sim == "cohJpsi") inDir += "kCohJpsiToElRad_";
+    else if(sim == "cohJpsi") inDir += "kCohJpsiToElRad/";
     // kIncohJpsiToElRad
-    else if(sim == "incJpsi") inDir += "kIncohJpsiToElRad_";
+    else if(sim == "incJpsi") inDir += "kIncohJpsiToElRad/";
     else {
         cout << " ERROR: Configuration not supported. Choose between \"boxEle\",\"boxPho\",\"cohJpsi\",\"incJpsi\". Terminating..." << endl;
         return;
     }
-    inDir += Form("%03i_1000ev/",nSim);
+    inDir += Form("%03i/",nSim);
     // set the output folder and subfolder:
     TString outDir = Form("results/sim%02i_g%02i_p%02i/%s/%03i/",simFiles,fileGeom,filePara,sim.Data(),nSim);
     TString outSubDir = "eventDisplay/";  

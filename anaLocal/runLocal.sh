@@ -3,9 +3,9 @@
 # to run it do (inside ali shell):
 # ./run.sh
 
-# version as of Nov 09, 2022
+# version as of Nov 24, 2022
 
-sim="cohJpsi"
+process="incPsi2s"
 overwrite=kFALSE
 
 # calculate:
@@ -16,11 +16,26 @@ if false; then
     aliroot -q 'StarlightRapDep.C'
 fi
 
-# run primary (grid) and secondary (main) analysis
-# over all input data for a selected process
-if true; then 
-    aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$sim'",'$overwrite')'
-    aliroot -q 'AnaMain.C("'$sim'")'
+# run primary (grid) and secondary (main) analysis over input data for a selected process
+if false; then 
+    aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$process'",'$overwrite')'
+    aliroot -q 'AnaMain.C("'$process'")'
+fi
+
+# run primary (grid) and secondary (main) analysis over all processes
+if false; then 
+    for pcs in "cohJpsi" "incJpsi" "cohFD" "incFD" "cohPsi2s" "incPsi2s"
+    do
+        aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$pcs'",'$overwrite')'
+        aliroot -q 'AnaMain.C("'$pcs'")'
+    done
+    # make the combined invariant mass fit 
+    aliroot -q AnaMain_InvMassFit.C
+fi
+
+# do invariant mass of the combined sample
+if true; then
+    aliroot -q AnaMain_InvMassFit.C
 fi
 
 # run clusterizer over a specific HITS file
@@ -40,10 +55,10 @@ fi
 
 # run primary analysis over a selected input: cohJpsi
 if false; then 
-    aliroot -q 'FocalUpcGrid.C(kTRUE,kFALSE,"inputData/sim02/kCohJpsiToElRad_001_1000ev/","results/sim02_g02_p02/cohJpsi/001/")'
+    aliroot -q 'FocalUpcGrid.C(kTRUE,"cohJpsi",'$overwrite',"inputData/aliDPG_v02/kCohJpsiToElRad/001/","results/sim02_g02_p02/cohJpsi/001/")'
 fi
 
 # run primary analysis over a selected input: box electrons
 if false; then 
-    aliroot -q 'FocalUpcGrid.C(kTRUE,kTRUE,"inputData/sim02/BoxElectrons_001_1000ev/","results/sim02_g02_p02/boxEle/001/")'
+    aliroot -q 'FocalUpcGrid.C(kTRUE,"boxEle",'$overwrite',"inputData/aliDPG_v02/BoxElectrons/001/","results/sim02_g02_p02/boxEle/001/")'
 fi

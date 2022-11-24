@@ -7,17 +7,19 @@
 
 void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString sIn = "", TString sOut = "")
 {
-    // PDG code of expected mother particle of physical primary electrons in the dataset
+    // PDG code of expected mother of physical primary electrons in the dataset
     // (!) in AliDPG notation in feed-down files, the mother of electron pairs is psi', not J/psi
     // not needed for box simulations
-    Int_t pdgMotherOfPhysPrimEl(-1);
+    Int_t pdgMother(-1);
+    // PDG code of the main vector meson in the dataset
+    Int_t pdgMainVM(-1);
     if(sim == "cohJpsi" 
     || sim == "cohJpsiNoFIT"
-    || sim == "incJpsi") pdgMotherOfPhysPrimEl = 443;
+    || sim == "incJpsi") { pdgMother = 443; pdgMainVM = 443; }
     else if(sim == "cohFD"  
-         || sim == "incFD" 
-         || sim == "cohPsi2s" 
-         || sim == "incPsi2s") pdgMotherOfPhysPrimEl = 100443;
+         || sim == "incFD") { pdgMother = 100443; pdgMainVM = 443; }
+    else if(sim == "cohPsi2s" 
+         || sim == "incPsi2s") { pdgMother = 100443; pdgMainVM = 100443; }
 
     // is it box simulation?
     Bool_t isBoxSim(kFALSE);
@@ -407,7 +409,7 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
             {
                 TParticle* part = stack->Particle(iTrk);
                 // if J/psi
-                if(part->GetPdgCode() == 443) {
+                if(part->GetPdgCode() == pdgMainVM) {
                     ((TH1F*)arrHistos->At(kJ1_mcJEn))->Fill(part->Energy());
                     ((TH1F*)arrHistos->At(kJ1_mcJPt))->Fill(part->Pt());
                     ((TH1F*)arrHistos->At(kJ1_mcJRap))->Fill(part->Y());
@@ -420,7 +422,7 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
                     if(part->GetMother(0) >= 0) {
                         TParticle* mother = stack->Particle(part->GetMother(0));
                         // if it doesn't have the expected pdg code:
-                        if(mother->GetPdgCode() != pdgMotherOfPhysPrimEl) 
+                        if(mother->GetPdgCode() != pdgMother) 
                             cout << " * MESSAGE: Unexpected mother of a pp electron." << endl;
                     }
                     ((TH2F*)arrHistos->At(kJ2_mcJElEta_mcJElPt))->Fill(part->Eta(), part->Pt());
