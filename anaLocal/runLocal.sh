@@ -5,7 +5,7 @@
 
 # version as of Nov 24, 2022
 
-process="incPsi2s"
+process="incFD"
 overwrite=kFALSE
 
 # calculate:

@@ -54,9 +54,12 @@ TString outSubDir = "";
 TString sOut = "";
 // mass binning
 Int_t nBinsM;
-Float_t fMLow = 0.; // GeV
-Float_t fMUpp = 5.;
-Float_t fMStep = 0.1;
+Float_t fMLow = 1.4; // GeV
+Float_t fMUpp = 4.2;
+Float_t fMStep = 0.04;
+// cuts
+Float_t fPtLow = 0.0;
+Float_t fPtUpp = 0.2;
 
 Float_t roundFloat(Float_t N)
 {
@@ -122,13 +125,18 @@ void PrepareHist(Int_t iPcs, TH1F* h, TH1F* hRnd)
     SetBranchAddresses_tClPairs(t);
     // go over tree entries and fill a histogram with masses
     Int_t nClPairs = t->GetEntries();
+    Float_t nNoRapCut = 0;
+    Float_t nRapCut = 0;
     for(Int_t iClPair = 0; iClPair < nClPairs; iClPair++)
     {
         t->GetEntry(iClPair);
         TLorentzVector clPair;
         clPair.SetPtEtaPhiE(fPtClPair,fEtaClPair,fEtaClPair,fEnClPair);
-        //if(clPair.Pt() < 0.4) 
-        h->Fill(clPair.M());
+        nNoRapCut++;
+        if(clPair.Pt() > fPtLow && clPair.Pt() < fPtUpp) {
+            nRapCut++;
+            h->Fill(clPair.M());
+        }
     }
     // get the total AxE
     Float_t totalAxE;
@@ -137,7 +145,7 @@ void PrepareHist(Int_t iPcs, TH1F* h, TH1F* hRnd)
     ifs.close();
     // scale the histogram to the expected yields
     Float_t currIntegral = h->Integral();
-    Float_t currNFocRap = currIntegral / totalAxE;
+    Float_t currNFocRap = currIntegral / (totalAxE * nRapCut / nNoRapCut);
     Float_t scale = expNFocRap[iPcs] / currNFocRap;
     // generate new histogram with the expected # of events
     Int_t nToGenerate = (Int_t)roundFloat(currIntegral * scale);
@@ -149,16 +157,17 @@ void PrepareHist(Int_t iPcs, TH1F* h, TH1F* hRnd)
     Float_t newIntegral = h->Integral();
     Float_t newAxE = newIntegral / expNFocRap[iPcs];
     // print the info
-    cout << "\n**********************************"
+    cout << "\n**********************************\n"
          << " process: " << processes[iPcs] << "\n"
          << " before scaling: \n"
          << "  - integral: " << currIntegral << "\n"
          << "  - total AxE: " << totalAxE << "\n"
+         << "  - pT cut eff: " << nRapCut / nNoRapCut << "\n"
          << "  - N in FOC rap: " << currNFocRap << "\n"
          << " scale: " << scale << "\n"
          << " after scaling: \n"
          << "  - integral: " << newIntegral << "\n"
-         << "  - total AxE: " << newAxE << "\n"
+         << "  - total AxE * pT cut eff: " << newAxE << "\n"
          << "  - N in FOC rap: " << newIntegral / newAxE << "\n";
     // print the histograms
     PrintHistogram(h);
@@ -189,12 +198,13 @@ void DrawCM(TCanvas* cCM, RooFitResult* fResFit)
 void SetCanvas(TCanvas* c, Bool_t logScale)
 {
     if(logScale) c->SetLogy();
+    c->SetTopMargin(0.05);
     c->SetLeftMargin(0.11);
     c->SetRightMargin(0.03);
     return;
 }
 
-void DoFit(TString sim, TH1F* h)
+void DoFit(Int_t iPcs, TH1F* h)
 {
     // fit the invariant mass distribution of the signal using Double sided CB function
 
@@ -209,13 +219,16 @@ void DoFit(TString sim, TH1F* h)
     cout << "Number of events in the histogram: " << nEv << endl;
 
     // roofit variables
-    RooRealVar mean("mean","m",3.097,2.8,3.3);
-    RooRealVar sigmaL("sigma_{L}", "sigma_{L}",0.1, 0.01, 0.20);
-    RooRealVar sigmaR("sigma_{R}", "sigma_{R}",0.1, 0.01, 0.20); 
-    RooRealVar nL("n_{L}","n_{L}",10.,0.,100.);
-    RooRealVar nR("n_{R}","n_{R}",10.,0.,100.);
-    RooRealVar alphaL("#alpha_{L}","alpha_{L}",10.,0.,40.);
-    RooRealVar alphaR("#alpha_{R}","alpha_{R}",10.,0.,40.);
+    Float_t meanVal, meanLow, meanUpp;
+    if(iPcs == 0) { meanVal = 3.097; meanLow = 2.8; meanUpp = 3.3; }
+    if(iPcs == 4) { meanVal = 3.686; meanLow = 3.4; meanUpp = 3.9; }
+    RooRealVar mean("#mu","m",meanVal,meanLow,meanUpp);
+    RooRealVar sigmaL("#sigma_{L}", "sigma_{L}",0.1, 0.01, 0.20);
+    RooRealVar sigmaR("#sigma_{R}", "sigma_{R}",0.1, 0.01, 0.20);
+    RooRealVar nL("#it{n}_{L}","n_{L}",1.,0.01,100.);
+    RooRealVar nR("#it{n}_{R}","n_{R}",1.,0.01,100.);
+    RooRealVar alphaL("#alpha_{L}","alpha_{L}",1.,0.01,40.);
+    RooRealVar alphaR("#alpha_{R}","alpha_{R}",1.,0.01,40.);
     RooCrystalBall DSCB("DSCB", "Double sided CB function", fM, mean, sigmaL, sigmaR, alphaL, nL, alphaR, nR);
     // fix some parameters?
     Bool_t fix = kFALSE;
@@ -224,12 +237,12 @@ void DoFit(TString sim, TH1F* h)
     }
     // perform the fit
     // extended fit?
-    Bool_t ext = kTRUE; 
-    RooRealVar N("N","N",nEv,nEv*0.8,nEv*1.2);
+    Bool_t ext = kTRUE;
+    RooRealVar N("#it{N}","N",nEv,nEv*0.8,nEv*1.2);
     RooExtendPdf ExtDSCB("ExtDSCB","Extended Double sided CB function",DSCB,N);
     RooFitResult* fResFit;
-    if(ext) fResFit = ExtDSCB.fitTo(fDataHist,Extended(kTRUE),Range(fMLow,fMUpp),Save()); 
-    else    fResFit = DSCB.fitTo(fDataHist,Range(fMLow,fMUpp),Save());
+    if(ext) fResFit = ExtDSCB.fitTo(fDataHist,SumW2Error(kFALSE),Extended(kTRUE),Save()); 
+    else    fResFit = DSCB.fitTo(fDataHist,SumW2Error(kFALSE),Save());
 
     // plot the results
     // draw correlation matrix
@@ -237,20 +250,20 @@ void DoFit(TString sim, TH1F* h)
     DrawCM(cCM,fResFit);
 
     // draw histogram and fit
-    TCanvas *c = new TCanvas("c","c",700,600);
+    TCanvas* c = new TCanvas("c","c",700,600);
     SetCanvas(c,kFALSE);
     
     RooPlot* fr = fM.frame(Title("inv mass fit")); 
-    fDataHist.plotOn(fr,Name("fDataHist"),MarkerStyle(20),MarkerSize(1.),Range(1.0,4.0));
+    fDataHist.plotOn(fr,Name("fDataHist"),MarkerStyle(20),MarkerSize(1.));
     if(ext) ExtDSCB.plotOn(fr,Name("ExtDSCB"),LineColor(215),LineWidth(3),LineStyle(9));
     else    DSCB.plotOn(fr,Name("DSCB"),LineColor(215),LineWidth(3),LineStyle(9));
     // Y axis
     Float_t hMax = h->GetMaximum();
-    fr->GetYaxis()->SetRangeUser(0.0,hMax*1.05);
+    //fr->GetYaxis()->SetRangeUser(0.0,hMax*1.05);
     // title
     fr->GetYaxis()->SetTitle(Form("Counts per %.0f MeV/#it{c}^{2}", fMStep*1e3));
     fr->GetYaxis()->SetTitleSize(0.032);
-    fr->GetYaxis()->SetTitleOffset(1.3);
+    fr->GetYaxis()->SetTitleOffset(1.4);
     // label
     fr->GetYaxis()->SetLabelSize(0.032);
     fr->GetYaxis()->SetLabelOffset(0.01);
@@ -274,38 +287,38 @@ void DoFit(TString sim, TH1F* h)
     Printf("chi2/NDF = %.3f", chi2);
     Printf("NDF = %i", fResFit->floatParsFinal().getSize());
     Printf("chi2/NDF = %.3f/%i", chi2*fResFit->floatParsFinal().getSize(), fResFit->floatParsFinal().getSize());
-    Printf("********************");   
+    Printf("********************");
     
-    TLegend *l = new TLegend(0.10,0.38,0.40,0.96);
-    /*
-    //l->AddEntry((TObject*)0,Form("%.1f < #it{p}_{T} < %.1f GeV/#it{c}",fPtCutLow,fPtCutUpp),"");
-    //l->AddEntry((TObject*)0,Form("%.1f < #it{y} < %.1f",fRapCutLow,fRapCutUpp),"");
-    l->AddEntry((TObject*)0,Form("#it{E}_{cl} > %.0f GeV",cutE),"");
+    TLegend *l = new TLegend(0.16,0.54,0.42,0.94);
+    l->AddEntry((TObject*)0,Form("%.1f < #it{p}_{T} < %.1f GeV/#it{c}",fPtLow,fPtUpp),"");
     l->AddEntry((TObject*)0,Form("#chi^{2}/NDF = %.3f",chi2),"");
-    l->AddEntry((TObject*)0,Form("#it{N} = %.f #pm %.f", norm.getVal(), norm.getError()),"");
-    l->AddEntry((TObject*)0,Form("#mu = %.2f GeV/#it{c}^{2}", mean_L.getVal()),""); // mean_L.getError()
-    l->AddEntry((TObject*)0,Form("#sigma = %.2f GeV/#it{c}^{2}", sigma_L.getVal()),""); // sigma_L.getError()
-    l->AddEntry((TObject*)0,Form("#alpha_{L} = %.2f #pm %.2f", alpha_L.getVal(), alpha_L.getError()),"");
-    if(fitWithDSCB) l->AddEntry((TObject*)0,Form("#alpha_{R} = %.2f #pm %.2f", (-1)*(alpha_R.getVal()), alpha_R.getError()),"");
-    if(!fixNParameters) {
-        l->AddEntry((TObject*)0,Form("#it{n}_{L} = %.0f #pm %.0f", n_L.getVal(), n_L.getError()),"");
-        if(fitWithDSCB) l->AddEntry((TObject*)0,Form("#it{n}_{R} = %.0f #pm %.0f", n_R.getVal(), n_R.getError()),"");
-    } else {
-        l->AddEntry((TObject*)0,Form("#it{n}_{L} = %.1f", n_L.getVal()),"");
-        if(fitWithDSCB) l->AddEntry((TObject*)0,Form("#it{n}_{R} = %.1f", n_R.getVal()),"");
-    }
-    l->SetTextSize(0.042);
+    l->AddEntry((TObject*)0,Form("#it{N} = %.f #pm %.f", N.getVal(), N.getError()),"");
+    l->AddEntry((TObject*)0,Form("#mu = %.2f GeV/#it{c}^{2}", mean.getVal()),"");
+    l->AddEntry((TObject*)0,Form("#sigma_{L} = %.2f GeV/#it{c}^{2}", sigmaL.getVal()),"");
+    l->AddEntry((TObject*)0,Form("#sigma_{R} = %.2f GeV/#it{c}^{2}", sigmaR.getVal()),""); 
+    l->AddEntry((TObject*)0,Form("#alpha_{L} = %.1f", alphaL.getVal()),"");
+    l->AddEntry((TObject*)0,Form("#alpha_{R} = %.1f", alphaR.getVal()),"");
+    l->AddEntry((TObject*)0,Form("#it{n}_{L} = %.1f", nL.getVal()),"");
+    l->AddEntry((TObject*)0,Form("#it{n}_{R} = %.1f", nR.getVal()),"");
+    l->SetTextSize(0.032);
     l->SetBorderSize(0);
     l->SetFillStyle(0);
+    l->SetMargin(0.);
     l->Draw();
-    */
-    
     // save the plots
-    cCM->Print(Form("%sfit_CM.pdf",sOut.Data()));
-    c->Print(Form("%sfit.pdf",sOut.Data()));
+    cCM->Print(Form("%sfit_%s_CM.pdf",sOut.Data(),processes[iPcs].Data()));
+    c->Print(Form("%sfit_%s.pdf",sOut.Data(),processes[iPcs].Data()));
+
+    // draw histogram with log scale
+    TCanvas *cLog = new TCanvas("cLog","cLog",700,600);
+    SetCanvas(cLog,kTRUE);
+    fr->Draw();
+    l->Draw();
+    cLog->Print(Form("%sfit_%s_log.pdf",sOut.Data(),processes[iPcs].Data()));
     
     delete cCM;
     delete c;
+    delete cLog;
     return;
 }
 
@@ -337,15 +350,12 @@ void AnaMain_InvMassFit()
     PrintHistogram(hAll);
     PrintHistogram(hRndAll);
 
-    DoFit("cohJpsi",h[0]);
+    // fit coherent J/psi
+    DoFit(0,hRnd[0]);
 
-    /*
-    // prepare the data tree that will be used for fitting
-    TString sIn = sOut + "invMassFit/tInvMassFit.root";
-    PrepareTree(sIn);
+    // fit coherent psi'
+    DoFit(4,hRnd[4]);
 
-    // do the invariant mass fit
-    DoFit(sim);
-    */
+    // fit the combined sample
     return;
 }
