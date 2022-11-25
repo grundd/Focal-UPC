@@ -4,11 +4,11 @@
 # ./runStarlightNoDigi.sh
 
 # options to set:
-first=11
-simulations=4
+first=13
+simulations=8
 last=$(($first+$simulations-1))
 evPerSim=1000
-process="kCohPsi2sToEl"
+process="kIncohPsi2sToElPi"
 
 # print info:
 echo ""
