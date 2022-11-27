@@ -7,6 +7,7 @@
 #include "TH2F.h"
 #include "TProfile.h"
 #include "TCanvas.h"
+#include "TTree.h"
 
 // ******************************************************************************************************************
 // Functions to plot 1d and 2d histograms 
