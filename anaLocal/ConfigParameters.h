@@ -10,7 +10,7 @@ const Float_t minSeedE = 5; // [GeV]
 const Float_t radius = 15; // [cm]
 
 // selections:
-const Float_t cutE = 30.0; // [GeV]; if > 0, filter out all (super)cls having energy below cutE
+const Float_t cutE = 10.0; // [GeV]; if > 0, filter out all (super)cls having energy below cutE
 const Float_t cutM = 0.0; // [GeV]; if > 0, filter out all (super)cl pairs having mass below cutM
 
 // matching to MC particles:

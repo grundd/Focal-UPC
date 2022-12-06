@@ -73,12 +73,12 @@ Float_t fPtEdgeUpp = 2.;
 Float_t fPtStep = 0.05;
 // cuts: inv mass fit
 Float_t fPtLow = 0.0;
-Float_t fPtUpp = 2.0;
+Float_t fPtUpp = 0.2;
 // cuts: pT distribution
 Float_t fMLow = 2.8;
 Float_t fMUpp = 3.4;
 // reduce the total scale by a factor of:
-Float_t fReduce = 10.;
+Float_t fReduce = 1.;
 
 Float_t roundFloat(Float_t N)
 {
@@ -113,13 +113,13 @@ void PrintHistogram(TH1F *h, TString sOut)
     h->SetBit(TH1::kNoTitle);
     h->Draw("HIST");
     // title
-    TLatex* latex = new TLatex();
-    latex->SetTextSize(0.032);
-    latex->SetTextAlign(21);
-    latex->SetNDC();
-    latex->DrawLatex(0.50,0.95,Form("%s",h->GetTitle()));
+    TLatex* ltx = new TLatex();
+    ltx->SetTextSize(0.032);
+    ltx->SetTextAlign(21);
+    ltx->SetNDC();
+    ltx->DrawLatex(0.50,0.95,Form("%s",h->GetTitle()));
     // legend
-    TLegend l(0.18,0.72,0.36,0.88);
+    TLegend l(0.35,0.72,0.55,0.88);
     l.AddEntry((TObject*)0,"#it{L}_{int} = 6.9 nb^{-1}","");
     l.AddEntry((TObject*)0,Form("total: %.0f events",h->Integral()),"");
     l.AddEntry((TObject*)0,"3.4 < #it{y}_{VM} < 5.8","");
@@ -213,30 +213,35 @@ void PrepareHistos(Int_t iPcs, TH1F* hMass, TH1F* hMassRnd, TH1F* hPt, TH1F* hPt
     return;
 }
 
-void DrawCM(TCanvas* cCM, RooFitResult* fResFit)
+void DrawCM(TCanvas* c, RooFitResult* fResFit)
 {
-    cCM->SetTopMargin(0.05);
-    cCM->SetRightMargin(0.12);
-    cCM->SetLeftMargin(0.12);
-
+    // canvas settings
+    c->SetTopMargin(0.05);
+    c->SetRightMargin(0.12);
+    c->SetLeftMargin(0.12);
+    // style
     gStyle->SetOptTitle(0);
     gStyle->SetOptStat(0);
     gStyle->SetPalette(1);
     gStyle->SetPaintTextFormat("4.2f");
-
-    TH2* hCorr = fResFit->correlationHist();
-    hCorr->SetMarkerSize(2.0);
-    hCorr->GetXaxis()->SetLabelSize(0.08);
-    hCorr->GetYaxis()->SetLabelSize(0.08);
-    hCorr->Draw("colz,text");
-
+    // corr matrix
+    TH2* h = fResFit->correlationHist();
+    h->SetMarkerSize(1.5);
+    // x-axis
+    h->GetXaxis()->SetLabelSize(0.06);
+    h->GetXaxis()->SetLabelOffset(0.01);
+    // y-axis
+    h->GetYaxis()->SetLabelSize(0.06);
+    // z-axis
+    h->GetZaxis()->SetDecimals(1);
+    h->Draw("colz,text");
     return;
 }
 
 void SetCanvas(TCanvas* c, Bool_t logScale)
 {
     if(logScale) c->SetLogy();
-    c->SetTopMargin(0.05);
+    c->SetTopMargin(0.06);
     c->SetLeftMargin(0.11);
     c->SetRightMargin(0.03);
     return;
@@ -323,20 +328,20 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     RooExtendPdf ExtDSCB("ExtDSCB","Extended Double sided CB function",DSCB,_N);
 
     // fit to the combined sample - PDF:
-    RooRealVar _N1(Form("#it{N}_{%s}",VM.Data()),Form("#it{N}_{%s}",VM.Data()),  nEv,nEv*0.8,nEv*1.2);
+    RooRealVar _N1(Form("#it{N}_{%s}",VM.Data()),Form("#it{N}_{%s}",VM.Data()),nEv,nEv*0.8,nEv*1.2);
     RooRealVar _N2(Form("#it{N}_{%s}",VM2.Data()),Form("#it{N}_{%s}",VM2.Data()),nEv*0.01,nEv*0.001,nEv*0.1);
-    RooAddPdf CombinedPDF("CombinedPDF","J/psi DSCB and psi' DSCB", RooArgList(DSCB,DSCB2), RooArgList(_N1,_N2));
+    RooAddPdf CombinedPDF("CombinedPDF","J/psi DSCB and psi' DSCB", RooArgList(DSCB,DSCB2),RooArgList(_N1,_N2));
 
     // perform the fit
     RooFitResult* fResFit;
     if(iPcs<6) {
         // fix some parameters?
-        Bool_t fix = kTRUE;
+        Bool_t fix = kFALSE;
         if(fix) {
             _aR.setConstant(kTRUE);
             _nR.setConstant(kTRUE);
         }
-        if(ext) fResFit = ExtDSCB.fitTo(fDataHist,SumW2Error(kFALSE),Extended(kTRUE),Save()); 
+        if(ext) fResFit = ExtDSCB.fitTo(fDataHist,SumW2Error(kFALSE),Extended(kTRUE),Save());
         else    fResFit = DSCB.fitTo(fDataHist,SumW2Error(kFALSE),Save());
     } else {
         // fix the parameters of the right tails
@@ -357,9 +362,10 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     // draw histogram and fit and calculate chi2
     TCanvas* c = new TCanvas("c","c",700,600);
     SetCanvas(c,kFALSE);
-    
+    gStyle->SetEndErrorSize(1); 
+
     RooPlot* fr = fM.frame(Title("inv mass fit")); 
-    fDataHist.plotOn(fr,Name("fDataHist"),MarkerStyle(20),MarkerSize(1.));
+    fDataHist.plotOn(fr,Name("fDataHist"),MarkerStyle(kFullCircle),MarkerSize(0.8),MarkerColor(kBlack),LineColor(kBlack),LineWidth(2));
     Float_t chi2;
     if(iPcs<6) {
         if(ext) {
@@ -375,8 +381,8 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
         CombinedPDF.plotOn(fr,Name("CombinedPDF"),LineColor(215),LineWidth(3),LineStyle(9));
         chi2 = fr->chiSquare("CombinedPDF","fDataHist",fResFit->floatParsFinal().getSize());
     }
-    // Y axis
-    //fr->GetYaxis()->SetRangeUser(0.0,h->GetMaximum()*1.05);
+    // y-axis
+    fr->GetYaxis()->SetRangeUser(0.0,h->GetMaximum()*1.05);
     // title
     fr->GetYaxis()->SetTitle(Form("Counts per %.0f MeV/#it{c}^{2}", fMStep*1e3));
     fr->GetYaxis()->SetTitleSize(0.032);
@@ -384,8 +390,9 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     // label
     fr->GetYaxis()->SetLabelSize(0.032);
     fr->GetYaxis()->SetLabelOffset(0.01);
+    fr->GetYaxis()->SetDecimals(1);
     fr->GetYaxis()->SetMaxDigits(3);
-    // X axis
+    // x-axis
     // title
     fr->GetXaxis()->SetTitle("#it{m}_{cl pair} [GeV/#it{c}^{2}]");
     fr->GetXaxis()->SetTitleSize(0.032);
@@ -393,7 +400,7 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     // label
     fr->GetXaxis()->SetLabelSize(0.032);
     fr->GetXaxis()->SetLabelOffset(0.01);
-    fr->GetYaxis()->SetDecimals(1);
+    fr->GetXaxis()->SetDecimals(1);
     fr->Draw();
 
     // print calculated chi2 
@@ -404,11 +411,13 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     Printf("********************");
     
     TLegend* l = NULL;
+    TLegend* l1 = NULL;
     if(iPcs<6) {
         Int_t nRows = 10;
-        l = new TLegend(0.16,0.94-nRows*0.04,0.42,0.94);
-        l->AddEntry((TObject*)0,Form("%.1f < #it{p}_{T} < %.1f GeV/#it{c}",fPtLow,fPtUpp),"");
-        l->AddEntry((TObject*)0,Form("#chi^{2}/NDF = %.3f",chi2),"");
+        l = new TLegend(0.14,0.925-nRows*0.04,0.56,0.925);
+        l->AddEntry("fDataHist","simulation","EPL");
+        if(ext) l->AddEntry("ExtDSCB",Form("model (#chi^{2}/NDF = %.3f)",chi2),"L");
+        else    l->AddEntry("DSCB",Form("model (#chi^{2}/NDF = %.3f)",chi2),"L");
         l->AddEntry((TObject*)0,Form("%s = %.f #pm %.f",_N.getTitle().Data(),_N.getVal(),_N.getError()),"");
         l->AddEntry((TObject*)0,Form("%s = %.2f GeV/#it{c}^{2}",_mu.getTitle().Data(),_mu.getVal()),"");
         l->AddEntry((TObject*)0,Form("%s = %.2f GeV/#it{c}^{2}",_sL.getTitle().Data(),_sL.getVal()),"");
@@ -417,21 +426,58 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
         l->AddEntry((TObject*)0,Form("%s = %.1f",_aR.getTitle().Data(),_aR.getVal()),"");
         l->AddEntry((TObject*)0,Form("%s = %.1f",_nL.getTitle().Data(),_nL.getVal()),"");
         l->AddEntry((TObject*)0,Form("%s = %.1f",_nR.getTitle().Data(),_nR.getVal()),"");
+        Int_t nRows1 = 2;
+        l1 = new TLegend(0.14,0.925-nRows1*0.04,0.56,0.925);
+        l1->AddEntry("fDataHist","simulation","EPL");
+        if(ext) l1->AddEntry("ExtDSCB",Form("model (#chi^{2}/NDF = %.3f)",chi2),"L");
+        else    l1->AddEntry("DSCB",Form("model (#chi^{2}/NDF = %.3f)",chi2),"L");
     } else {
-        Int_t nRows = 6;
-        l = new TLegend(0.16,0.94-nRows*0.04,0.42,0.94);
-        l->AddEntry((TObject*)0,Form("%.1f < #it{p}_{T} < %.1f GeV/#it{c}",fPtLow,fPtUpp),"");
-        l->AddEntry((TObject*)0,Form("#chi^{2}/NDF = %.3f",chi2),"");
+        Int_t nRows = 12;
+        l = new TLegend(0.14,0.925-nRows*0.04,0.56,0.925);
+        l->AddEntry("fDataHist","simulation","EPL");
+        l->AddEntry("CombinedPDF",Form("model (#chi^{2}/NDF = %.3f)",chi2),"L");
+        l->AddEntry("DSCB","double-sided CB: J/#psi","L");
         l->AddEntry((TObject*)0,Form("%s = %.f #pm %.f",_N1.getTitle().Data(),_N1.getVal(),_N1.getError()),"");
-        l->AddEntry((TObject*)0,Form("%s = %.f #pm %.f",_N2.getTitle().Data(),_N2.getVal(),_N2.getError()),"");
         l->AddEntry((TObject*)0,Form("%s = %.2f GeV/#it{c}^{2}",_mu.getTitle().Data(),_mu.getVal()),"");
+        l->AddEntry((TObject*)0,Form("%s = %.2f GeV/#it{c}^{2}",_sL.getTitle().Data(),_sL.getVal()),"");
+        l->AddEntry((TObject*)0,Form("%s = %.2f GeV/#it{c}^{2}",_sR.getTitle().Data(),_sR.getVal()),""); 
+        l->AddEntry("DSCB2","double-sided CB: #psi'","L");
+        l->AddEntry((TObject*)0,Form("%s = %.f #pm %.f",_N2.getTitle().Data(),_N2.getVal(),_N2.getError()),"");
         l->AddEntry((TObject*)0,Form("%s = %.2f GeV/#it{c}^{2}",_mu2.getTitle().Data(),_mu2.getVal()),"");
+        l->AddEntry((TObject*)0,Form("%s = %.2f GeV/#it{c}^{2}",_sL2.getTitle().Data(),_sL2.getVal()),"");
+        l->AddEntry((TObject*)0,Form("%s = %.2f GeV/#it{c}^{2}",_sR2.getTitle().Data(),_sR2.getVal()),"");
+        Int_t nRows1 = 4;
+        l1 = new TLegend(0.14,0.925-nRows1*0.04,0.56,0.925);
+        l1->AddEntry("fDataHist","simulation","EPL");
+        l1->AddEntry("CombinedPDF",Form("model (#chi^{2}/NDF = %.3f)",chi2),"L");
+        l1->AddEntry("DSCB","double-sided CB: J/#psi","L");
+        l1->AddEntry("DSCB2","double-sided CB: #psi'","L");
     }
+    l->SetMargin(0.16); 
     l->SetTextSize(0.032);
     l->SetBorderSize(0);
     l->SetFillStyle(0);
-    l->SetMargin(0.);
     l->Draw();
+    l1->SetMargin(0.16); 
+    l1->SetTextSize(0.032);
+    l1->SetBorderSize(0);
+    l1->SetFillStyle(0);
+    // second legend
+    Int_t nRows2 = 2;
+    TLegend l2(0.72,0.925-nRows2*0.04,0.92,0.925);
+    l2.AddEntry((TObject*)0,"J/#psi and #psi' #rightarrow e^{+}e^{-}","");
+    l2.AddEntry((TObject*)0,Form("%.1f < #it{p}_{T} < %.1f GeV/#it{c}",fPtLow,fPtUpp),"");
+    l2.SetTextSize(0.032);
+    l2.SetBorderSize(0);
+    l2.SetFillStyle(0);
+    l2.SetMargin(0.);
+    l2.Draw();
+    // title
+    TLatex* ltx = new TLatex();
+    ltx->SetTextSize(0.032);
+    ltx->SetTextAlign(21);
+    ltx->SetNDC();
+    ltx->DrawLatex(0.55,0.96,"ALICE Run-4 Simulation: Pb#minusPb UPC at #sqrt{#it{s}_{NN}} = 5.02 TeV");
     // save the plots
     cCM->Print(Form("%sfit_%s_CM.pdf",sOutMass.Data(),processes[iPcs].Data()));
     c->Print(Form("%sfit_%s.pdf",sOutMass.Data(),processes[iPcs].Data()));
@@ -452,13 +498,106 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     // draw histogram with log scale
     TCanvas *cLog = new TCanvas("cLog","cLog",700,600);
     SetCanvas(cLog,kTRUE);
+    fr->GetYaxis()->SetRangeUser(0.1,h->GetMaximum()*2.5);
     fr->Draw();
-    l->Draw();
+    l1->Draw();
+    l2.Draw();
+    ltx->DrawLatex(0.55,0.96,"ALICE Run-4 Simulation: Pb#minusPb UPC at #sqrt{#it{s}_{NN}} = 5.02 TeV");
     cLog->Print(Form("%sfit_%s_log.pdf",sOutMass.Data(),processes[iPcs].Data()));
     
     delete cCM;
     delete c;
     delete cLog;
+    return;
+}
+
+void SetHistoProperties(TH1F* h, Color_t c, Int_t lineStyle)
+{
+    h->GetYaxis()->SetRangeUser(1.,h->GetMaximum()*1.05);
+    h->SetLineWidth(3);
+    h->SetLineColor(c);
+    h->SetLineStyle(lineStyle);
+    return;
+}
+
+void PlotPtDistribution(TH1F* hData, TH1F* hCohJ, TH1F* hIncJ, TH1F* hCohFD, TH1F* hIncFD)
+{
+    TCanvas* c = new TCanvas("c","c",700,600);
+    SetCanvas(c,kFALSE);
+    // plot data
+    // y-axis
+    hData->GetYaxis()->SetRangeUser(1.,hData->GetMaximum()*1.05);
+    // title
+    hData->GetYaxis()->SetTitle(Form("Counts per %.0f MeV/#it{c}", fPtStep*1e3));
+    hData->GetYaxis()->SetTitleSize(0.032);
+    hData->GetYaxis()->SetTitleOffset(1.4);
+    // label
+    hData->GetYaxis()->SetLabelSize(0.032);
+    hData->GetYaxis()->SetLabelOffset(0.01);
+    hData->GetYaxis()->SetDecimals(1);
+    hData->GetYaxis()->SetMaxDigits(3);
+    // x-axis
+    // title
+    hData->GetXaxis()->SetTitle("#it{p}_{T,cl pair} [GeV/#it{c}]");
+    hData->GetXaxis()->SetTitleSize(0.032);
+    hData->GetXaxis()->SetTitleOffset(1.25);
+    // label
+    hData->GetXaxis()->SetLabelSize(0.032);
+    hData->GetXaxis()->SetLabelOffset(0.01);
+    hData->GetXaxis()->SetDecimals(1);
+    // marker style
+    hData->SetMarkerStyle(kFullCircle);
+    hData->SetMarkerSize(0.7);
+    hData->SetMarkerColor(kBlack);
+    hData->SetLineColor(kBlack);
+    hData->SetLineWidth(2);
+    hData->Draw("E1");
+    // coh J/psi
+    SetHistoProperties(hCohJ,215,1);
+    hCohJ->Draw("HIST SAME");
+    // inc J/psi
+    SetHistoProperties(hIncJ,kRed,1);
+    hIncJ->Draw("HIST SAME");
+    // coh FD
+    SetHistoProperties(hCohFD,215,2);
+    hCohFD->Draw("HIST SAME");
+    // inc FD
+    SetHistoProperties(hIncFD,kRed,2);
+    hIncFD->Draw("HIST SAME");
+    // title
+    TLatex* ltx = new TLatex();
+    ltx->SetTextSize(0.032);
+    ltx->SetTextAlign(21);
+    ltx->SetNDC();
+    ltx->DrawLatex(0.55,0.96,"ALICE Run-4 Simulation: Pb#minusPb UPC at #sqrt{#it{s}_{NN}} = 5.02 TeV");
+    // legends
+    Int_t nRows = 7;
+    TLegend l(0.58,0.925-nRows*0.04,1.00,0.925);
+    l.AddEntry((TObject*)0,"J/#psi and #psi' photoproduction","");
+    l.AddEntry((TObject*)0,Form("%.1f < #it{m}_{ee} < %.1f GeV/#it{c}^{2}",fMLow,fMUpp),"");
+    l.AddEntry(hData,"simulation","EPL");
+    l.AddEntry(hCohJ,"coh J/#psi","L");
+    l.AddEntry(hIncJ,"inc J/#psi","L");
+    l.AddEntry(hCohFD,"feed-down from coh #psi'","L");
+    l.AddEntry(hIncFD,"feed-down from inc #psi'","L");
+    l.SetTextSize(0.032);
+    l.SetBorderSize(0);
+    l.SetFillStyle(0);
+    l.SetMargin(0.16);
+    l.Draw();
+    c->Print(Form("%sptDist.pdf",sOutPt.Data()));
+    // log scale
+    TCanvas* cLog = new TCanvas("cLog","cLog",700,600);
+    SetCanvas(cLog,kTRUE);
+    hData->GetYaxis()->SetRangeUser(1.,hData->GetMaximum()*2.0);
+    hData->Draw("E1");
+    hCohJ->Draw("HIST SAME");
+    hIncJ->Draw("HIST SAME");
+    hCohFD->Draw("HIST SAME");
+    hIncFD->Draw("HIST SAME");
+    ltx->DrawLatex(0.55,0.96,"ALICE Run-4 Simulation: Pb#minusPb UPC at #sqrt{#it{s}_{NN}} = 5.02 TeV");
+    l.Draw();
+    cLog->Print(Form("%sptDist_log.pdf",sOutPt.Data()));
     return;
 }
 
@@ -493,19 +632,26 @@ void AnaMain_SignalExtraction()
     for(Int_t i = 0; i < 6; i++) {
         PrepareHistos(i,hMass[i],hMassRnd[i],hPt[i],hPtRnd[i]);
         hMass[6]->Add(hMass[i]);
+        hPt[6]->Add(hPt[i]);
         hMassRnd[6]->Add(hMassRnd[i]);
+        hPtRnd[6]->Add(hPtRnd[i]);
     }
     PrintHistogram(hMass[6],sOutMass);
+    PrintHistogram(hPt[6],sOutPt);
     PrintHistogram(hMassRnd[6],sOutMass);
+    PrintHistogram(hPtRnd[6],sOutPt);
 
     // fit coherent J/psi
-    DoInvMassFit(0,hMassRnd[0]);
+    DoInvMassFit(0,hMass[0]);
 
     // fit coherent psi'
-    DoInvMassFit(4,hMassRnd[4]);
+    DoInvMassFit(4,hMass[4]);
 
     // fit the combined sample
-    DoInvMassFit(6,hMassRnd[6]);
+    DoInvMassFit(6,hMass[6]);
+
+    // plot the pT distribution with highlighted components
+    PlotPtDistribution(hPt[6],hPt[0],hPt[1],hPt[2],hPt[3]);
 
     return;
 }

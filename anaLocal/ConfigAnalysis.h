@@ -18,7 +18,7 @@ Int_t filePara = 3;
 // parameters.txt
 // 1 -> parameters_01.txt: Calib.Const1 set to 12900. (current official version)
 // 2 -> parameters_02.txt: Calib.Const1 set to 11220. (old value)
-// 3 -> parameters_03.txt: Calib.Const1 set to 6000.
+// 3 -> parameters_03.txt: Calib.Const1 set to 6300.
 
 TString sGeomFile = "";
 TString sParaFile = "";
@@ -28,11 +28,11 @@ const Int_t nBoxEle[nSim] = {16, 16, 0};
 const Int_t nBoxPho[nSim] = {6, 0, 0};
 const Int_t nCohJpsi[nSim] = {11, 97, 70};
 const Int_t nIncJpsi[nSim] = {0,  72, 50};
-const Int_t nCohFD[nSim] = {0, 18, 10};
-const Int_t nIncFD[nSim] = {0, 18, 10};
+const Int_t nCohFD[nSim] = {0, 18, 20};
+const Int_t nIncFD[nSim] = {0, 18, 20};
 const Int_t nBkg[nSim]   = {0, 13, 0};
-const Int_t nCohPsi2s[nSim] = {0, 24, 17};
-const Int_t nIncPsi2s[nSim] = {0, 20, 15};
+const Int_t nCohPsi2s[nSim] = {0, 24, 25};
+const Int_t nIncPsi2s[nSim] = {0, 20, 25};
 const Int_t nCohJpsiNoFIT[nSim] = {0, 10, 0};
 Int_t nFiles(0.);
 TString inDir = "";

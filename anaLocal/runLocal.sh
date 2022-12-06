@@ -23,7 +23,7 @@ if false; then
 fi
 
 # run primary (grid) and secondary (main) analysis over all processes
-if false; then 
+if false; then
     for pcs in "cohJpsi" "incJpsi" "cohFD" "incFD" "cohPsi2s" "incPsi2s"
     do
         aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$pcs'",'$overwrite')'
