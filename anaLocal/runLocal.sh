@@ -5,7 +5,7 @@
 
 # version as of Nov 24, 2022
 
-process="cohPsi2s"
+process="incPsi2s"
 overwrite=kFALSE
 
 # calculate:
@@ -30,12 +30,12 @@ if false; then
         aliroot -q 'AnaMain.C("'$pcs'")'
     done
     # make the combined invariant mass fit 
-    aliroot -q AnaMain_InvMassFit.C
+    aliroot -q AnaMain_SignalExtraction.C
 fi
 
 # do invariant mass of the combined sample
 if true; then
-    aliroot -q AnaMain_InvMassFit.C
+    aliroot -q AnaMain_SignalExtraction.C
 fi
 
 # run clusterizer over a specific HITS file
