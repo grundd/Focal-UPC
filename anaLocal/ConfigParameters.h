@@ -7,7 +7,7 @@
 Bool_t doSupercls = kTRUE;
 // if true, create superclusters using:
 const Float_t minSeedE = 5; // [GeV]
-const Float_t radius = 15; // [cm]
+const Float_t radius = 8; // [cm]
 TString sCl = "";
 
 // selections:

@@ -77,6 +77,7 @@ enum kGridJpsi {
     kJ1_mcJElPairRap_acc,
     //* TH2F histograms:
     kGridJpsi_firstTH2F,
+    kJ2_mcJElPairEn_nCls,
     kJ2_clX_clY,
     kJ2_clX_clEn,
     kJ2_clY_clEn,
@@ -244,6 +245,9 @@ void CreateHistos_GridJpsi(TObjArray* objArr)
                     hJ1_mcJElPairRap_acc->SetTitle("#it{y} of pp electron pairs with 3.4 < #eta^{e^{#pm}}< 5.8;#it{y}_{ppe pair} [-];counts");
                     objArr->AddAt(hJ1_mcJElPairRap_acc, kJ1_mcJElPairRap_acc);
     //* TH2F histograms:
+    TH2F* hJ2_mcJElPairEn_nCls = new TH2F("hJ2_mcJElPairEn_nCls","",nBinsEn,lowEn,uppEn,10,-0.5,9.5);
+                    hJ2_mcJElPairEn_nCls->SetTitle(Form("#it{E} of pairs of pp electrons vs #it{N}_{%ss};#it{E}_{ppe pair} [GeV];#it{N}_{%ss} [-]",sCl.Data(),sCl.Data()));
+                    objArr->AddAt(hJ2_mcJElPairEn_nCls, kJ2_mcJElPairEn_nCls);
     TH2F* hJ2_clX_clY = new TH2F("hJ2_clX_clY","",2*nBinsXY,lowXY,uppXY,2*nBinsXY,lowXY,uppXY);
                     hJ2_clX_clY->SetTitle(Form("(#it{x}, #it{y}) of %ss;#it{x}_{%s} [cm];#it{y}_{%s} [cm]",sCl.Data(),sCl.Data(),sCl.Data()));
                     objArr->AddAt(hJ2_clX_clY, kJ2_clX_clY);

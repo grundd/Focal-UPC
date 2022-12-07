@@ -16,6 +16,7 @@
 #include "ConfigAnalysis.h"
 #include "ConfigParameters.h"
 #include "CreateHistograms.h"
+#include "FocalUpcGrid.h"
 #include "AnaMain.h"
 
 TString outSubDir = "";
@@ -173,11 +174,9 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
         Int_t EvNumberThisCl = fEvNumber;
         if(debug) cout << Form("   Cl %i: ev %03i\n", iCl, fEvNumber);
         // create its 4-vector
-        TLorentzVector* thisCl = new TLorentzVector();
-        thisCl->SetPtEtaPhiE(fPtCl,fEtaCl,fPhiCl,fEnCl);
+        TLorentzVector* thisCl = new TLorentzVector(ConvertXYZEtoLorVec(fXCl,fYCl,fZCl,fEnCl));
         // create 4-vector of the matched physical primary electron
-        TLorentzVector* thisEl = new TLorentzVector();
-        thisEl->SetPtEtaPhiE(fPtJEl,fEtaJEl,fPhiJEl,fEnJEl);
+        TParticle* thisEl = new TParticle(*fJEl);
         // create TLists where all clusters and pp electrons from the same event will be stored
         TList lCls;
         TList lEls;
@@ -190,6 +189,9 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
         // create a vector to store indices of phys. prim. electrons matched with the clusters
         std::vector<Int_t> idxMtchJEl;
         idxMtchJEl.push_back(fIdxJEl);
+        // vectors to store xCl, yCl and zCl
+        std::vector<Float_t> vectX; std::vector<Float_t> vectY; std::vector<Float_t> vectZ;
+        vectX.push_back(fXCl); vectY.push_back(fYCl); vectZ.push_back(fZCl);
         Int_t nClThisEvent(1.);
         // is next cluster from the same event?
         tCls->GetEntry(iCl+1);
@@ -200,16 +202,16 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
             nClThisEvent++;
             if(debug) cout << Form(" + Cl %i: ev %03i\n", iCl, fEvNumber);
             // create its 4-vector
-            TLorentzVector* nextCl = new TLorentzVector();
-            nextCl->SetPtEtaPhiE(fPtCl,fEtaCl,fPhiCl,fEnCl);
+            TLorentzVector* nextCl = new TLorentzVector(ConvertXYZEtoLorVec(fXCl,fYCl,fZCl,fEnCl));
             // create 4-vector of the matched physical primary electron
-            TLorentzVector* nextEl = new TLorentzVector();
-            nextEl->SetPtEtaPhiE(fPtJEl,fEtaJEl,fPhiJEl,fEnJEl);
+            TParticle* nextEl = new TParticle(*fJEl);
             // add them to the lists
             lCls.AddLast(nextCl);
             lEls.AddLast(nextEl);
             // store the electron index
             idxMtchJEl.push_back(fIdxJEl);
+            // store xCl, yCl and zCl
+            vectX.push_back(fXCl); vectY.push_back(fYCl); vectZ.push_back(fZCl);
             // is next cluster from the same event?
             if(tCls->GetEntry(iCl+1) == 0) break;
             else EvNumberNextCl = fEvNumber;
@@ -221,14 +223,14 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
         {
             TLorentzVector* Cl1 = (TLorentzVector*)lCls.At(iCl1);
             if(!Cl1) continue;
-            TLorentzVector* El1 = (TLorentzVector*)lEls.At(iCl1);
+            TParticle* El1 = (TParticle*)lEls.At(iCl1);
             if(!El1) continue;     
             // go over all possible pairs of clusters
             for(Int_t iCl2 = iCl1+1; iCl2 < nClThisEvent; iCl2++) 
             {
                 TLorentzVector* Cl2 = (TLorentzVector*)lCls.At(iCl2);
                 if(!Cl2) continue;
-                TLorentzVector* El2 = (TLorentzVector*)lEls.At(iCl2);
+                TParticle* El2 = (TParticle*)lEls.At(iCl2);
                 if(!El2) continue;
                 // add the momentum vectors of the two clusters
                 TLorentzVector Cl12 = *Cl1 + *Cl2;
@@ -239,12 +241,16 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
                 fPhiClPair = Cl12.Phi();
                 Float_t clPairM = Cl12.M();
                 // add the momentum vector of the two electrons
-                TLorentzVector El12 = *El1 + *El2;
+                TLorentzVector lvEl1;
+                lvEl1.SetPxPyPzE(El1->Px(),El1->Py(),El1->Pz(),El1->Energy());
+                TLorentzVector lvEl2;
+                lvEl2.SetPxPyPzE(El2->Px(),El2->Py(),El2->Pz(),El2->Energy());
+                TLorentzVector lvEl12 = lvEl1 + lvEl2;
                 // electron pair kinematics -> tree
-                fEnJElPair = El12.Energy();
-                fPtJElPair = El12.Pt();
-                fEtaJElPair = El12.Eta();
-                fPhiJElPair = El12.Phi();
+                fEnJElPair = lvEl12.Energy();
+                fPtJElPair = lvEl12.Pt();
+                fEtaJElPair = lvEl12.Eta();
+                fPhiJElPair = lvEl12.Phi();
                 // fill some kinematic histograms
                 ((TH1F*)arrHistos->At(kJ1_clPairEn))->Fill(fEnClPair);
                 ((TH1F*)arrHistos->At(kJ1_clPairPt))->Fill(fPtClPair);
@@ -255,31 +261,30 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
                 // inv mass cut on (sup)cl pairs
                 if(clPairM > cutMLow && clPairM < cutMUpp) 
                 {
-                    ((TH1F*)arrHistos->At(kJ1_mcJElPairRap_rec))->Fill(El12.Rapidity());
+                    ((TH1F*)arrHistos->At(kJ1_mcJElPairRap_rec))->Fill(lvEl12.Rapidity());
                     ((TH1F*)arrHistos->At(kJ1_clPairRap_rec))->Fill(Cl12.Rapidity());
                 }                
                 // radial separation between the pairs of clusters
-                /*
-                Float_t sepCl = TMath::Sqrt(TMath::Power(xCl1-xCl2,2) + TMath::Power(yCl1-yCl2,2));
-                ((TH1F*)arrTH1F->At(kJ1_clPairSep))->Fill(sepCl);
+                Float_t sepCl = TMath::Sqrt(TMath::Power(vectX[iCl1]-vectX[iCl2],2) + TMath::Power(vectY[iCl1]-vectY[iCl2],2));
+                ((TH1F*)arrHistos->At(kJ1_clPairSep))->Fill(sepCl);
                 // radial separation between cluster pair vs between the pair of ppe
                 Float_t x1(0.), y1(0.);
-                TrackCoordinatesAtZ(ppEl1,zCl1,x1,y1);
+                TrackCoordinatesAtZ(El1,vectZ[iCl1],x1,y1);
                 Float_t x2(0.), y2(0.);
-                TrackCoordinatesAtZ(ppEl2,zCl2,x2,y2);
+                TrackCoordinatesAtZ(El2,vectZ[iCl2],x2,y2);
                 Float_t sepMC = TMath::Sqrt(TMath::Power(x1-x2,2) + TMath::Power(y1-y2,2));
-                ((TH2F*)arrTH2F->At(kJ2_clPairSep_mcJElSep))->Fill(sepCl,sepMC);
-                */
+                ((TH2F*)arrHistos->At(kJ2_clPairSep_mcJElSep))->Fill(sepCl,sepMC);
                 // if both clusters are paired to a different physical primary electron
                 if(idxMtchJEl[iCl1] != idxMtchJEl[iCl2]) {
+                    if(idxMtchJEl[iCl1] == -1 || idxMtchJEl[iCl2] == -1) continue;
                     ((TH1F*)arrHistos->At(kJ1_ppeClPairM))->Fill(clPairM);
-                    //((TH1F*)arrHistos->At(kJ1_ppeClPairSep))->Fill(sepCl); 
-                    ((TH2F*)arrHistos->At(kJ2_ppeClPairEn_mtchEn))->Fill(fEnClPair,fEnJElPair);
-                    ((TH2F*)arrHistos->At(kJ2_ppeClPairRap_mtchRap))->Fill(Cl12.Rapidity(),El12.Rapidity());
-                    ((TH2F*)arrHistos->At(kJ2_ppeClPairPt_mtchPt))->Fill(fPtClPair,fPtJElPair);
-                    ((TH2F*)arrHistos->At(kJ2_ppeClPairM_mtchM))->Fill(clPairM,El12.M());
+                    ((TH1F*)arrHistos->At(kJ1_ppeClPairSep))->Fill(sepCl); 
+                    ((TH2F*)arrHistos->At(kJ2_ppeClPairEn_mtchEn))->Fill(fEnClPair,lvEl12.Energy());
+                    ((TH2F*)arrHistos->At(kJ2_ppeClPairRap_mtchRap))->Fill(Cl12.Rapidity(),lvEl12.Rapidity());
+                    ((TH2F*)arrHistos->At(kJ2_ppeClPairPt_mtchPt))->Fill(fPtClPair,lvEl12.Pt());
+                    ((TH2F*)arrHistos->At(kJ2_ppeClPairM_mtchM))->Fill(clPairM,lvEl12.M());
                 } else {
-                    //((TH1F*)arrHistos->At(kJ1_sameppeClPairSep))->Fill(sepCl); 
+                    ((TH1F*)arrHistos->At(kJ1_sameppeClPairSep))->Fill(sepCl); 
                 }
                 tOut->Fill();
             }
@@ -494,6 +499,8 @@ void AnaMain(TString sim)
     outSubDir = CreateOutputSubDir();
     iSim = SetSimIndex(sim);
     gSystem->Exec(Form("mkdir -p %smerged_%s",outDir.Data(),outSubDir.Data()));
+    Bool_t isBoxSim = kFALSE;
+    if(sim=="boxEle" || sim=="boxPho") isBoxSim = kTRUE;
 
     // merge all output files produced by FocalUpcGrid
     MergeOutputFiles();
@@ -501,15 +508,18 @@ void AnaMain(TString sim)
     // print all histograms from the Grid analysis
     DrawHistograms(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()));
 
-    // open merged output file, go over clusters and create cluster pairs
-    // store cluster pairs in a tree
-    PrepareClPairs(Form("%smerged_%s",outDir.Data(),outSubDir.Data()));
+    if(!isBoxSim) 
+    {
+        // open merged output file, go over clusters and create cluster pairs
+        // store cluster pairs in a tree
+        PrepareClPairs(Form("%smerged_%s",outDir.Data(),outSubDir.Data()));
 
-    // print all histograms from the main analysis
-    DrawHistograms(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()));
+        // print all histograms from the main analysis
+        DrawHistograms(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()));
 
-    // calculate rapidity dependence of AxE
-    AxE();
+        // calculate rapidity dependence of AxE
+        AxE();
+    }
 
     return;
 }

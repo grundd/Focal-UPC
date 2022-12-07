@@ -4,8 +4,8 @@
 # ./runBoxNoDigi.sh
 
 # options to set:
-first=1
-simulations=10
+first=11
+simulations=5
 last=$(($first+$simulations-1))
 evPerSim=1000
 pdgCode=11 # electrons 11, photons 22
@@ -36,7 +36,7 @@ do
     echo ""
     # run the simulation:
     $ALIDPG_ROOT/bin/aliroot_dpgsim.sh --mode sim --run 294925 --uid $ranSeed --generator Upgrade:FOCAL_Generators:box \
-    --nevents $nEvPerSim --simulation NoDigitization --detector FOCAL --focalGeometryFile geometry_03.txt --etamin 3.4 --etamax 5.8 \
+    --nevents $evPerSim --simulation NoDigitization --detector FOCAL --focalGeometryFile geometry_03.txt --etamin 3.4 --etamax 5.8 \
     --ptmin 0.0 --ptmax 2.0 --pdg $pdgCode
     # create a folder to store the results:
     mkdir -p $folderName

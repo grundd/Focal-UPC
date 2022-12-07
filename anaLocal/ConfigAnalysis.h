@@ -24,15 +24,15 @@ TString sGeomFile = "";
 TString sParaFile = "";
 
 // number of available input files for each simulation version (1000 events each):
-const Int_t nBoxEle[nSim] = {16, 16, 0};
+const Int_t nBoxEle[nSim] = {16, 16, 13};
 const Int_t nBoxPho[nSim] = {6, 0, 0};
 const Int_t nCohJpsi[nSim] = {11, 97, 70};
 const Int_t nIncJpsi[nSim] = {0,  72, 50};
 const Int_t nCohFD[nSim] = {0, 18, 20};
 const Int_t nIncFD[nSim] = {0, 18, 20};
 const Int_t nBkg[nSim]   = {0, 13, 0};
-const Int_t nCohPsi2s[nSim] = {0, 24, 25};
-const Int_t nIncPsi2s[nSim] = {0, 20, 25};
+const Int_t nCohPsi2s[nSim] = {0, 24, 20};
+const Int_t nIncPsi2s[nSim] = {0, 20, 16};
 const Int_t nCohJpsiNoFIT[nSim] = {0, 10, 0};
 Int_t nFiles(0.);
 TString inDir = "";

@@ -169,21 +169,18 @@ void SetCanvas(TCanvas* c, Bool_t logScale)
 // ******************************************************************************************************************
 
 Int_t fEvNumber, fIdxJEl;
-Float_t fEnCl, fPtCl, fEtaCl, fPhiCl;
-Float_t fEnJEl, fPtJEl, fEtaJEl, fPhiJEl;
+Float_t fEnCl, fXCl, fYCl, fZCl;
+TParticle* fJEl = new TParticle();
 
 void SetBranchAddresses_tCls(TTree* t)
 {
     t->SetBranchAddress("fEvNumber", &fEvNumber);
     t->SetBranchAddress("fEnCl", &fEnCl);
-    t->SetBranchAddress("fPtCl", &fPtCl);
-    t->SetBranchAddress("fEtaCl", &fEtaCl);
-    t->SetBranchAddress("fPhiCl", &fPhiCl);
+    t->SetBranchAddress("fXCl", &fXCl);
+    t->SetBranchAddress("fYCl", &fYCl);
+    t->SetBranchAddress("fZCl", &fZCl);
     t->SetBranchAddress("fIdxJEl", &fIdxJEl);
-    t->SetBranchAddress("fEnJEl", &fEnJEl);
-    t->SetBranchAddress("fPtJEl", &fPtJEl);
-    t->SetBranchAddress("fEtaJEl", &fEtaJEl);
-    t->SetBranchAddress("fPhiJEl", &fPhiJEl);
+    t->SetBranchAddress("fJEl", &fJEl);
     Printf("Branch addresses of %s set.", t->GetName());
     return;
 }

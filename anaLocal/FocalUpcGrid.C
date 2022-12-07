@@ -115,20 +115,17 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
     TTree* tOut = new TTree("tCls", "output tree containing prefiltered clusters");
     // prefiltered clusters
     Int_t fEvNumber;
-    Float_t fEnCl, fPtCl, fEtaCl, fPhiCl;
+    Float_t fEnCl, fXCl, fYCl, fZCl;
     tOut->Branch("fEvNumber", &fEvNumber, "fEvNumber/I"); 
     tOut->Branch("fEnCl", &fEnCl, "fEnCl/F");
-    tOut->Branch("fPtCl", &fPtCl, "fPtCl/F");
-    tOut->Branch("fEtaCl", &fEtaCl, "fEtaCl/F");
-    tOut->Branch("fPhiCl", &fPhiCl, "fPhiCl/F");
+    tOut->Branch("fXCl", &fXCl, "fXCl/F");
+    tOut->Branch("fYCl", &fYCl, "fYCl/F");
+    tOut->Branch("fZCl", &fZCl, "fZCl/F");
     // J/psi electrons with which the clusters were matched
     Int_t fIdxJEl;
-    Float_t fEnJEl, fPtJEl, fEtaJEl, fPhiJEl;
-    tOut->Branch("fIdxJEl", &fIdxJEl, "fIdxJEl/I"); 
-    tOut->Branch("fEnJEl", &fEnJEl, "fEnJEl/F");
-    tOut->Branch("fPtJEl", &fPtJEl, "fPtJEl/F");
-    tOut->Branch("fEtaJEl", &fEtaJEl, "fEtaJEl/F");
-    tOut->Branch("fPhiJEl", &fPhiJEl, "fPhiJEl/F");
+    tOut->Branch("fIdxJEl", &fIdxJEl, "fIdxJEl/I");
+    TParticle* fJEl = new TParticle();
+    tOut->Branch("fJEl","TParticle",&fJEl,32000,-1);
     gROOT->cd();    
 
     // output log file
@@ -461,6 +458,8 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
                 ((TH1F*)arrHistos->At(kJ1_mcJElPairRap_gen))->Fill(lvJElPair->Rapidity());
                 if(3.4 < ppEl1->Eta() && ppEl1->Eta() < 5.8 && 3.4 < ppEl2->Eta() && ppEl2->Eta() < 5.8)
                     ((TH1F*)arrHistos->At(kJ1_mcJElPairRap_acc))->Fill(lvJElPair->Rapidity());
+                // number of (sup)cls
+                ((TH2F*)arrHistos->At(kJ2_mcJElPairEn_nCls))->Fill(lvJElPair->Energy(),nClsPref);
             }
 
             // match clusters to MC tracks
@@ -479,18 +478,17 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
                 Float_t zCl = clust->Z();
                 Float_t ECl = clust->E();
                 TLorentzVector cl = ConvertXYZEtoLorVec(xCl,yCl,zCl,ECl);
-
+                // -> tree:
                 fEvNumber = iEv;
-                // cluster kinematics -> tree
                 fEnCl = cl.Energy();
-                fPtCl = cl.Pt();
-                fEtaCl = cl.Eta();
-                fPhiCl = cl.Phi();
-                // pp electron kinematics -> tree
-                fEnJEl = -1e3;
-                fPtJEl = -1e3;
-                fEtaJEl = -1e3;
-                fPhiJEl = -1e3;
+                fXCl = xCl;
+                fYCl = yCl;
+                fZCl = zCl;
+                fIdxJEl = -1;
+                // other cluster kinematics
+                Float_t fPtCl = cl.Pt();
+                Float_t fEtaCl = cl.Eta();
+                Float_t fPhiCl = cl.Phi();
 
                 ((TH1F*)arrHistos->At(kJ1_clZ))->Fill(zCl);
                 // fill some histograms with cluster kinematics
@@ -513,21 +511,22 @@ void FocalUpcGrid(Bool_t isLocal, TString sim, Bool_t overwrite = kTRUE, TString
                     // if electron (ppe)
                     if(isEleOrPos(mtchPhysPrimPart)) {
                         fIdxJEl = idxMtchPhysPrimParts[iCl];
-                        fEnJEl = mtchPhysPrimPart->Energy();
-                        fPtJEl = mtchPhysPrimPart->Pt();
-                        fEtaJEl = mtchPhysPrimPart->Eta();
-                        fPhiJEl = mtchPhysPrimPart->Phi();
+                        Float_t fEnJEl = mtchPhysPrimPart->Energy();
+                        Float_t fPtJEl = mtchPhysPrimPart->Pt();
+                        Float_t fEtaJEl = mtchPhysPrimPart->Eta();
+                        *fJEl = TParticle(*mtchPhysPrimPart);
                         ((TH2F*)arrHistos->At(kJ2_ppeClEn_mtchEn))->Fill(fEnCl, fEnJEl);
                         ((TH2F*)arrHistos->At(kJ2_ppeClEta_mtchEta))->Fill(fEtaCl, fEtaJEl);
                         ((TH2F*)arrHistos->At(kJ2_ppeClPt_mtchPt))->Fill(fPtCl, fPtJEl);
                         ((TProfile*)arrHistos->At(kJP_ppeClX_mtchEn))->Fill(xCl, fEnJEl);
                         ((TProfile*)arrHistos->At(kJP_ppeClY_mtchEn))->Fill(yCl, fEnJEl);
                         ((TProfile2D*)arrHistos->At(kJP2_ppeClX_ppeClY_mtchEn))->Fill(xCl, yCl, fEnJEl);
+                    } else {
+                        *fJEl = TParticle();
                     }
                 }
                 tOut->Fill();
             }
-            
             delete lvJElPair;
         }
         delete listClsPref;
