@@ -26,26 +26,6 @@
 
 using namespace RooFit;
 
-// processes
-TString processes[7] = {
-    "cohJpsi",
-    "incJpsi",
-    "cohFD",
-    "incFD",
-    "cohPsi2s",
-    "incPsi2s",
-    "all"
-};
-// names
-TString names[7] = {
-    "coh J/#psi #rightarrow e^{+}e^{-}",
-    "inc J/#psi #rightarrow e^{+}e^{-}",
-    "coh #psi' #rightarrow J/#psi + #pi^{+}#pi^{-} #rightarrow e^{+}e^{-} + #pi^{+}#pi^{-}",
-    "inc #psi' #rightarrow J/#psi + #pi^{+}#pi^{-} #rightarrow e^{+}e^{-} + #pi^{+}#pi^{-}",
-    "coh #psi' #rightarrow e^{+}e^{-}",
-    "inc #psi' #rightarrow e^{+}e^{-}",
-    "ALICE Run-4 Simulation: Pb#minusPb UPC at #sqrt{#it{s}_{NN}} = 5.02 TeV, J/#psi and #psi' #rightarrow e^{+}e^{-}"
-};
 // expected number of photoproduced VMs in FOCAL rapidity converage:
 // 3.4 < y < 5.8
 // obtained from StarlightRapDep.C
@@ -61,12 +41,10 @@ Float_t nFocRapExpected[6] = {
 TString outSubDir = "";
 TString sOutMass = "";
 TString sOutPt = "";
-// mass binning
+// mass binning:
 Int_t nBinsM;
-Float_t fMEdgeLow = 1.4; // GeV
-Float_t fMEdgeUpp = 4.2;
 Float_t fMStep = 0.04;
-// pT binning
+// pT binning:
 Int_t nBinsPt;
 Float_t fPtEdgeLow = 0.; // GeV
 Float_t fPtEdgeUpp = 2.;
@@ -74,9 +52,6 @@ Float_t fPtStep = 0.05;
 // cuts: inv mass fit
 Float_t fPtLow = 0.0;
 Float_t fPtUpp = 0.2;
-// cuts: pT distribution
-Float_t fMLow = 2.8;
-Float_t fMUpp = 3.4;
 // reduce the total scale by a factor of:
 Float_t fReduce = 1.;
 
@@ -98,11 +73,11 @@ void PrintHistogram(TH1F *h, TString sOut)
     c.SetLeftMargin(0.11);
     c.SetRightMargin(0.03);
     // x-axis
-    h->GetXaxis()->SetTitle("#it{m}_{cl pair} [GeV/#it{c}^{2}]");
+    h->GetXaxis()->SetTitle(Form("#it{m}_{%s pair} [GeV/#it{c}^{2}]",sCl.Data()));
     h->GetXaxis()->SetDecimals(1);
     h->GetXaxis()->SetTitleOffset(1.2);
     // y-axis
-    h->GetYaxis()->SetTitle(Form("counts per %.0f MeV [-]", fMStep*1e3));
+    h->GetYaxis()->SetTitle(Form("Counts per %.0f MeV [-]", fMStep*1e3));
     h->GetYaxis()->SetDecimals(1);
     h->GetYaxis()->SetMaxDigits(3);
     // ranges of axes
@@ -160,7 +135,7 @@ void ScaleHistos(TH1F* h, TH1F* hRnd, Int_t iPcs, Float_t fAxE, Float_t fCutEff,
          << " scale: " << fScale << "\n"
          << " after scaling: \n"
          << "  - integral: " << intHistNew << "\n"
-         << "  - total AxE * pT cut eff: " << fAxENew << "\n"
+         << "  - total AxE * pT/mass cut eff: " << fAxENew << "\n"
          << "  - N in FOC rap: " << intHistNew / fAxENew << "\n";
     // print the histograms
     PrintHistogram(h,sOut);
@@ -192,7 +167,7 @@ void PrepareHistos(Int_t iPcs, TH1F* hMass, TH1F* hMassRnd, TH1F* hPt, TH1F* hPt
             hMass->Fill(clPair.M());
         }
         // pT dist:
-        if(clPair.M() > fMLow && clPair.M() < fMUpp) {
+        if(clPair.M() > cutMLowPtDist && clPair.M() < cutMUppPtDist) {
             nMassCut++;
             hPt->Fill(clPair.Pt());
         }
@@ -238,15 +213,6 @@ void DrawCM(TCanvas* c, RooFitResult* fResFit)
     return;
 }
 
-void SetCanvas(TCanvas* c, Bool_t logScale)
-{
-    if(logScale) c->SetLogy();
-    c->SetTopMargin(0.06);
-    c->SetLeftMargin(0.11);
-    c->SetRightMargin(0.03);
-    return;
-}
-
 void LoadFitParams(TString s, Float_t& aL, Float_t& aR, Float_t& m, Float_t& nL, Float_t& nR, Float_t& sL, Float_t& sR)
 {
     ifstream ifs(s.Data());
@@ -276,7 +242,7 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     // if iPcs == 6 => fit to the combined sample
 
     // roofit variables
-    RooRealVar fM("fM","fM",fMEdgeLow,fMEdgeUpp);
+    RooRealVar fM("fM","fM",cutMLow,cutMUpp);
 
     // histogram with data
     RooDataHist fDataHist("fDataHist","fDataHist",fM,Import(*h));
@@ -362,7 +328,6 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     // draw histogram and fit and calculate chi2
     TCanvas* c = new TCanvas("c","c",700,600);
     SetCanvas(c,kFALSE);
-    gStyle->SetEndErrorSize(1); 
 
     RooPlot* fr = fM.frame(Title("inv mass fit")); 
     fDataHist.plotOn(fr,Name("fDataHist"),MarkerStyle(kFullCircle),MarkerSize(0.8),MarkerColor(kBlack),LineColor(kBlack),LineWidth(2));
@@ -394,7 +359,7 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     fr->GetYaxis()->SetMaxDigits(3);
     // x-axis
     // title
-    fr->GetXaxis()->SetTitle("#it{m}_{cl pair} [GeV/#it{c}^{2}]");
+    fr->GetXaxis()->SetTitle(Form("#it{m}_{%s pair} [GeV/#it{c}^{2}]",sCl.Data()));
     fr->GetXaxis()->SetTitleSize(0.032);
     fr->GetXaxis()->SetTitleOffset(1.25);
     // label
@@ -538,7 +503,7 @@ void PlotPtDistribution(TH1F* hData, TH1F* hCohJ, TH1F* hIncJ, TH1F* hCohFD, TH1
     hData->GetYaxis()->SetMaxDigits(3);
     // x-axis
     // title
-    hData->GetXaxis()->SetTitle("#it{p}_{T,cl pair} [GeV/#it{c}]");
+    hData->GetXaxis()->SetTitle(Form("#it{p}_{T,%s pair} [GeV/#it{c}]",sCl.Data()));
     hData->GetXaxis()->SetTitleSize(0.032);
     hData->GetXaxis()->SetTitleOffset(1.25);
     // label
@@ -546,11 +511,7 @@ void PlotPtDistribution(TH1F* hData, TH1F* hCohJ, TH1F* hIncJ, TH1F* hCohFD, TH1
     hData->GetXaxis()->SetLabelOffset(0.01);
     hData->GetXaxis()->SetDecimals(1);
     // marker style
-    hData->SetMarkerStyle(kFullCircle);
-    hData->SetMarkerSize(0.7);
-    hData->SetMarkerColor(kBlack);
-    hData->SetLineColor(kBlack);
-    hData->SetLineWidth(2);
+    SetMarkerProperties(hData,kBlack);
     hData->Draw("E1");
     // coh J/psi
     SetHistoProperties(hCohJ,215,1);
@@ -574,7 +535,7 @@ void PlotPtDistribution(TH1F* hData, TH1F* hCohJ, TH1F* hIncJ, TH1F* hCohFD, TH1
     Int_t nRows = 7;
     TLegend l(0.58,0.925-nRows*0.04,1.00,0.925);
     l.AddEntry((TObject*)0,"J/#psi and #psi' photoproduction","");
-    l.AddEntry((TObject*)0,Form("%.1f < #it{m}_{ee} < %.1f GeV/#it{c}^{2}",fMLow,fMUpp),"");
+    l.AddEntry((TObject*)0,Form("%.1f < #it{m}_{ee} < %.1f GeV/#it{c}^{2}",cutMLowPtDist,cutMUppPtDist),"");
     l.AddEntry(hData,"simulation","EPL");
     l.AddEntry(hCohJ,"coh J/#psi","L");
     l.AddEntry(hIncJ,"inc J/#psi","L");
@@ -604,7 +565,7 @@ void PlotPtDistribution(TH1F* hData, TH1F* hCohJ, TH1F* hIncJ, TH1F* hCohFD, TH1
 void AnaMain_SignalExtraction()
 {
     // set the binning
-    nBinsM = (fMEdgeUpp-fMEdgeLow) / fMStep;
+    nBinsM = (cutMUpp-cutMLow) / fMStep;
     Printf("%i mass bins will be used.", nBinsM);
     nBinsPt = (fPtEdgeUpp-fPtEdgeLow) / fPtStep;
     Printf("%i pT bins will be used.", nBinsPt);
@@ -623,9 +584,9 @@ void AnaMain_SignalExtraction()
     TH1F* hPtRnd[7] = { NULL };
     // define the histograms
     for(Int_t i = 0; i < 7; i++) {
-        hMass[i] = new TH1F(Form("hMass_%s",processes[i].Data()),names[i],nBinsM,fMEdgeLow,fMEdgeUpp);
+        hMass[i] = new TH1F(Form("hMass_%s",processes[i].Data()),names[i],nBinsM,cutMLow,cutMUpp);
         hPt[i] = new TH1F(Form("hPt_%s",processes[i].Data()),names[i],nBinsPt,fPtEdgeLow,fPtEdgeUpp);
-        hMassRnd[i] = new TH1F(Form("hMassRnd_%s",processes[i].Data()),names[i],nBinsM,fMEdgeLow,fMEdgeUpp);
+        hMassRnd[i] = new TH1F(Form("hMassRnd_%s",processes[i].Data()),names[i],nBinsM,cutMLow,cutMUpp);
         hPtRnd[i] = new TH1F(Form("hPtRnd_%s",processes[i].Data()),names[i],nBinsPt,fPtEdgeLow,fPtEdgeUpp);       
     }
     // fill the histograms

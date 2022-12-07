@@ -9,6 +9,40 @@
 #include "TCanvas.h"
 #include "TTree.h"
 
+// processes
+TString processes[7] = {
+    "cohJpsi",
+    "incJpsi",
+    "cohFD",
+    "incFD",
+    "cohPsi2s",
+    "incPsi2s",
+    "all"
+};
+// names
+TString names[7] = {
+    "coh J/#psi #rightarrow e^{+}e^{-}",
+    "inc J/#psi #rightarrow e^{+}e^{-}",
+    "coh #psi' #rightarrow J/#psi + #pi^{+}#pi^{-} #rightarrow e^{+}e^{-} + #pi^{+}#pi^{-}",
+    "inc #psi' #rightarrow J/#psi + #pi^{+}#pi^{-} #rightarrow e^{+}e^{-} + #pi^{+}#pi^{-}",
+    "coh #psi' #rightarrow e^{+}e^{-}",
+    "inc #psi' #rightarrow e^{+}e^{-}",
+    "ALICE Run-4 Simulation: Pb#minusPb UPC at #sqrt{#it{s}_{NN}} = 5.02 TeV, J/#psi and #psi' #rightarrow e^{+}e^{-}"
+};
+
+Int_t SetSimIndex(TString sim)
+{
+    Int_t iSim = -1;
+    if(sim=="cohJpsi") iSim = 0;
+    else if(sim=="incJpsi") iSim = 1;
+    else if(sim=="cohFD") iSim = 2;
+    else if(sim=="incFD") iSim = 3;
+    else if(sim=="cohPsi2s") iSim = 4;
+    else if(sim=="incPsi2s") iSim = 5;
+    else cout << "Unknown process!\n"; 
+    return iSim;
+}
+
 // ******************************************************************************************************************
 // Functions to plot 1d and 2d histograms 
 // ******************************************************************************************************************
@@ -21,8 +55,19 @@ void SetHistoLineFill(TH *h, Color_t c, Bool_t filled = kFALSE)
     if(filled) {
         h->SetFillColor(c);
         h->SetFillStyle(1001);
-        h->SetFillColorAlpha(c,0.3);
+        h->SetFillColorAlpha(c,0.2);
     } 
+}
+
+void SetMarkerProperties(TH1F* h, Color_t c)
+{
+    gStyle->SetEndErrorSize(1); 
+    h->SetMarkerStyle(kFullCircle);
+    h->SetMarkerSize(0.7);
+    h->SetMarkerColor(c);
+    h->SetLineColor(c);
+    h->SetLineWidth(2);
+    return;
 }
 
 template <typename TH> // for TH1 and TProfile
@@ -107,6 +152,15 @@ void DrawHisto3D(TH* h, TString sDir)
     h->Draw("SURF1");
     TString sName = sDir + h->GetName() + ".pdf";
     c.Print(sName.Data());
+    return;
+}
+
+void SetCanvas(TCanvas* c, Bool_t logScale)
+{
+    if(logScale) c->SetLogy();
+    c->SetTopMargin(0.06);
+    c->SetLeftMargin(0.11);
+    c->SetRightMargin(0.03);
     return;
 }
 

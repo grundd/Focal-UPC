@@ -8,10 +8,18 @@ Bool_t doSupercls = kTRUE;
 // if true, create superclusters using:
 const Float_t minSeedE = 5; // [GeV]
 const Float_t radius = 15; // [cm]
+TString sCl = "";
 
 // selections:
+// applied on (sup)clusters:
 const Float_t cutE = 10.0; // [GeV]; if > 0, filter out all (super)cls having energy below cutE
-const Float_t cutM = 0.0; // [GeV]; if > 0, filter out all (super)cl pairs having mass below cutM
+const Float_t cutM = 0.0; // [GeV]; if > 0, filter out all (super)cls having mass below cutM when paired to any other (sup)cl
+// applied on (sup)cl pairs:
+const Float_t cutMLow = 1.4; // [GeV]
+const Float_t cutMUpp = 4.2; // [GeV]
+// pT distribution of (sup)cl pairs:
+const Float_t cutMLowPtDist = 2.8; // [GeV]
+const Float_t cutMUppPtDist = 3.4; // [GeV]
 
 // matching to MC particles:
 Bool_t matchDirectly = kFALSE;
@@ -24,6 +32,10 @@ const Float_t cutdPhi = 0.4; // [-] difference in phi angles of a MC particle an
 
 TString CreateOutputSubDir()
 {
+    // set cl name
+    if(doSupercls) sCl = "supcl";
+    else           sCl = "cl";
+    // output dir
     TString outSubDir = "";
     outSubDir = "output";
     if(doSupercls)    outSubDir += Form("_supCl");

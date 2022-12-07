@@ -5,8 +5,8 @@
 
 # version as of Nov 24, 2022
 
-process="incPsi2s"
-overwrite=kFALSE
+process="cohJpsi"
+overwrite=kTRUE
 
 # calculate:
 # - rapidity dependence of Starlight cross sections
@@ -23,7 +23,7 @@ if false; then
 fi
 
 # run primary (grid) and secondary (main) analysis over all processes
-if false; then
+if true; then
     for pcs in "cohJpsi" "incJpsi" "cohFD" "incFD" "cohPsi2s" "incPsi2s"
     do
         aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$pcs'",'$overwrite')'
@@ -34,7 +34,7 @@ if false; then
 fi
 
 # do invariant mass of the combined sample
-if true; then
+if false; then
     aliroot -q AnaMain_SignalExtraction.C
 fi
 
