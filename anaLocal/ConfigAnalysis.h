@@ -10,15 +10,17 @@ Int_t simFiles = 3;
 // 3 -> produced after the update on Nov 30; geometry_03.txt
 // which geometry and parameters files will be used to run the clusterizer:
 // geometry.txt
-Int_t fileGeom = 3;
+Int_t fileGeom = 4;
 // 1 -> geometry_01.txt (before the update on Oct 19, 2022)
 // 2 -> geometry_02.txt (before the update on Nov 30, 2022)
 // 3 -> geometry_03.txt (after the update on Nov 30)
-Int_t filePara = 3;
+// 3 -> geometry_03.txt (after the update on Dec 09)
+Int_t filePara = 4;
 // parameters.txt
 // 1 -> parameters_01.txt: Calib.Const1 set to 12900. (current official version)
 // 2 -> parameters_02.txt: Calib.Const1 set to 11220. (old value)
 // 3 -> parameters_03.txt: Calib.Const1 set to 6300.
+// 4 -> parameters_03.txt: Calib.Const1 set to 6900.
 
 TString sGeomFile = "";
 TString sParaFile = "";

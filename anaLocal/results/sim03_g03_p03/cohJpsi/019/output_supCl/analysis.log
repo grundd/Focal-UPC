@@ -1,6 +1,6 @@
 create supercls: 1
   with min seed energy: 5.0 GeV
-  radius parameter: 15.0 cm
+  radius parameter: 8.0 cm
 cut on min cl energy: 0.0 GeV
 cut on min cl pair mass: 0.0 GeV/c^2
 match directly: 0
@@ -384,7 +384,7 @@ Ev 125:
   identified supercls: 2
 Ev 126:
   summed cls: 5
-  identified supercls: 2
+  identified supercls: 3
 Ev 127:
   summed cls: 2
   identified supercls: 2
@@ -636,7 +636,7 @@ Ev 209:
   identified supercls: 1
 Ev 210:
   summed cls: 4
-  identified supercls: 1
+  identified supercls: 2
 Ev 211:
   summed cls: 2
   identified supercls: 2
@@ -1413,7 +1413,7 @@ Ev 468:
   identified supercls: 2
 Ev 469:
   summed cls: 3
-  identified supercls: 0
+  identified supercls: 2
 Ev 470:
   summed cls: 3
   identified supercls: 2
@@ -1758,7 +1758,7 @@ Ev 583:
   identified supercls: 1
 Ev 584:
   summed cls: 2
-  identified supercls: 1
+  identified supercls: 2
 Ev 585:
   summed cls: 1
   identified supercls: 1
@@ -2115,7 +2115,7 @@ Ev 702:
   identified supercls: 2
 Ev 703:
   summed cls: 3
-  identified supercls: 2
+  identified supercls: 3
 Ev 704:
   summed cls: 4
   identified supercls: 2
@@ -2415,7 +2415,7 @@ Ev 802:
   identified supercls: 2
 Ev 803:
   summed cls: 3
-  identified supercls: 2
+  identified supercls: 3
 Ev 804:
   summed cls: 1
   identified supercls: 1
@@ -2757,7 +2757,7 @@ Ev 916:
   identified supercls: 2
 Ev 917:
   summed cls: 4
-  identified supercls: 2
+  identified supercls: 3
 Ev 918:
   summed cls: 2
   identified supercls: 1
@@ -2766,7 +2766,7 @@ Ev 919:
   identified supercls: 1
 Ev 920:
   summed cls: 2
-  identified supercls: 1
+  identified supercls: 2
 Ev 921:
   summed cls: 0
   identified supercls: 0
@@ -2907,7 +2907,7 @@ Ev 966:
   identified supercls: 0
 Ev 967:
   summed cls: 2
-  identified supercls: 1
+  identified supercls: 2
 Ev 968:
   summed cls: 0
   identified supercls: 0
