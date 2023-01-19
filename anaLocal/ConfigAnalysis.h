@@ -4,18 +4,18 @@
 const Int_t nSim = 3;
 // which version of MC simulations:
 // (matters only for local analysis)
-Int_t simFiles = 3; 
+Int_t simFiles = 2; 
 // 1 -> produced before the update on Oct 19, 2022; geometry_01.txt
 // 2 -> produced before the update on Nov 30, 2022; geometry_02.txt
 // 3 -> produced after the update on Nov 30; geometry_03.txt
 // which geometry and parameters files will be used to run the clusterizer:
 // geometry.txt
-Int_t fileGeom = 4;
+Int_t fileGeom = 2;
 // 1 -> geometry_01.txt (before the update on Oct 19, 2022)
 // 2 -> geometry_02.txt (before the update on Nov 30, 2022)
 // 3 -> geometry_03.txt (after the update on Nov 30)
 // 3 -> geometry_03.txt (after the update on Dec 09)
-Int_t filePara = 4;
+Int_t filePara = 2;
 // parameters.txt
 // 1 -> parameters_01.txt: Calib.Const1 set to 12900. (current official version)
 // 2 -> parameters_02.txt: Calib.Const1 set to 11220. (old value)

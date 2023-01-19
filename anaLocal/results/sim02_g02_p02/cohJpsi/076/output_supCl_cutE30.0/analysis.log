@@ -1,6 +1,6 @@
 create supercls: 1
   with min seed energy: 5.0 GeV
-  radius parameter: 15.0 cm
+  radius parameter: 8.0 cm
 cut on min cl energy: 30.0 GeV
 cut on min cl pair mass: 0.0 GeV/c^2
 match directly: 0
@@ -297,7 +297,7 @@ Ev 72:
   after energy cut: 0
 Ev 73:
   summed cls: 5
-  identified supercls: 1
+  identified supercls: 2
   after energy cut: 1
 Ev 74:
   summed cls: 3
@@ -365,7 +365,7 @@ Ev 89:
   after energy cut: 1
 Ev 90:
   summed cls: 3
-  identified supercls: 1
+  identified supercls: 2
   after energy cut: 0
 Ev 91:
   summed cls: 2
@@ -1609,7 +1609,7 @@ Ev 400:
   after energy cut: 2
 Ev 401:
   summed cls: 4
-  identified supercls: 0
+  identified supercls: 1
   after energy cut: 0
 Ev 402:
   summed cls: 1
@@ -2969,7 +2969,7 @@ Ev 740:
   after energy cut: 0
 Ev 741:
   summed cls: 6
-  identified supercls: 2
+  identified supercls: 3
   after energy cut: 1
 Ev 742:
   summed cls: 4
@@ -3117,7 +3117,7 @@ Ev 777:
   after energy cut: 1
 Ev 778:
   summed cls: 7
-  identified supercls: 1
+  identified supercls: 2
   after energy cut: 0
 Ev 779:
   summed cls: 5
@@ -3273,8 +3273,8 @@ Ev 816:
   after energy cut: 1
 Ev 817:
   summed cls: 4
-  identified supercls: 2
-  after energy cut: 1
+  identified supercls: 3
+  after energy cut: 2
 Ev 818:
   summed cls: 3
   identified supercls: 2

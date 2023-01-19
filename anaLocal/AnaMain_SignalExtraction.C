@@ -266,8 +266,8 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     // first CB function
     TString VM;
     Float_t meanVal, meanLow, meanUpp;
-    if(iPcs<4 || iPcs==6) { VM = "J/#psi", meanVal = 3.097; meanLow = 2.8; meanUpp = 3.3; }
-    else                  { VM = "#psi'",  meanVal = 3.686; meanLow = 3.4; meanUpp = 3.9; }
+    if(iPcs<4 || iPcs==6) { VM = "J/#psi", meanVal = 3.097; meanLow = 2.6; meanUpp = 3.3; }
+    else                  { VM = "#psi'",  meanVal = 3.686; meanLow = 3.2; meanUpp = 3.9; }
     RooRealVar _aL(Form("#alpha_{L,%s}",VM.Data()),Form("#alpha_{L,%s}",VM.Data()),aL,0.001,40.);
     RooRealVar _aR(Form("#alpha_{R,%s}",VM.Data()),Form("#alpha_{R,%s}",VM.Data()),aR,0.001,40.);   
     RooRealVar _mu(Form("#it{m}_{%s}",VM.Data()),Form("#it{m}_{%s}",VM.Data()),meanVal,meanLow,meanUpp);
