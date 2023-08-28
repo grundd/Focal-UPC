@@ -4,11 +4,11 @@
 # ./runStarlightNoDigi.sh
 
 # options to set:
-first=11
+first=1
 simulations=10
 last=$(($first+$simulations-1))
 evPerSim=1000
-process="kIncohPsi2sToElPi"
+process="kIncohPsi2sToEl"
 
 # print info:
 echo ""
@@ -36,7 +36,7 @@ do
     echo ""
     # run the simulation:
     $ALIDPG_ROOT/bin/aliroot_dpgsim.sh --run 294925 --system Pb-Pb --energy 5500.0 --mode sim --detector FOCAL --uid $ranSeed \
-    --nevents $evPerSim --generator Starlight --process $process --simulation NoDigitization --focalGeometryFile geometry_03.txt \
+    --nevents $evPerSim --generator Starlight --process $process --simulation NoDigitization --focalGeometryFile geometry_05.txt \
     --ymin 3.4 --ymax 6.0
     # create a folder to store the results:
     mkdir -p $folderName

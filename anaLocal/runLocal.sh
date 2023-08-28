@@ -17,7 +17,7 @@ if false; then
 fi
 
 # run primary (grid) and secondary (main) analysis over input data for a selected process
-if true; then 
+if false; then 
     aliroot -q 'FocalUpcGrid_RunAnalysis.C(kTRUE,"'$process'",'$overwrite')'
     aliroot -q 'AnaMain.C("'$process'")'
 fi
@@ -34,7 +34,7 @@ if false; then
 fi
 
 # do invariant mass of the combined sample
-if false; then
+if true; then
     aliroot -q AnaMain_SignalExtraction.C
 fi
 

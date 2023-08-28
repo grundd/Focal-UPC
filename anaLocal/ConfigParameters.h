@@ -7,16 +7,16 @@
 Bool_t doSupercls = kTRUE;
 // if true, create superclusters using:
 const Float_t minSeedE = 5; // [GeV]
-const Float_t radius = 8; // [cm]
+const Float_t radius = 5; // [cm]
 TString sCl = "";
 
 // selections:
 // applied on (sup)clusters:
-const Float_t cutE = 0.0; // [GeV]; if > 0, filter out all (super)cls having energy below cutE
+const Float_t cutE = 10.0; // [GeV]; if > 0, filter out all (super)cls having energy below cutE
 const Float_t cutM = 0.0; // [GeV]; if > 0, filter out all (super)cls having mass below cutM when paired to any other (sup)cl
 // applied on (sup)cl pairs:
-const Float_t cutMLow = 1.4; // [GeV]
-const Float_t cutMUpp = 4.2; // [GeV]
+const Float_t cutMLow = 1.4; // [GeV] // was 1.4 GeV // 2.8
+const Float_t cutMUpp = 4.2; // [GeV] // was 4.2 GeV // 3.4
 // pT distribution of (sup)cl pairs:
 const Float_t cutMLowPtDist = 2.8; // [GeV]
 const Float_t cutMUppPtDist = 3.4; // [GeV]

@@ -73,8 +73,8 @@ enum kGridJpsi {
     kJ1_mcJElPairRap,
     kJ1_mcJElPairM,
     // acceptance and efficiency
-    kJ1_mcJElPairRap_gen,
-    kJ1_mcJElPairRap_acc,
+    kJ1_rap_gen,
+    kJ1_rap_acc,
     //* TH2F histograms:
     kGridJpsi_firstTH2F,
     kJ2_mcJElPairEn_nCls,
@@ -122,8 +122,10 @@ enum kMainJpsi {
     kJ1_clPairM,
     kJ1_clPairSep,
     // acceptance and efficiency
-    kJ1_mcJElPairRap_rec,
-    kJ1_clPairRap_rec,
+    kJ1_rap_rec_genKine,
+    kJ1_rap_rec,
+    kJ1_rap_sig_genKine,
+    kJ1_rap_sig,
     // matched cl. pairs
     kJ1_ppeClPairM,
     kJ1_ppeClPairSep,
@@ -238,12 +240,12 @@ void CreateHistos_GridJpsi(TObjArray* objArr)
                     hJ1_mcJElPairM->SetTitle("#it{m} of pairs of pp electrons;#it{m}_{ppe pair} [GeV/#it{c}^{2}];counts");
                     objArr->AddAt(hJ1_mcJElPairM, kJ1_mcJElPairM);
     // acceptance and efficiency
-    TH1F* hJ1_mcJElPairRap_gen = new TH1F("hJ1_mcJElPairRap_gen","",30,3.0,6.0);
-                    hJ1_mcJElPairRap_gen->SetTitle("#it{y} of pp electrons pairs generated in 3.4 < #it{y} < 5.8;#it{y}_{ppe pair} [-];counts");
-                    objArr->AddAt(hJ1_mcJElPairRap_gen, kJ1_mcJElPairRap_gen);
-    TH1F* hJ1_mcJElPairRap_acc = new TH1F("hJ1_mcJElPairRap_acc","",30,3.0,6.0);
-                    hJ1_mcJElPairRap_acc->SetTitle("#it{y} of pp electron pairs with 3.4 < #eta^{e^{#pm}}< 5.8;#it{y}_{ppe pair} [-];counts");
-                    objArr->AddAt(hJ1_mcJElPairRap_acc, kJ1_mcJElPairRap_acc);
+    TH1F* hJ1_rap_gen = new TH1F("hJ1_rap_gen","",30,3.0,6.0);
+                    hJ1_rap_gen->SetTitle("#it{y} of pp electrons pairs generated in 3.4 < #it{y} < 5.8;#it{y}_{ppe pair} [-];counts");
+                    objArr->AddAt(hJ1_rap_gen, kJ1_rap_gen);
+    TH1F* hJ1_rap_acc = new TH1F("hJ1_rap_acc","",30,3.0,6.0);
+                    hJ1_rap_acc->SetTitle("#it{y} of pp electron pairs with 3.4 < #eta^{e^{#pm}}< 5.8;#it{y}_{ppe pair} [-];counts");
+                    objArr->AddAt(hJ1_rap_acc, kJ1_rap_acc);
     //* TH2F histograms:
     TH2F* hJ2_mcJElPairEn_nCls = new TH2F("hJ2_mcJElPairEn_nCls","",nBinsEn,lowEn,uppEn,10,-0.5,9.5);
                     hJ2_mcJElPairEn_nCls->SetTitle(Form("#it{E} of pairs of pp electrons vs #it{N}_{%ss};#it{E}_{ppe pair} [GeV];#it{N}_{%ss} [-]",sCl.Data(),sCl.Data()));
@@ -353,12 +355,18 @@ void CreateHistos_MainJpsi(TObjArray* objArr)
                     hJ1_clPairSep->SetTitle(Form("Radial separation of %s pairs;#Delta#it{R}_{%s pair} [cm];counts",sCl.Data(),sCl.Data()));
                     objArr->AddAt(hJ1_clPairSep, kJ1_clPairSep);
     // acceptance and efficiency
-    TH1F* hJ1_mcJElPairRap_rec = new TH1F("hJ1_mcJElPairRap_rec","",30,3.0,6.0);
-                    hJ1_mcJElPairRap_rec->SetTitle(Form("#it{y} of pp electron pairs matched with reconstructed %ss;#it{y}_{%s pair} [-];counts",sCl.Data(),sCl.Data()));
-                    objArr->AddAt(hJ1_mcJElPairRap_rec, kJ1_mcJElPairRap_rec);
-    TH1F* hJ1_clPairRap_rec = new TH1F("hJ1_clPairRap_rec","",30,3.0,6.0);
-                    hJ1_clPairRap_rec->SetTitle(Form("#it{y} of rec %s pairs with %.1f < #it{m}_{%s pair} < %.1f GeV/#it{c}^{2};#it{y}_{%s pair} [-];counts",sCl.Data(),cutMLow,sCl.Data(),cutMUpp,sCl.Data()));
-                    objArr->AddAt(hJ1_clPairRap_rec, kJ1_clPairRap_rec);
+    TH1F* hJ1_rap_rec_genKine = new TH1F("hJ1_rap_rec_genKine","",30,3.0,6.0);
+                    hJ1_rap_rec_genKine->SetTitle(Form("#it{y} of pp electron pairs (both e^{#pm} in the acceptance) matched with rec %ss;#it{y}_{%s pair} [-];counts",sCl.Data(),sCl.Data()));
+                    objArr->AddAt(hJ1_rap_rec_genKine, kJ1_rap_rec_genKine);
+    TH1F* hJ1_rap_rec = new TH1F("hJ1_rap_rec","",30,3.0,6.0);
+                    hJ1_rap_rec->SetTitle(Form("#it{y} of rec %s pairs (both matched e^{#pm} in the acceptance);#it{y}_{%s pair} [-];counts",sCl.Data(),sCl.Data()));
+                    objArr->AddAt(hJ1_rap_rec, kJ1_rap_rec);
+    TH1F* hJ1_rap_sig_genKine = new TH1F("hJ1_rap_sig_genKine","",30,3.0,6.0);
+                    hJ1_rap_sig_genKine->SetTitle(Form("#it{y} of pp electron pairs (both e^{#pm} in the acceptance) matched with rec %ss, where %.1f < #it{m}_{%s pair} < %.1f GeV/#it{c}^{2};#it{y}_{%s pair} [-];counts",sCl.Data(),cutMLow,sCl.Data(),cutMUpp,sCl.Data()));
+                    objArr->AddAt(hJ1_rap_sig_genKine, kJ1_rap_sig_genKine);
+    TH1F* hJ1_rap_sig = new TH1F("hJ1_rap_sig","",30,3.0,6.0);
+                    hJ1_rap_sig->SetTitle(Form("#it{y} of rec %s pairs (both matched e^{#pm} in the acceptance) with %.1f < #it{m}_{%s pair} < %.1f GeV/#it{c}^{2};#it{y}_{%s pair} [-];counts",sCl.Data(),cutMLow,sCl.Data(),cutMUpp,sCl.Data()));
+                    objArr->AddAt(hJ1_rap_sig, kJ1_rap_sig);
     // cluster pairs matched with ppe pairs
     TH1F* hJ1_ppeClPairM = new TH1F("hJ1_ppeClPairM","",nBinsM,lowM,uppM);
                     hJ1_ppeClPairM->SetTitle(Form("#it{m} of %s pairs matched with a pair of pp electrons;#it{m}_{matched %s pair} [GeV/#it{c}^{2}];counts",sCl.Data(),sCl.Data()));

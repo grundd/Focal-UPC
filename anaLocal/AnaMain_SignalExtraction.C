@@ -30,10 +30,10 @@ using namespace RooFit;
 // 3.4 < y < 5.8
 // obtained from StarlightRapDep.C
 Float_t nFocRapExpected[6] = {
-    965000, // coh J/psi
-    715000, // inc J/psi
-    95000,  // coh FD
-    74000,  // inc FD
+    980000, // coh J/psi
+    730000, // inc J/psi
+    96000,  // coh FD
+    75000,  // inc FD
     20000,  // coh psi'
     16000   // inc psi'
 };
@@ -43,7 +43,7 @@ TString sOutMass = "";
 TString sOutPt = "";
 // mass binning:
 Int_t nBinsM;
-Float_t fMStep = 0.04;
+Float_t fMStep = 0.08;
 // pT binning:
 Int_t nBinsPt;
 Float_t fPtEdgeLow = 0.; // GeV
@@ -279,14 +279,18 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     
     // second CB function (for iPcs == 6)
     TString VM2 = "#psi'";
+    /*
     RooRealVar _aL2(Form("#alpha_{L,%s}",VM2.Data()),Form("#alpha_{L,%s}",VM2.Data()),aL2,0.01,40.);
-    RooRealVar _aR2(Form("#alpha_{R,%s}",VM2.Data()),Form("#alpha_{R,%s}",VM2.Data()),aR2,0.01,40.);   
+    RooRealVar _aR2(Form("#alpha_{R,%s}",VM2.Data()),Form("#alpha_{R,%s}",VM2.Data()),aR2,0.01,40.); 
+    */  
     RooRealVar _mu2(Form("#it{m}_{%s}",VM2.Data()),Form("#it{m}_{%s}",VM2.Data()),3.686,3.4,3.9);
+    /*
     RooRealVar _nL2(Form("#it{n}_{L,%s}",VM2.Data()),Form("#it{n}_{L,%s}",VM2.Data()),nL2,0.01,100.);
     RooRealVar _nR2(Form("#it{n}_{R,%s}",VM2.Data()),Form("#it{n}_{R,%s}",VM2.Data()),nR2,0.01,100.);
+    */
     RooRealVar _sL2(Form("#sigma_{L,%s}",VM2.Data()),Form("#sigma_{L,%s}",VM2.Data()),sL2, 0.01, 0.20);
     RooRealVar _sR2(Form("#sigma_{R,%s}",VM2.Data()),Form("#sigma_{R,%s}",VM2.Data()),sR2, 0.01, 0.20);
-    RooCrystalBall DSCB2("DSCB2", "Double sided CB function", fM, _mu2, _sL2, _sR2, _aL2, _nL2, _aR2, _nR2);
+    RooCrystalBall DSCB2("DSCB2", "Double sided CB function", fM, _mu2, _sL2, _sR2, _aL, _nL, _aR, _nR);
 
     // extended fit?
     Bool_t ext = kTRUE;
@@ -315,8 +319,10 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
         _aR.setConstant(kTRUE); 
         _nR.setConstant(kTRUE);
         //_aL2.setConstant(kTRUE); _nL2.setConstant(kTRUE); _sL2.setConstant(kTRUE);  _sR2.setConstant(kTRUE);
+        /*
         _aR2.setConstant(kTRUE); 
         _nR2.setConstant(kTRUE); 
+        */
         fResFit = CombinedPDF.fitTo(fDataHist,SumW2Error(kFALSE),Extended(kTRUE),Save());
     }
 
@@ -330,20 +336,20 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     SetCanvas(c,kFALSE);
 
     RooPlot* fr = fM.frame(Title("inv mass fit")); 
-    fDataHist.plotOn(fr,Name("fDataHist"),MarkerStyle(kFullCircle),MarkerSize(0.8),MarkerColor(kBlack),LineColor(kBlack),LineWidth(2));
+    fDataHist.plotOn(fr,Name("fDataHist"),MarkerStyle(kOpenCircle),MarkerSize(1.2),MarkerColor(kBlack),LineColor(kBlack),LineWidth(2));
     Float_t chi2;
     if(iPcs<6) {
         if(ext) {
-            ExtDSCB.plotOn(fr,Name("ExtDSCB"),LineColor(215),LineWidth(3),LineStyle(9));
+            ExtDSCB.plotOn(fr,Name("ExtDSCB"),LineColor(kBlue),LineWidth(3),LineStyle(1));
             chi2 = fr->chiSquare("ExtDSCB","fDataHist",fResFit->floatParsFinal().getSize());
         } else {
-            DSCB.plotOn(fr,Name("DSCB"),LineColor(215),LineWidth(3),LineStyle(9));
+            DSCB.plotOn(fr,Name("DSCB"),LineColor(kBlue),LineWidth(3),LineStyle(1));
             chi2 = fr->chiSquare("DSCB","fDataHist",fResFit->floatParsFinal().getSize());
         }
     } else {
         CombinedPDF.plotOn(fr,Name("DSCB"),Components(DSCB),LineColor(kRed),LineWidth(3),LineStyle(2));
         CombinedPDF.plotOn(fr,Name("DSCB2"),Components(DSCB2),LineColor(kViolet),LineWidth(3),LineStyle(2));
-        CombinedPDF.plotOn(fr,Name("CombinedPDF"),LineColor(215),LineWidth(3),LineStyle(9));
+        CombinedPDF.plotOn(fr,Name("CombinedPDF"),LineColor(kBlue),LineWidth(3),LineStyle(1));
         chi2 = fr->chiSquare("CombinedPDF","fDataHist",fResFit->floatParsFinal().getSize());
     }
     // y-axis
@@ -469,10 +475,88 @@ void DoInvMassFit(Int_t iPcs, TH1F* h)
     l2.Draw();
     ltx->DrawLatex(0.55,0.96,"ALICE Run-4 Simulation: Pb#minusPb UPC at #sqrt{#it{s}_{NN}} = 5.02 TeV");
     cLog->Print(Form("%sfit_%s_log.pdf",sOutMass.Data(),processes[iPcs].Data()));
+
+    // **********************************
+    // Plots for the Public Note:
+
+    // frame settings
+    // y-axis
+    fr->GetYaxis()->SetTitle(Form("counts per %.0f MeV/#it{c}^{2}", fMStep*1e3));
+    fr->GetYaxis()->SetTitleSize(0.05);
+    fr->GetYaxis()->SetTitleOffset(1.25);
+    fr->GetYaxis()->SetLabelSize(0.05);
+    fr->GetYaxis()->SetLabelOffset(0.005);
+    fr->GetYaxis()->SetMaxDigits(3);
+    fr->GetYaxis()->SetDecimals(0);
+    // x-axis
+    fr->GetXaxis()->SetTitle("#it{m}_{cl pair} (GeV/#it{c}^{2})");
+    fr->GetXaxis()->SetTitleSize(0.05);
+    fr->GetXaxis()->SetTitleOffset(1.05);
+    fr->GetXaxis()->SetLabelSize(0.05);
+    fr->GetXaxis()->SetLabelOffset(0.005);
+    fr->GetXaxis()->SetDecimals(0);
+
+    // linear scale
+    TCanvas* cPN = new TCanvas("cPN","",900,800);
+    cPN->SetTopMargin(0.06);
+    cPN->SetBottomMargin(0.12);
+    cPN->SetRightMargin(0.02);
+    cPN->SetLeftMargin(0.14);
+    cPN->cd();
+    fr->GetYaxis()->SetRangeUser(0.0,h->GetMaximum()*1.10);
+    fr->Draw();
+    TLegend* lPN_main = new TLegend(0.18,0.75,0.60,0.93);
+    lPN_main->AddEntry((TObject*)0,"ALICE Simulation, Pb#minusPb UPC #sqrt{#it{s}_{NN}} = 5.5 TeV, #it{L}_{int} = 7 nb^{-1}","");
+    lPN_main->AddEntry((TObject*)0,"STARlight, J/#psi and #psi(2#it{S}) #rightarrow e^{+}e^{-}","");
+    lPN_main->AddEntry((TObject*)0,"3.4 < #it{y} < 5.8","");
+    lPN_main->AddEntry((TObject*)0,"#it{p}_{T} < 0.2 GeV/#it{c}","");
+    lPN_main->SetMargin(0.); 
+    lPN_main->SetTextSize(0.038);
+    lPN_main->SetBorderSize(0);
+    lPN_main->SetFillStyle(0);
+    lPN_main->Draw();
+    TLegend* lPN_comp = new TLegend(0.18,0.36,0.65,0.54);
+    lPN_comp->AddEntry("fDataHist","data","EP");
+    lPN_comp->AddEntry("CombinedPDF","model","L");
+    lPN_comp->AddEntry("DSCB","J/#psi Crystal Ball","L");
+    lPN_comp->AddEntry("DSCB2","#psi(2#it{S}) Crystal Ball","L");
+    lPN_comp->SetMargin(0.12); 
+    lPN_comp->SetTextSize(0.038);
+    lPN_comp->SetBorderSize(0);
+    lPN_comp->SetFillStyle(0);
+    lPN_comp->Draw();
+    cPN->Print("publicNotePlots/massFit.pdf");
+    cPN->Print("publicNotePlots/massFit.C");
+
+    // log scale
+    TCanvas* cPNLog = new TCanvas("cPNLog","",900,800);
+    cPNLog->SetTopMargin(0.06);
+    cPNLog->SetBottomMargin(0.12);
+    cPNLog->SetRightMargin(0.02);
+    cPNLog->SetLeftMargin(0.14);
+    cPNLog->SetLogy();
+    cPNLog->cd();
+    fr->GetYaxis()->SetRangeUser(5,h->GetMaximum()*4.0);
+    fr->Draw();
+    lPN_main->Draw();
+    lPN_comp = new TLegend(0.18,0.20,0.65,0.38);
+    lPN_comp->AddEntry("fDataHist","data","EP");
+    lPN_comp->AddEntry("CombinedPDF","model","L");
+    lPN_comp->AddEntry("DSCB","J/#psi Crystal Ball","L");
+    lPN_comp->AddEntry("DSCB2","#psi(2#it{S}) Crystal Ball","L");
+    lPN_comp->SetMargin(0.12); 
+    lPN_comp->SetTextSize(0.038);
+    lPN_comp->SetBorderSize(0);
+    lPN_comp->SetFillStyle(0);
+    lPN_comp->Draw();
+    cPNLog->Print("publicNotePlots/massFit_log.pdf");
+    cPNLog->Print("publicNotePlots/massFit_log.C");
     
     delete cCM;
     delete c;
     delete cLog;
+    delete cPN;
+    delete cPNLog;
     return;
 }
 
@@ -514,13 +598,13 @@ void PlotPtDistribution(TH1F* hData, TH1F* hCohJ, TH1F* hIncJ, TH1F* hCohFD, TH1
     SetMarkerProperties(hData,kBlack);
     hData->Draw("E1");
     // coh J/psi
-    SetHistoProperties(hCohJ,215,1);
+    SetHistoProperties(hCohJ,kBlue,1);
     hCohJ->Draw("HIST SAME");
     // inc J/psi
     SetHistoProperties(hIncJ,kRed,1);
     hIncJ->Draw("HIST SAME");
     // coh FD
-    SetHistoProperties(hCohFD,215,2);
+    SetHistoProperties(hCohFD,kBlue,2);
     hCohFD->Draw("HIST SAME");
     // inc FD
     SetHistoProperties(hIncFD,kRed,2);
@@ -559,11 +643,87 @@ void PlotPtDistribution(TH1F* hData, TH1F* hCohJ, TH1F* hIncJ, TH1F* hCohFD, TH1
     ltx->DrawLatex(0.55,0.96,"ALICE Run-4 Simulation: Pb#minusPb UPC at #sqrt{#it{s}_{NN}} = 5.02 TeV");
     l.Draw();
     cLog->Print(Form("%sptDist_log.pdf",sOutPt.Data()));
+
+    // histogram settings
+    TH1F* hPN = (TH1F*)hData->Clone();
+    // y-axis
+    hData->GetYaxis()->SetRangeUser(5.,hData->GetMaximum()*2.0);
+    hData->GetYaxis()->SetTitle(Form("counts per %.0f MeV/#it{c}", fPtStep*1e3));
+    hData->GetYaxis()->SetTitleSize(0.05);
+    hData->GetYaxis()->SetTitleOffset(1.25);
+    hData->GetYaxis()->SetLabelSize(0.05);
+    hData->GetYaxis()->SetLabelOffset(0.005);
+    hData->GetYaxis()->SetMaxDigits(3);
+    hData->GetYaxis()->SetDecimals(0);
+    // x-axis
+    hData->GetXaxis()->SetTitle("#it{p}_{T,cl pair} (GeV/#it{c})");
+    hData->GetXaxis()->SetTitleSize(0.05);
+    hData->GetXaxis()->SetTitleOffset(1.05);
+    hData->GetXaxis()->SetLabelSize(0.05);
+    hData->GetXaxis()->SetLabelOffset(0.005);
+    hData->GetXaxis()->SetDecimals(0);
+    // marker style
+    hData->SetMarkerStyle(kOpenCircle);
+    hData->SetMarkerSize(1.2);
+    hData->SetMarkerColor(kBlack);
+    hData->SetLineColor(kBlack);
+    hData->SetLineWidth(2);
+
+    TCanvas* cPN = new TCanvas("cPN","",900,800);
+    cPN->SetTopMargin(0.06);
+    cPN->SetBottomMargin(0.12);
+    cPN->SetRightMargin(0.02);
+    cPN->SetLeftMargin(0.14);
+    cPN->SetLogy();
+    cPN->cd();
+    hData->Draw("E");
+    hCohJ->Draw("HIST SAME");
+    hIncJ->Draw("HIST SAME");
+    hCohFD->Draw("HIST SAME");
+    hIncFD->Draw("HIST SAME");
+    TLegend* lPN_main = new TLegend(0.18,0.84,0.60,0.93);
+    lPN_main->AddEntry((TObject*)0,"ALICE Simulation, Pb#minusPb UPC #sqrt{#it{s}_{NN}} = 5.5 TeV, #it{L}_{int} = 7 nb^{-1}","");
+    lPN_main->AddEntry((TObject*)0,"STARlight, J/#psi and #psi(2#it{S}) #rightarrow e^{+}e^{-}","");
+    lPN_main->SetMargin(0.); 
+    lPN_main->SetTextSize(0.038);
+    lPN_main->SetBorderSize(0);
+    lPN_main->SetFillStyle(0);
+    lPN_main->Draw();
+    nRows = 6;
+    TLegend* lPN_details = new TLegend(0.585,0.845-nRows*0.045,0.95,0.845);
+    lPN_details->AddEntry((TObject*)0,"3.4 < #it{y} < 5.8","");
+    lPN_details->AddEntry((TObject*)0,Form("%.1f < #it{m}_{cl pair} < %.1f GeV/#it{c}^{2}",cutMLowPtDist,cutMUppPtDist),"");
+    lPN_details->AddEntry(hData,"data","EP");
+    lPN_details->AddEntry(hCohJ,"coh J/#psi","L");
+    lPN_details->AddEntry(hIncJ,"inc J/#psi","L");
+    lPN_details->AddEntry(hCohFD,"feed-down from coh #psi'","L");
+    lPN_details->AddEntry(hIncFD,"feed-down from inc #psi'","L");
+    lPN_details->SetMargin(0.16); 
+    lPN_details->SetTextSize(0.036);
+    lPN_details->SetBorderSize(0);
+    lPN_details->SetFillStyle(0);
+    lPN_details->Draw();
+    /*
+    nRows = 4;
+    TLegend* lPN_comp = new TLegend(0.63,0.74-nRows*0.045,0.95,0.74);
+    lPN_comp->SetMargin(0.15); 
+    lPN_comp->SetTextSize(0.036);
+    lPN_comp->SetBorderSize(0);
+    lPN_comp->SetFillStyle(0);
+    lPN_comp->Draw();
+    */
+    cPN->Print("publicNotePlots/ptDist.pdf");
+    cPN->Print("publicNotePlots/ptDist.C");
+
+    delete c;
+    delete cLog;
+    delete cPN;
     return;
 }
 
 void AnaMain_SignalExtraction()
 {
+    gStyle->SetEndErrorSize(0.);
     // set the binning
     nBinsM = (cutMUpp-cutMLow) / fMStep;
     Printf("%i mass bins will be used.", nBinsM);

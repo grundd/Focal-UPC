@@ -1,0 +1,147 @@
+#ifdef __CLING__
+#pragma cling optimize(0)
+#endif
+void cohJpsi_genPt()
+{
+//=========Macro generated from canvas: c/
+//=========  (Sat Aug 26 14:09:56 2023) by ROOT version 6.28/04
+   TCanvas *c = new TCanvas("c", "",78,53,900,800);
+   c->Range(-0.102439,-3124.493,0.6292683,22912.95);
+   c->SetFillColor(0);
+   c->SetBorderMode(0);
+   c->SetBorderSize(2);
+   c->SetLeftMargin(0.14);
+   c->SetRightMargin(0.04);
+   c->SetTopMargin(0.06);
+   c->SetBottomMargin(0.12);
+   c->SetFrameBorderMode(0);
+   c->SetFrameBorderMode(0);
+   
+   TH1F *hJ1_mcJElPairPt__1 = new TH1F("hJ1_mcJElPairPt__1","",80,0,2);
+   hJ1_mcJElPairPt__1->SetBinContent(1,9114);
+   hJ1_mcJElPairPt__1->SetBinContent(2,20334);
+   hJ1_mcJElPairPt__1->SetBinContent(3,18018);
+   hJ1_mcJElPairPt__1->SetBinContent(4,9130);
+   hJ1_mcJElPairPt__1->SetBinContent(5,3027);
+   hJ1_mcJElPairPt__1->SetBinContent(6,1574);
+   hJ1_mcJElPairPt__1->SetBinContent(7,1473);
+   hJ1_mcJElPairPt__1->SetBinContent(8,1091);
+   hJ1_mcJElPairPt__1->SetBinContent(9,616);
+   hJ1_mcJElPairPt__1->SetBinContent(10,480);
+   hJ1_mcJElPairPt__1->SetBinContent(11,522);
+   hJ1_mcJElPairPt__1->SetBinContent(12,394);
+   hJ1_mcJElPairPt__1->SetBinContent(13,357);
+   hJ1_mcJElPairPt__1->SetBinContent(14,317);
+   hJ1_mcJElPairPt__1->SetBinContent(15,269);
+   hJ1_mcJElPairPt__1->SetBinContent(16,250);
+   hJ1_mcJElPairPt__1->SetBinContent(17,230);
+   hJ1_mcJElPairPt__1->SetBinContent(18,195);
+   hJ1_mcJElPairPt__1->SetBinContent(19,180);
+   hJ1_mcJElPairPt__1->SetBinContent(20,188);
+   hJ1_mcJElPairPt__1->SetBinContent(21,125);
+   hJ1_mcJElPairPt__1->SetBinContent(22,143);
+   hJ1_mcJElPairPt__1->SetBinContent(23,127);
+   hJ1_mcJElPairPt__1->SetBinContent(24,130);
+   hJ1_mcJElPairPt__1->SetBinContent(25,119);
+   hJ1_mcJElPairPt__1->SetBinContent(26,108);
+   hJ1_mcJElPairPt__1->SetBinContent(27,96);
+   hJ1_mcJElPairPt__1->SetBinContent(28,109);
+   hJ1_mcJElPairPt__1->SetBinContent(29,85);
+   hJ1_mcJElPairPt__1->SetBinContent(30,94);
+   hJ1_mcJElPairPt__1->SetBinContent(31,66);
+   hJ1_mcJElPairPt__1->SetBinContent(32,68);
+   hJ1_mcJElPairPt__1->SetBinContent(33,66);
+   hJ1_mcJElPairPt__1->SetBinContent(34,71);
+   hJ1_mcJElPairPt__1->SetBinContent(35,57);
+   hJ1_mcJElPairPt__1->SetBinContent(36,65);
+   hJ1_mcJElPairPt__1->SetBinContent(37,66);
+   hJ1_mcJElPairPt__1->SetBinContent(38,45);
+   hJ1_mcJElPairPt__1->SetBinContent(39,46);
+   hJ1_mcJElPairPt__1->SetBinContent(40,55);
+   hJ1_mcJElPairPt__1->SetBinContent(41,52);
+   hJ1_mcJElPairPt__1->SetBinContent(42,33);
+   hJ1_mcJElPairPt__1->SetBinContent(43,38);
+   hJ1_mcJElPairPt__1->SetBinContent(44,33);
+   hJ1_mcJElPairPt__1->SetBinContent(45,30);
+   hJ1_mcJElPairPt__1->SetBinContent(46,33);
+   hJ1_mcJElPairPt__1->SetBinContent(47,38);
+   hJ1_mcJElPairPt__1->SetBinContent(48,23);
+   hJ1_mcJElPairPt__1->SetBinContent(49,23);
+   hJ1_mcJElPairPt__1->SetBinContent(50,21);
+   hJ1_mcJElPairPt__1->SetBinContent(51,20);
+   hJ1_mcJElPairPt__1->SetBinContent(52,28);
+   hJ1_mcJElPairPt__1->SetBinContent(53,27);
+   hJ1_mcJElPairPt__1->SetBinContent(54,23);
+   hJ1_mcJElPairPt__1->SetBinContent(55,17);
+   hJ1_mcJElPairPt__1->SetBinContent(56,9);
+   hJ1_mcJElPairPt__1->SetBinContent(57,13);
+   hJ1_mcJElPairPt__1->SetBinContent(58,14);
+   hJ1_mcJElPairPt__1->SetBinContent(59,13);
+   hJ1_mcJElPairPt__1->SetBinContent(60,2);
+   hJ1_mcJElPairPt__1->SetBinContent(61,8);
+   hJ1_mcJElPairPt__1->SetBinContent(62,2);
+   hJ1_mcJElPairPt__1->SetEntries(70000);
+   hJ1_mcJElPairPt__1->SetDirectory(nullptr);
+   hJ1_mcJElPairPt__1->SetStats(0);
+
+   Int_t ci;      // for color index setting
+   TColor *color; // for color definition with alpha
+   ci = TColor::GetColor("#0000ff");
+   hJ1_mcJElPairPt__1->SetLineColor(ci);
+   hJ1_mcJElPairPt__1->SetLineWidth(2);
+   hJ1_mcJElPairPt__1->GetXaxis()->SetTitle("#it{p}_{T} (GeV/#it{c})");
+   hJ1_mcJElPairPt__1->GetXaxis()->SetRange(1,24);
+   hJ1_mcJElPairPt__1->GetXaxis()->SetLabelFont(42);
+   hJ1_mcJElPairPt__1->GetXaxis()->SetLabelSize(0.05);
+   hJ1_mcJElPairPt__1->GetXaxis()->SetTitleSize(0.05);
+   hJ1_mcJElPairPt__1->GetXaxis()->SetTitleOffset(1.05);
+   hJ1_mcJElPairPt__1->GetXaxis()->SetTitleFont(42);
+   hJ1_mcJElPairPt__1->GetYaxis()->SetTitle("counts");
+   hJ1_mcJElPairPt__1->GetYaxis()->SetNdivisions(3000510);
+   hJ1_mcJElPairPt__1->GetYaxis()->SetLabelFont(42);
+   hJ1_mcJElPairPt__1->GetYaxis()->SetLabelSize(0.05);
+   hJ1_mcJElPairPt__1->GetYaxis()->SetTitleSize(0.05);
+   hJ1_mcJElPairPt__1->GetYaxis()->SetTitleOffset(1.25);
+   hJ1_mcJElPairPt__1->GetYaxis()->SetTitleFont(42);
+   hJ1_mcJElPairPt__1->GetZaxis()->SetLabelFont(42);
+   hJ1_mcJElPairPt__1->GetZaxis()->SetTitleOffset(1);
+   hJ1_mcJElPairPt__1->GetZaxis()->SetTitleFont(42);
+   hJ1_mcJElPairPt__1->Draw("HIST");
+   
+   TLegend *leg = new TLegend(0.32,0.795,1,0.93,NULL,"brNDC");
+   leg->SetBorderSize(0);
+   leg->SetTextSize(0.038);
+   leg->SetLineColor(1);
+   leg->SetLineStyle(1);
+   leg->SetLineWidth(1);
+   leg->SetFillColor(0);
+   leg->SetFillStyle(0);
+   TLegendEntry *entry=leg->AddEntry("NULL","ALICE Simulation, Pb#minusPb UPC #sqrt{#it{s}_{NN}} = 5.5 TeV","");
+   entry->SetLineColor(1);
+   entry->SetLineStyle(1);
+   entry->SetLineWidth(1);
+   entry->SetMarkerColor(1);
+   entry->SetMarkerStyle(21);
+   entry->SetMarkerSize(1);
+   entry->SetTextFont(42);
+   entry=leg->AddEntry("NULL","STARlight coherent J/#psi #rightarrow e^{+}e^{-}","");
+   entry->SetLineColor(1);
+   entry->SetLineStyle(1);
+   entry->SetLineWidth(1);
+   entry->SetMarkerColor(1);
+   entry->SetMarkerStyle(21);
+   entry->SetMarkerSize(1);
+   entry->SetTextFont(42);
+   entry=leg->AddEntry("NULL","3.4 < #it{y} < 6.0","");
+   entry->SetLineColor(1);
+   entry->SetLineStyle(1);
+   entry->SetLineWidth(1);
+   entry->SetMarkerColor(1);
+   entry->SetMarkerStyle(21);
+   entry->SetMarkerSize(1);
+   entry->SetTextFont(42);
+   leg->Draw();
+   c->Modified();
+   c->cd();
+   c->SetSelected(c);
+}

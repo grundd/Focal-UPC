@@ -25,7 +25,7 @@ Int_t binNegLow = 2;
 Int_t binNegUpp = 13;
 Int_t binPosLow = 48;
 Int_t binPosUpp = 59;
-Float_t fLumiRun4 = 6.9; // [nb^(-1)]
+Float_t fLumiRun4 = 7.0; // [nb^(-1)]
 // direct starlight
 Float_t fTotalCS[7] = {
     38.8, // [mb]

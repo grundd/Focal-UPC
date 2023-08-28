@@ -156,7 +156,7 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
     tOut->Branch("fPtClPair", &fPtClPair, "fPtClPair/F");
     tOut->Branch("fEtaClPair", &fEtaClPair, "fEtaClPair/F");
     tOut->Branch("fPhiClPair", &fPhiClPair, "fPhiClPair/F");
-    // pairs of J/psi electrons (if cluster pairs was matched with it)
+    // pairs of J/psi electrons (if cluster pairs were matched with it)
     tOut->Branch("fEnJElPair", &fEnJElPair, "fEnJElPair/F");
     tOut->Branch("fPtJElPair", &fPtJElPair, "fPtJElPair/F");
     tOut->Branch("fEtaJElPair", &fEtaJElPair, "fEtaJElPair/F");
@@ -256,14 +256,17 @@ void PrepareClPairs(TString sDir, Bool_t debug = kFALSE)
                 ((TH1F*)arrHistos->At(kJ1_clPairPt))->Fill(fPtClPair);
                 if(clPairM > cutMLowPtDist && clPairM < cutMUppPtDist) ((TH1F*)arrHistos->At(kJ1_clPairPt_massCut))->Fill(fPtClPair);
                 ((TH1F*)arrHistos->At(kJ1_clPairRap))->Fill(Cl12.Rapidity());
-                ((TH1F*)arrHistos->At(kJ1_clPairM))->Fill(clPairM);
+                ((TH1F*)arrHistos->At(kJ1_clPairM))->Fill(clPairM);      
                 // acceptance and efficiency
-                // inv mass cut on (sup)cl pairs
-                if(clPairM > cutMLow && clPairM < cutMUpp) 
-                {
-                    ((TH1F*)arrHistos->At(kJ1_mcJElPairRap_rec))->Fill(lvEl12.Rapidity());
-                    ((TH1F*)arrHistos->At(kJ1_clPairRap_rec))->Fill(Cl12.Rapidity());
-                }                
+                if(3.4 < El1->Eta() && El1->Eta() < 5.8 && 3.4 < El2->Eta() && El2->Eta() < 5.8) {
+                    ((TH1F*)arrHistos->At(kJ1_rap_rec_genKine))->Fill(lvEl12.Rapidity());
+                    ((TH1F*)arrHistos->At(kJ1_rap_rec))->Fill(Cl12.Rapidity());
+                    // inv mass cut on (sup)cl pairs
+                    if(clPairM > cutMLow && clPairM < cutMUpp) {
+                        ((TH1F*)arrHistos->At(kJ1_rap_sig_genKine))->Fill(lvEl12.Rapidity());
+                        ((TH1F*)arrHistos->At(kJ1_rap_sig))->Fill(Cl12.Rapidity());
+                    }
+                }
                 // radial separation between the pairs of clusters
                 Float_t sepCl = TMath::Sqrt(TMath::Power(vectX[iCl1]-vectX[iCl2],2) + TMath::Power(vectY[iCl1]-vectY[iCl2],2));
                 ((TH1F*)arrHistos->At(kJ1_clPairSep))->Fill(sepCl);
@@ -347,73 +350,104 @@ TH* GetHistoFromList(TString filePath, TString listName, TString histoName, Bool
 
 void AxE()
 {
-    // rapidity distribution of AxE:
-    // histogram with all JEl pairs generated in FOCAL rapidity coverage
-    TH1F *hJElPairGen = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()),
-        "lTH1F","hJ1_mcJElPairRap_gen");
-    hJElPairGen->SetName("hJElPairGen");
-    // histogram with all JEl pairs with both electrons reaching FOCAL
-    TH1F *hJElPairAcc = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()),
-        "lTH1F","hJ1_mcJElPairRap_acc");
-    hJElPairAcc->SetName("hJElPairAcc");
-    // histogram with rapidity dist of pp ele pairs matched with reconstructed cl pairs
-    TH1F *hJElPairRec = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()),
-        "lTH1F","hJ1_mcJElPairRap_rec");
-    hJElPairRec->SetName("hJElPairRec");
-    // histogram with rapidity dist of reconstructed cl pairs
-    TH1F* hClPairRec = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()),
-        "lTH1F","hJ1_clPairRap_rec");
-    hClPairRec->SetName("hClPairRec");
-    // calculate and draw AxE in given rapidity bins
-    TH1F* hAxE = (TH1F*)(hClPairRec->Clone("hAxE"));
-    hAxE->SetTitle(Form("Rapidity dependence of Acc#times#it{#varepsilon};#it{y} [-];Acc#times#it{#varepsilon} = #it{N}_{rec %s pairs} / #it{N}_{gen events}",sCl.Data()));
-    hAxE->Sumw2();
-    hAxE->Divide(hJElPairGen);
-    // only acceptance
-    TH1F* hA = (TH1F*)(hJElPairAcc->Clone("hA"));
-    hA->SetTitle("Rapidity dependence of acceptance;#it{y} [-];Acc = #it{N}_{FOCAL acceptance} / #it{N}_{gen events}");
-    hA->Sumw2();
-    hA->Divide(hJElPairGen);
-    // only efficiency
-    TH1F* hE = (TH1F*)(hClPairRec->Clone("hE"));
-    hE->SetTitle(Form("Rapidity dependence of efficiency;#it{y} [-];#it{#varepsilon} = #it{N}_{rec %s pairs} / #it{N}_{FOCAL acceptance}",sCl.Data()));
-    hE->Sumw2();
-    hE->Divide(hJElPairAcc);
-    // calculate the integrated (total) efficiency
-    Float_t NGen(0.), NRec(0.);
-    for(Int_t iBin = 1; iBin <= 30; iBin++) {
-        NGen += hJElPairGen->GetBinContent(iBin);
-        NRec += hClPairRec->GetBinContent(iBin);
+    // rapidity distributions contributing to AxE:
+    // rapidity of all generated JEl pairs
+    TH1F *hRap_gen = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()),
+        "lTH1F","hJ1_rap_gen");
+    hRap_gen->SetName("hRap_gen");
+    // rapidity of generated JEl pairs, where both electrons reach FOCAL acceptance (3.4 < eta < 5.8)
+    TH1F *hRap_acc = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsGrid.root",outDir.Data(),outSubDir.Data()),
+        "lTH1F","hJ1_rap_acc");
+    hRap_acc->SetName("hRap_acc");
+    // rapidity of generated JEl pairs in FOCAL acc matched to reconstructed cl pairs
+    TH1F *hRap_rec_genKine = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()),
+        "lTH1F","hJ1_rap_rec_genKine");
+    hRap_rec_genKine->SetName("hRap_rec_genKine");
+    // rapidity of reconstructed cl pairs matched to generated JEl pairs in FOCAL acc
+    TH1F *hRap_rec_detKine = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()),
+        "lTH1F","hJ1_rap_rec");
+    hRap_rec_detKine->SetName("hRap_rec_detKine");
+    // rapidity of generated JEl pairs in FOCAL acc matched to reconstructed cl pairs, with a cut on m_{cl pair}
+    TH1F *hRap_sig_genKine = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()),
+        "lTH1F","hJ1_rap_sig_genKine");
+    hRap_sig_genKine->SetName("hRap_sig_genKine");
+    // rapidity of reconstructed cl pairs matched to generated JEl pairs in FOCAL acc, with a cut on m_{cl pair}
+    TH1F *hRap_sig_detKine = GetHistoFromList<TH1F>(Form("%smerged_%sanalysisResultsMain.root",outDir.Data(),outSubDir.Data()),
+        "lTH1F","hJ1_rap_sig");
+    hRap_sig_detKine->SetName("hRap_sig_detKine");
+
+    // ********************************************
+    // use distributions with generator kinematics?
+    bool genKine = true;
+    TH1F* hRap_rec = NULL;
+    TH1F* hRap_sig = NULL;
+    if(genKine) {
+        hRap_rec = hRap_rec_genKine;
+        hRap_sig = hRap_sig_genKine;
+    } else {
+        hRap_rec = hRap_rec_detKine;
+        hRap_sig = hRap_sig_detKine;
     }
-    Float_t totalAxE = NRec / NGen;
+    // ********************************************
+
+    // calculate and draw AxE in given rapidity bins
+    // only acceptance
+    TH1F* hA = (TH1F*)(hRap_acc->Clone("hA"));
+    hA->SetTitle("Rapidity dependence of acceptance;#it{y} [-];Acc = #it{N}_{FOCAL acc} / #it{N}_{gen}");
+    hA->Sumw2();
+    hA->Divide(hRap_gen);
+    // only efficiency
+    TH1F* hERec = hERec = (TH1F*)(hRap_rec->Clone("hERec"));
+    hERec->SetTitle("Rapidity dependence of rec. efficiency;#it{y} [-];#it{#varepsilon} = #it{N}_{rec} / #it{N}_{FOCAL acc}");
+    hERec->Sumw2();
+    hERec->Divide(hRap_acc);
+    // only signal eff
+    TH1F* hESig = (TH1F*)(hRap_sig->Clone("hESig"));
+    hESig->SetTitle("Rapidity dependence of sig. efficiency;#it{y} [-];#it{#varepsilon} = #it{N}_{sig} / #it{N}_{rec}");
+    hESig->Sumw2();
+    hESig->Divide(hRap_rec);
+    // full AxE
+    TH1F* hAxE = (TH1F*)(hRap_sig->Clone("hAxE"));
+    hAxE->SetTitle("Rapidity dependence of Acc#times#it{#varepsilon};#it{y} [-];Acc#times#it{#varepsilon} = #it{N}_{sig} / #it{N}_{gen}");
+    hAxE->Sumw2();
+    hAxE->Divide(hRap_gen);
+
+    // calculate the integrated (total) efficiency
+    Float_t NGen(0.), NSig(0.);
+    for(Int_t iBin = 1; iBin <= 30; iBin++) {
+        NGen += hRap_gen->GetBinContent(iBin);
+        NSig += hRap_sig->GetBinContent(iBin);
+    }
+    Float_t totalAxE = NSig / NGen;
     // print the value
     ofstream of(Form("%smerged_%stotalAxE.txt",outDir.Data(),outSubDir.Data()));
     of << totalAxE;
     of.close();
+
     // plot rapidity dist of all four histograms
     TCanvas c1("c1","c1",700,600);
     SetCanvas(&c1,kFALSE);
     // x-axis
-    hJElPairGen->GetXaxis()->SetDecimals(1);
-    hJElPairGen->GetXaxis()->SetLabelOffset(0.01);
-    hJElPairGen->GetXaxis()->SetTitle("#it{y} [-]");
-    hJElPairGen->GetXaxis()->SetTitleOffset(1.2);
+    hRap_gen->GetXaxis()->SetDecimals(1);
+    hRap_gen->GetXaxis()->SetLabelOffset(0.01);
+    hRap_gen->GetXaxis()->SetTitle("#it{y} (-)");
+    hRap_gen->GetXaxis()->SetTitleOffset(1.2);
     // y-axis
-    hJElPairGen->GetYaxis()->SetDecimals(1);
-    hJElPairGen->GetYaxis()->SetMaxDigits(3);
+    hRap_gen->GetYaxis()->SetDecimals(1);
+    hRap_gen->GetYaxis()->SetMaxDigits(3);
     // ranges of axes
-    hJElPairGen->GetYaxis()->SetRangeUser(0.,hJElPairGen->GetMaximum()*1.05);
+    hRap_gen->GetYaxis()->SetRangeUser(0.,hRap_gen->GetMaximum()*1.05);
     // print the histograms
-    SetHistoLineFill(hJElPairGen,kBlue,kTRUE);
-    hJElPairGen->SetBit(TH1::kNoStats);
-    hJElPairGen->SetBit(TH1::kNoTitle);
-    hJElPairGen->Draw("HIST");
-    SetHistoLineFill(hJElPairAcc,kRed,kTRUE);
-    hJElPairAcc->Draw("HIST SAME");
-    SetHistoLineFill(hJElPairRec,kGreen,kTRUE);
-    hJElPairRec->Draw("HIST SAME");
-    SetHistoLineFill(hClPairRec,kViolet,kTRUE);
-    hClPairRec->Draw("HIST SAME");
+    SetHistoLineFill(hRap_gen,kBlue,kTRUE);
+    hRap_gen->SetBit(TH1::kNoStats);
+    hRap_gen->SetBit(TH1::kNoTitle);
+    hRap_gen->Draw("HIST");
+    SetHistoLineFill(hRap_acc,kRed,kTRUE);
+    hRap_acc->Draw("HIST SAME");
+    SetHistoLineFill(hRap_rec,kGreen,kTRUE);
+    hRap_rec->Draw("HIST SAME");
+    SetHistoLineFill(hRap_sig,kMagenta,kTRUE);
+    hRap_sig->Draw("HIST SAME");
     // title
     TLatex* ltx = new TLatex();
     ltx->SetTextSize(0.032);
@@ -422,50 +456,60 @@ void AxE()
     ltx->DrawLatex(0.55,0.96,"ALICE Run-4 Simulation: Pb#minusPb UPC at #sqrt{#it{s}_{NN}} = 5.02 TeV");
     // legend
     Int_t nRows1 = 5;
-    TLegend l1(0.46,0.925-nRows1*0.04,0.95,0.925);
+    TLegend l1(0.42,0.925-nRows1*0.04,0.95,0.925);
     l1.AddEntry((TObject*)0,Form("#bf{%s}",names[iSim].Data()),"");
-    l1.AddEntry(hJElPairGen,"generated e^{+}e^{-} pairs","L");
-    l1.AddEntry(hJElPairAcc,"e^{+}e^{-} pairs with 3.4 < #eta^{e^{#pm}} < 5.8","L");
-    l1.AddEntry(hJElPairRec,Form("e^{+}e^{-} pairs matched with rec %s pairs",sCl.Data()),"L");
-    l1.AddEntry(hClPairRec,Form("rec %s pairs",sCl.Data()),"L");
+    l1.AddEntry(hRap_gen,"generated e^{+}e^{-} pairs","L");
+    l1.AddEntry(hRap_acc,"e^{+}e^{-} pairs with 3.4 < #eta^{e^{#pm}} < 5.8","L");
+    if(genKine) {
+        l1.AddEntry(hRap_rec,"rec e^{+}e^{-} pairs","L");
+        l1.AddEntry(hRap_sig,Form("rec e^{+}e^{-} pairs with %.1f < #it{m} < %.1f GeV/#it{c}^{2}",cutMLow,cutMUpp),"L");
+    } else {
+        l1.AddEntry(hRap_rec,Form("rec %s pairs",sCl.Data()),"L");
+        l1.AddEntry(hRap_sig,Form("rec %s pairs with %.1f < #it{m} < %.1f GeV/#it{c}^{2}",sCl.Data(),cutMLow,cutMUpp),"L");
+    }
     l1.SetTextSize(0.032);
     l1.SetBorderSize(0);
     l1.SetFillStyle(0);
-    l1.SetMargin(0.15);
+    l1.SetMargin(0.14);
     l1.Draw();
     // print the canvas
-    c1.Print(Form("%smerged_%shAxE_rapDists.pdf",outDir.Data(),outSubDir.Data()));
+    if(genKine) c1.Print(Form("%smerged_%shAxE_genKine_rapDists.pdf",outDir.Data(),outSubDir.Data()));
+    else        c1.Print(Form("%smerged_%shAxE_rapDists.pdf",outDir.Data(),outSubDir.Data()));
+    
     // plot AxE
     TCanvas c2("c2","c2",700,600);
     SetCanvas(&c2,kFALSE);
-    c2.SetTopMargin(0.25);
+    c2.SetTopMargin(0.265);
     // x-axis
-    hE->GetXaxis()->SetDecimals(1);
-    hE->GetXaxis()->SetLabelOffset(0.01);
-    hE->GetXaxis()->SetTitleOffset(1.2);
+    hA->GetXaxis()->SetDecimals(1);
+    hA->GetXaxis()->SetLabelOffset(0.01);
+    hA->GetXaxis()->SetTitleOffset(1.2);
     // y-axis
-    hE->GetYaxis()->SetDecimals(1);
-    hE->GetYaxis()->SetMaxDigits(3);
-    hE->GetYaxis()->SetTitle(Form("Acc#times#it{#varepsilon} = #it{N}_{rec %s pairs} / #it{N}_{gen events}",sCl.Data()));
+    hA->GetYaxis()->SetDecimals(1);
+    hA->GetYaxis()->SetMaxDigits(3);
+    hA->GetYaxis()->SetTitle("Acc#times#it{#varepsilon} = #it{N}_{sig} / #it{N}_{gen}");
     // style
     gStyle->SetEndErrorSize(1); 
-    hE->SetBit(TH1::kNoStats);
-    hE->SetBit(TH1::kNoTitle);
-    hE->GetYaxis()->SetRangeUser(0.,1.4);
-    SetMarkerProperties(hAxE,kGreen+1);
-    SetMarkerProperties(hA,kBlue+1);
-    SetMarkerProperties(hE,kRed+1);
+    hA->SetBit(TH1::kNoStats);
+    hA->SetBit(TH1::kNoTitle);
+    hA->GetYaxis()->SetRangeUser(0.,1.05);
+    SetMarkerProperties(hA,kRed+1);
+    SetMarkerProperties(hERec,kGreen+1);
+    SetMarkerProperties(hESig,kMagenta+1);
+    SetMarkerProperties(hAxE,kBlue+1);
     // print the histogram
-    hE->Draw("E1");
-    hA->Draw("E1 SAME");
+    hA->Draw("E1");
+    hERec->Draw("E1 SAME");
+    hESig->Draw("E1 SAME");
     hAxE->Draw("E1 SAME");
     // legends
-    Int_t nRows2 = 4;
-    TLegend l2(0.12,0.925-nRows2*0.04,0.40,0.925);
+    Int_t nRows2 = 5;
+    TLegend l2(0.12,0.94-nRows2*0.04,0.40,0.94);
     l2.AddEntry((TObject*)0,Form("#bf{%s}",names[iSim].Data()),"");
-    l2.AddEntry(hAxE,Form("Acc#times#it{#varepsilon} (total = %.1f%%)",totalAxE*100.),"EPL");
     l2.AddEntry(hA,"acceptance","EPL");
-    l2.AddEntry(hE,"efficiency","EPL");
+    l2.AddEntry(hERec,"reconstruction eff","EPL");
+    l2.AddEntry(hESig,"signal eff","EPL");
+    l2.AddEntry(hAxE,Form("Acc#times#it{#varepsilon} (total = %.1f%%)",totalAxE*100.),"EPL");
     l2.SetTextSize(0.032);
     l2.SetBorderSize(0);
     l2.SetFillStyle(0);
@@ -475,9 +519,9 @@ void AxE()
     if(doSupercls) nRows3++;
     if(cutE > 0.)  nRows3++;
     if(cutM > 0.)  nRows3++;
-    TLegend l3(0.60,0.925-nRows3*0.04,0.90,0.925);
+    TLegend l3(0.60,0.94-nRows3*0.04,0.90,0.94);
     l3.AddEntry((TObject*)0,"#bf{selections}:","");
-    if(doSupercls) l3.AddEntry((TObject*)0,Form("superclusterizer (%.0f GeV,%.0f cm)",minSeedE,radius),"");
+    if(doSupercls) l3.AddEntry((TObject*)0,Form("superclusterizer (%.0f GeV, %.0f cm)",minSeedE,radius),"");
     if(cutE > 0.)  l3.AddEntry((TObject*)0,Form("#it{E}_{%s} > %.0f GeV",sCl.Data(),cutE),"");
     if(cutM > 0.)  l3.AddEntry((TObject*)0,Form("mass filtering (%.1f)",cutM),"");
     l3.AddEntry((TObject*)0,Form("%.1f < #it{m}_{%s pair} < %.1f GeV/#it{c}^{2}",cutMLow,sCl.Data(),cutMUpp),"");
@@ -488,8 +532,9 @@ void AxE()
     l3.Draw();
     // title
     ltx->DrawLatex(0.5,0.96,"ALICE Run-4 Simulation: Pb#minusPb UPC at #sqrt{#it{s}_{NN}} = 5.02 TeV");
-    c2.Print(Form("%smerged_%shAxE.pdf",outDir.Data(),outSubDir.Data()));
-
+    if(genKine) c2.Print(Form("%smerged_%shAxE_genKine.pdf",outDir.Data(),outSubDir.Data()));
+    else        c2.Print(Form("%smerged_%shAxE.pdf",outDir.Data(),outSubDir.Data()));
+    
     return;
 }
 
